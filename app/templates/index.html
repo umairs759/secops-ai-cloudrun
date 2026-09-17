@@ -1,382 +1,1756 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SecOps-AI Sentinel | Autonomous Cyber Threat Triage</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="SecOps-AI Sentinel — Autonomous Cyber Threat Triage & Incident Response Copilot" />
+  <title>SecOps-AI Sentinel | Mission Control</title>
   <link rel="icon" type="image/svg+xml" href="/static/logo.svg" />
 
-  <!-- Clean CDNs with zero markdown wrappers -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    /* ============================================================
+       DESIGN TOKENS
+    ============================================================ */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+    :root {
+      --bg-0: #04060B;
+      --bg-1: #070A12;
+      --bg-2: #0A0F1C;
+      --panel: #0C1220;
+      --panel-2: #101827;
+      --border: #1A2332;
+      --border-2: #232E42;
+      --text-0: #F1F5F9;
+      --text-1: #CBD5E1;
+      --text-2: #94A3B8;
+      --text-3: #64748B;
+      --cyan: #06B6D4;
+      --cyan-glow: rgba(6, 182, 212, 0.35);
+      --emerald: #10B981;
+      --amber: #F59E0B;
+      --rose: #F43F5E;
+      --violet: #8B5CF6;
+      --indigo: #6366F1;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-0);
+      color: var(--text-0);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
 
     body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: #07090E;
-      background-image: radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.08) 0%, transparent 60%);
+      background-image:
+        radial-gradient(circle at 15% 0%, rgba(6, 182, 212, 0.06) 0%, transparent 45%),
+        radial-gradient(circle at 85% 100%, rgba(139, 92, 246, 0.05) 0%, transparent 45%);
+      background-attachment: fixed;
+      overflow-x: hidden;
     }
 
-    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .font-mono { font-family: 'JetBrains Mono', 'SF Mono', Consolas, monospace; }
+    .num { font-variant-numeric: tabular-nums; }
 
-    .glass-panel {
-      background: rgba(13, 19, 33, 0.75);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 1px solid rgba(30, 41, 59, 0.8);
-    }
-
-    .glow-cyan { box-shadow: 0 0 30px -5px rgba(6, 182, 212, 0.25); }
-
-    /* Bulletproof fallback for hidden containers */
-    .hidden { display: none !important; }
-
+    /* ============================================================
+       SCROLLBAR
+    ============================================================ */
     ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: rgba(15,23,42,0.5); }
-    ::-webkit-scrollbar-thumb { background: rgba(6,182,212,0.35); border-radius: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, rgba(6,182,212,0.25), rgba(99,102,241,0.25));
+      border-radius: 4px;
+      border: 2px solid var(--bg-0);
+    }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(6,182,212,0.5); }
+
+    /* ============================================================
+       GLASS PANELS
+    ============================================================ */
+    .panel {
+      background: linear-gradient(180deg, rgba(12,18,32,0.9), rgba(10,15,28,0.75));
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      transition: all 0.2s ease;
+    }
+    .panel-hover:hover {
+      border-color: var(--border-2);
+      box-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.6);
+    }
+
+    /* ============================================================
+       SIDEBAR
+    ============================================================ */
+    .sidebar {
+      width: 240px;
+      background: linear-gradient(180deg, rgba(7,10,18,0.98), rgba(4,6,11,0.98));
+      border-right: 1px solid var(--border);
+      transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .sidebar.collapsed { width: 68px; }
+    .sidebar.collapsed .nav-label,
+    .sidebar.collapsed .brand-text,
+    .sidebar.collapsed .user-info { display: none; }
+    .sidebar.collapsed .nav-item { justify-content: center; padding: 12px; }
+    .sidebar.collapsed .brand { justify-content: center; padding: 0; }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      color: var(--text-2);
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      position: relative;
+      user-select: none;
+    }
+    .nav-item:hover {
+      background: rgba(30, 41, 59, 0.4);
+      color: var(--text-0);
+    }
+    .nav-item.active {
+      background: linear-gradient(90deg, rgba(6,182,212,0.12), rgba(6,182,212,0.02));
+      color: var(--cyan);
+      border: 1px solid rgba(6,182,212,0.2);
+    }
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 20%; bottom: 20%;
+      width: 3px;
+      background: var(--cyan);
+      border-radius: 0 4px 4px 0;
+      box-shadow: 0 0 12px var(--cyan-glow);
+    }
+
+    /* ============================================================
+       BUTTONS
+    ============================================================ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 9px 16px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      border: 1px solid transparent;
+      white-space: nowrap;
+      user-select: none;
+    }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #06B6D4, #6366F1);
+      color: white;
+      box-shadow: 0 4px 20px -4px rgba(6, 182, 212, 0.5), inset 0 1px 0 rgba(255,255,255,0.15);
+    }
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 26px -4px rgba(6, 182, 212, 0.65), inset 0 1px 0 rgba(255,255,255,0.2);
+    }
+    .btn-primary:active:not(:disabled) { transform: translateY(0); }
+
+    .btn-ghost {
+      background: rgba(30, 41, 59, 0.4);
+      color: var(--text-1);
+      border-color: var(--border-2);
+    }
+    .btn-ghost:hover:not(:disabled) {
+      background: rgba(30, 41, 59, 0.75);
+      color: var(--text-0);
+      border-color: #334155;
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #F43F5E, #DC2626);
+      color: white;
+      box-shadow: 0 4px 20px -4px rgba(244, 63, 94, 0.5);
+    }
+
+    .btn-icon {
+      padding: 8px;
+      width: 36px; height: 36px;
+    }
+
+    /* ============================================================
+       CARDS / STATS
+    ============================================================ */
+    .stat-card {
+      position: relative;
+      overflow: hidden;
+      padding: 18px 20px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(16,24,39,0.7), rgba(12,18,32,0.5));
+      border: 1px solid var(--border);
+      transition: all 0.2s ease;
+    }
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 100px; height: 100px;
+      background: radial-gradient(circle, var(--glow, rgba(6,182,212,0.1)) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .stat-card:hover {
+      border-color: var(--border-2);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px -12px rgba(0,0,0,0.7);
+    }
+    .stat-card[data-accent="cyan"]    { --glow: rgba(6,182,212,0.15); }
+    .stat-card[data-accent="emerald"] { --glow: rgba(16,185,129,0.15); }
+    .stat-card[data-accent="amber"]   { --glow: rgba(245,158,11,0.15); }
+    .stat-card[data-accent="violet"]  { --glow: rgba(139,92,246,0.15); }
+
+    /* ============================================================
+       BADGES
+    ============================================================ */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border: 1px solid;
+    }
+    .badge-critical { background: rgba(244,63,94,0.12); color: #FB7185; border-color: rgba(244,63,94,0.35); }
+    .badge-high     { background: rgba(245,158,11,0.12); color: #FBBF24; border-color: rgba(245,158,11,0.35); }
+    .badge-medium   { background: rgba(6,182,212,0.12); color: #22D3EE; border-color: rgba(6,182,212,0.35); }
+    .badge-low      { background: rgba(16,185,129,0.12); color: #34D399; border-color: rgba(16,185,129,0.35); }
+    .badge-neutral  { background: rgba(100,116,139,0.15); color: #94A3B8; border-color: rgba(100,116,139,0.3); }
+
+    /* ============================================================
+       RADAR ANIMATION
+    ============================================================ */
+    .radar {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle, rgba(6,182,212,0.08) 0%, transparent 70%),
+        repeating-radial-gradient(circle, transparent 0, transparent 24%, rgba(6,182,212,0.06) 25%, transparent 26%),
+        linear-gradient(0deg, transparent 49.5%, rgba(6,182,212,0.08) 50%, transparent 50.5%),
+        linear-gradient(90deg, transparent 49.5%, rgba(6,182,212,0.08) 50%, transparent 50.5%);
+      overflow: hidden;
+    }
+    .radar::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, transparent 0deg, transparent 300deg, rgba(6,182,212,0.5) 350deg, rgba(6,182,212,0.8) 360deg);
+      animation: radar-spin 4s linear infinite;
+      mask: radial-gradient(circle, black 0%, black 70%, transparent 71%);
+      -webkit-mask: radial-gradient(circle, black 0%, black 70%, transparent 71%);
+    }
+    @keyframes radar-spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .radar-dot {
+      position: absolute;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #F43F5E;
+      box-shadow: 0 0 12px 2px rgba(244,63,94,0.6);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 0.3; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    /* ============================================================
+       TEXTAREA / INPUTS
+    ============================================================ */
+    .input-field {
+      width: 100%;
+      background: rgba(4,6,11,0.9);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: var(--text-0);
+      font-size: 13px;
+      transition: all 0.18s ease;
+      outline: none;
+    }
+    .input-field::placeholder { color: var(--text-3); }
+    .input-field:focus {
+      border-color: rgba(6,182,212,0.6);
+      box-shadow: 0 0 0 3px rgba(6,182,212,0.12);
+      background: rgba(4,6,11,1);
+    }
+
+    textarea.code-area {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      line-height: 1.65;
+      resize: vertical;
+      min-height: 220px;
+    }
+
+    /* ============================================================
+       TABS
+    ============================================================ */
+    .tab {
+      position: relative;
+      padding: 10px 16px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-2);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .tab:hover { color: var(--text-0); }
+    .tab.active {
+      color: var(--cyan);
+      border-bottom-color: var(--cyan);
+    }
+
+    /* ============================================================
+       TOAST
+    ============================================================ */
+    .toast-container {
+      position: fixed;
+      top: 76px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+    .toast {
+      pointer-events: auto;
+      min-width: 300px;
+      max-width: 420px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: rgba(12,18,32,0.98);
+      border: 1px solid var(--border-2);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 12px 40px -8px rgba(0,0,0,0.7);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      animation: toast-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .toast.removing { animation: toast-out 0.25s ease forwards; }
+    @keyframes toast-in {
+      from { opacity: 0; transform: translateX(40px) scale(0.95); }
+      to   { opacity: 1; transform: translateX(0) scale(1); }
+    }
+    @keyframes toast-out {
+      to { opacity: 0; transform: translateX(40px) scale(0.95); }
+    }
+    .toast-success { border-left: 3px solid var(--emerald); }
+    .toast-error   { border-left: 3px solid var(--rose); }
+    .toast-info    { border-left: 3px solid var(--cyan); }
+    .toast-warn    { border-left: 3px solid var(--amber); }
+
+    /* ============================================================
+       LOADING SHIMMER
+    ============================================================ */
+    .shimmer {
+      background: linear-gradient(90deg, rgba(30,41,59,0.3) 0%, rgba(30,41,59,0.6) 50%, rgba(30,41,59,0.3) 100%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 6px;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ============================================================
+       ACTIVITY FEED
+    ============================================================ */
+    .feed-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px dashed var(--border);
+      animation: fade-slide 0.4s ease backwards;
+    }
+    .feed-item:last-child { border-bottom: none; }
+    @keyframes fade-slide {
+      from { opacity: 0; transform: translateX(-8px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ============================================================
+       PROGRESS BAR
+    ============================================================ */
+    .progress-track {
+      height: 6px;
+      background: rgba(30,41,59,0.5);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ============================================================
+       MISC UTILS
+    ============================================================ */
+    .divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); }
+    .glow-text { text-shadow: 0 0 20px currentColor; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { scrollbar-width: none; }
+
+    .hidden { display: none !important; }
+    .fade-in { animation: fadeIn 0.35s ease; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Dropzone */
+    .dropzone.dragover {
+      border-color: var(--cyan);
+      background: rgba(6,182,212,0.05);
+    }
+
+    /* Pulse ring */
+    .pulse-ring {
+      position: relative;
+    }
+    .pulse-ring::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0.3;
+      animation: pulse-ring 2s ease-out infinite;
+    }
+    @keyframes pulse-ring {
+      0%   { transform: scale(0.9); opacity: 0.5; }
+      100% { transform: scale(1.7); opacity: 0; }
+    }
+
+    /* MITRE chip */
+    .mitre-chip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 11px 13px;
+      border-radius: 10px;
+      background: rgba(4,6,11,0.7);
+      border: 1px solid var(--border);
+      transition: all 0.15s ease;
+    }
+    .mitre-chip:hover {
+      border-color: rgba(6,182,212,0.4);
+      background: rgba(6,182,212,0.04);
+      transform: translateX(2px);
+    }
+
+    /* IoC row */
+    .ioc-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      padding: 11px 13px;
+      background: rgba(4,6,11,0.6);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      transition: all 0.15s ease;
+    }
+    .ioc-row:hover {
+      border-color: rgba(244,63,94,0.35);
+      background: rgba(244,63,94,0.03);
+    }
+
+    /* Terminal output */
+    .terminal {
+      background: #02040A;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      overflow: hidden;
+    }
+    .terminal-header {
+      padding: 9px 14px;
+      background: rgba(10,15,28,0.8);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-3);
+    }
+    .terminal-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+    .terminal-body {
+      padding: 14px 16px;
+      max-height: 320px;
+      overflow-y: auto;
+      color: #4ADE80;
+      line-height: 1.7;
+    }
+    .terminal-body .cmd-line { color: #4ADE80; }
+    .terminal-body .cmd-line::before { content: '$ '; color: var(--cyan); }
+
+    /* Status pill */
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 11px;
+      border-radius: 999px;
+      background: rgba(16,185,129,0.08);
+      border: 1px solid rgba(16,185,129,0.3);
+      font-size: 11px;
+      font-weight: 600;
+      color: #34D399;
+    }
+    .status-pill .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #34D399;
+      box-shadow: 0 0 8px #34D399;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    /* scrollbar for outputs */
+    .output-scroll { max-height: 480px; overflow-y: auto; padding-right: 6px; }
   </style>
 </head>
-<body class="text-slate-200 min-h-screen flex flex-col justify-between selection:bg-cyan-500 selection:text-black">
 
-  <!-- Top Navigation -->
-  <header class="border-b border-slate-800/80 bg-slate-950/80 sticky top-0 z-50 backdrop-blur-xl">
-    <div class="max-w-7xl mx-auto px-4 lg:px-8 h-16 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 via-indigo-600 to-purple-600 flex items-center justify-center glow-cyan shadow-lg shadow-cyan-500/10 border border-cyan-400/30">
-          <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
-        </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <span class="text-lg font-extrabold tracking-tight text-white">SecOps<span class="text-cyan-400">AI</span></span>
-            <span class="text-[10px] tracking-widest font-mono uppercase px-2 py-0.5 rounded-full bg-cyan-950/80 text-cyan-400 border border-cyan-800/60 font-semibold">Sentinel v1.0</span>
+<body>
+
+  <!-- ============================================================
+       TOAST CONTAINER
+  ============================================================ -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- ============================================================
+       APP SHELL
+  ============================================================ -->
+  <div class="flex min-h-screen">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside id="sidebar" class="sidebar flex flex-col fixed top-0 left-0 h-screen z-40">
+      <!-- Brand -->
+      <div class="flex items-center gap-3 px-4 h-16 border-b" style="border-color: var(--border);">
+        <div class="brand flex items-center gap-3 w-full">
+          <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+               style="background: linear-gradient(135deg, #06B6D4, #6366F1); box-shadow: 0 4px 18px -4px rgba(6,182,212,0.6);">
+            <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
           </div>
-          <p class="text-[11px] text-slate-400 hidden sm:block">Enterprise Autonomous Incident Copilot</p>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-xs">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span class="text-slate-300 font-mono text-[11px]">SOC Engine Online</span>
-        </div>
-        <a href="https://github.com/umairs759/secops-ai-cloudrun" target="_blank" rel="noopener"
-          class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-xs font-semibold text-slate-200 transition shadow-sm">
-          <i data-lucide="github" class="w-4 h-4"></i>
-          <span>GitHub</span>
-        </a>
-      </div>
-    </div>
-  </header>
-
-  <!-- Main Workstation -->
-  <main class="max-w-7xl mx-auto px-4 lg:px-8 py-8 w-full space-y-8 flex-1">
-
-    <!-- KPI Metric Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div class="glass-panel p-4 rounded-2xl border-slate-800/80 flex items-center justify-between">
-        <div>
-          <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">AI Copilot</p>
-          <h4 class="text-base font-bold text-white mt-0.5">Gemini 1.5 Flash</h4>
-        </div>
-        <div class="w-9 h-9 rounded-xl bg-cyan-950/60 border border-cyan-800/60 flex items-center justify-center text-cyan-400">
-          <i data-lucide="sparkles" class="w-4 h-4"></i>
-        </div>
-      </div>
-
-      <div class="glass-panel p-4 rounded-2xl border-slate-800/80 flex items-center justify-between">
-        <div>
-          <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Target Protocol</p>
-          <h4 class="text-base font-bold text-cyan-400 mt-0.5 font-mono">MITRE ATT&CK</h4>
-        </div>
-        <div class="w-9 h-9 rounded-xl bg-indigo-950/60 border border-indigo-800/60 flex items-center justify-center text-indigo-400">
-          <i data-lucide="crosshair" class="w-4 h-4"></i>
-        </div>
-      </div>
-
-      <div class="glass-panel p-4 rounded-2xl border-slate-800/80 flex items-center justify-between">
-        <div>
-          <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Hosting Model</p>
-          <h4 class="text-base font-bold text-emerald-400 mt-0.5">Cloud Run ($0)</h4>
-        </div>
-        <div class="w-9 h-9 rounded-xl bg-emerald-950/60 border border-emerald-800/60 flex items-center justify-center text-emerald-400">
-          <i data-lucide="cloud" class="w-4 h-4"></i>
-        </div>
-      </div>
-
-      <div class="glass-panel p-4 rounded-2xl border-slate-800/80 flex items-center justify-between">
-        <div>
-          <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Latency Triage</p>
-          <h4 class="text-base font-bold text-amber-400 mt-0.5 font-mono">&lt; 380 ms</h4>
-        </div>
-        <div class="w-9 h-9 rounded-xl bg-amber-950/60 border border-amber-800/60 flex items-center justify-center text-amber-400">
-          <i data-lucide="activity" class="w-4 h-4"></i>
-        </div>
-      </div>
-    </div>
-
-    <!-- Log Ingestion Workspace -->
-    <div class="glass-panel rounded-2xl p-6 border-slate-800/80 shadow-2xl relative overflow-hidden">
-      <div class="flex flex-col gap-5">
-
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-800/60">
-          <div class="flex items-center gap-2.5">
-            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
-            <h3 class="font-bold text-sm tracking-wide text-white">Live Telemetry Ingestion Console</h3>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="text-xs text-slate-400 mr-1">1-Click Scenarios:</span>
-            <button onclick="injectSample('ssh')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-cyan-300 border border-slate-700 font-medium transition flex items-center gap-1.5">
-              <i data-lucide="terminal" class="w-3.5 h-3.5"></i> SSH Brute-Force
-            </button>
-            <button onclick="injectSample('sqli')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-rose-300 border border-slate-700 font-medium transition flex items-center gap-1.5">
-              <i data-lucide="code" class="w-3.5 h-3.5"></i> Web SQL Injection
-            </button>
+          <div class="brand-text flex-1 overflow-hidden">
+            <div class="flex items-center gap-1.5">
+              <span class="text-[15px] font-extrabold tracking-tight text-white">SecOps<span style="color: var(--cyan)">AI</span></span>
+            </div>
+            <p class="text-[10px] font-mono tracking-widest uppercase" style="color: var(--text-3)">Sentinel v1.0</p>
           </div>
         </div>
+      </div>
 
-        <div>
-          <textarea id="logStream" rows="7" placeholder="Paste raw security logs (SSH auth.log, Nginx access logs, iptables traces) or click a 1-Click scenario above..."
-            class="w-full bg-slate-950/90 border border-slate-800/90 rounded-xl p-4 font-mono text-xs text-slate-300 focus:outline-none focus:border-cyan-500/80 focus:ring-1 focus:ring-cyan-500/50 transition resize-none"></textarea>
+      <!-- Nav -->
+      <nav class="flex-1 p-3 space-y-1 overflow-y-auto no-scrollbar">
+        <div class="text-[10px] font-bold uppercase tracking-widest px-3 pt-3 pb-2" style="color: var(--text-3)">Operations</div>
+
+        <div class="nav-item active" data-view="dashboard" onclick="switchView('dashboard')">
+          <i data-lucide="layout-dashboard" class="w-[18px] h-[18px] flex-shrink-0"></i>
+          <span class="nav-label">Mission Control</span>
         </div>
 
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pt-1">
-          <div class="flex items-center gap-3">
-            <input type="password" id="userKey" placeholder="Optional: Custom Gemini API Key"
-              class="bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-300 focus:outline-none focus:border-cyan-500 w-72">
-            <span class="text-[11px] text-slate-500 hidden sm:inline">(Leave empty for auto heuristic engine)</span>
-          </div>
+        <div class="nav-item" data-view="console" onclick="switchView('console')">
+          <i data-lucide="terminal-square" class="w-[18px] h-[18px] flex-shrink-0"></i>
+          <span class="nav-label">Ingestion Console</span>
+        </div>
 
-          <button id="inspectBtn" onclick="dispatchAnalysis()"
-            class="px-7 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2.5 glow-cyan transition shadow-lg shadow-cyan-500/20">
-            <i data-lucide="scan-line" class="w-4 h-4"></i>
-            <span>Execute AI Triage</span>
+        <div class="nav-item" data-view="analysis" onclick="switchView('analysis')">
+          <i data-lucide="activity" class="w-[18px] h-[18px] flex-shrink-0"></i>
+          <span class="nav-label">Analysis Report</span>
+          <span id="analysisDot" class="ml-auto hidden w-2 h-2 rounded-full bg-rose-500"></span>
+        </div>
+
+        <div class="text-[10px] font-bold uppercase tracking-widest px-3 pt-5 pb-2" style="color: var(--text-3)">Library</div>
+
+        <div class="nav-item" data-view="scenarios" onclick="switchView('scenarios')">
+          <i data-lucide="book-marked" class="w-[18px] h-[18px] flex-shrink-0"></i>
+          <span class="nav-label">Attack Scenarios</span>
+        </div>
+
+        <div class="nav-item" data-view="mitre" onclick="switchView('mitre')">
+          <i data-lucide="crosshair" class="w-[18px] h-[18px] flex-shrink-0"></i>
+          <span class="nav-label">MITRE Matrix</span>
+        </div>
+
+        <div class="nav-item" data-view="settings" onclick="switchView('settings')">
+          <i data-lucide="settings" class="w-[18px] h-[18px] flex-shrink-0"></i>
+          <span class="nav-label">Configuration</span>
+        </div>
+      </nav>
+
+      <!-- Status -->
+      <div class="p-3 border-t" style="border-color: var(--border);">
+        <div class="flex items-center gap-3 px-2 py-2 rounded-lg" style="background: rgba(16,185,129,0.05);">
+          <div class="relative flex-shrink-0">
+            <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+            <div class="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-60"></div>
+          </div>
+          <div class="user-info flex-1 min-w-0">
+            <p class="text-[11px] font-semibold text-emerald-400">Engine Online</p>
+            <p class="text-[10px] font-mono truncate" style="color: var(--text-3)">latency &lt;380ms</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ================= MAIN ================= -->
+    <div id="mainWrap" class="flex-1 min-w-0 transition-all duration-300" style="margin-left: 240px;">
+
+      <!-- ============ TOPBAR ============ -->
+      <header class="sticky top-0 z-30 h-16 flex items-center justify-between px-6 border-b"
+              style="background: rgba(7,10,18,0.85); backdrop-filter: blur(20px); border-color: var(--border);">
+        <div class="flex items-center gap-4">
+          <button onclick="toggleSidebar()" class="btn btn-ghost btn-icon">
+            <i data-lucide="panel-left" class="w-4 h-4"></i>
           </button>
+          <div>
+            <h1 id="pageTitle" class="text-base font-bold text-white leading-tight">Mission Control</h1>
+            <p id="pageSubtitle" class="text-[11.5px]" style="color: var(--text-3)">Real-time security operations overview</p>
+          </div>
         </div>
 
-      </div>
-    </div>
+        <div class="flex items-center gap-3">
+          <div class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg" style="background: rgba(4,6,11,0.7); border: 1px solid var(--border);">
+            <i data-lucide="search" class="w-3.5 h-3.5" style="color: var(--text-3)"></i>
+            <input type="text" placeholder="Search IoCs, IPs, techniques..."
+                   class="bg-transparent outline-none text-xs w-52" style="color: var(--text-1)" />
+            <kbd class="text-[9px] px-1.5 py-0.5 rounded font-mono" style="background: var(--bg-2); color: var(--text-3); border: 1px solid var(--border);">⌘K</kbd>
+          </div>
 
-    <!-- Results Dashboard Section (Hidden by Default) -->
-    <div id="resultsDashboard" class="hidden space-y-6">
+          <div class="status-pill">
+            <span class="dot"></span>
+            <span class="font-mono">ALL SYSTEMS NOMINAL</span>
+          </div>
 
-      <!-- Severity Banner -->
-      <div id="statusBanner" class="p-6 rounded-2xl border transition-all duration-300">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div class="flex items-start gap-4">
-            <div id="statusIndicator" class="w-14 h-14 rounded-2xl flex items-center justify-center font-bold text-2xl flex-shrink-0"></div>
-            <div class="space-y-1">
-              <div class="flex flex-wrap items-center gap-3">
-                <span id="severityTag" class="text-xs font-extrabold px-3 py-0.5 rounded-full tracking-wider uppercase"></span>
-                <span id="threatScoreTag" class="text-xs font-mono px-2.5 py-0.5 rounded-full bg-slate-900 border border-slate-800 text-slate-300"></span>
-                <span id="engineTag" class="text-[11px] text-slate-400 font-mono"></span>
-              </div>
-              <h2 id="incidentTitle" class="text-xl font-bold text-white tracking-tight"></h2>
-              <p id="incidentSummary" class="text-sm text-slate-300 max-w-4xl leading-relaxed"></p>
+          <button class="btn btn-ghost btn-icon relative" onclick="toast('info', 'Notifications', 'No new alerts in queue')">
+            <i data-lucide="bell" class="w-4 h-4"></i>
+            <span id="notifDot" class="hidden absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500"></span>
+          </button>
+
+          <div class="flex items-center gap-2 pl-3 border-l" style="border-color: var(--border);">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-[11px] font-bold text-white"
+                 style="background: linear-gradient(135deg, #06B6D4, #8B5CF6);">SA</div>
+            <div class="hidden md:block">
+              <p class="text-xs font-semibold text-white leading-tight">SOC Analyst</p>
+              <p class="text-[10px] font-mono" style="color: var(--text-3)">Tier-3 Responder</p>
             </div>
           </div>
         </div>
-      </div>
+      </header>
 
-      <!-- Analysis Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- ============ CONTENT ============ -->
+      <main class="p-6 space-y-6">
 
-        <div class="glass-panel rounded-2xl p-5 space-y-5 border-slate-800/80">
-          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-              <i data-lucide="target" class="w-4 h-4 text-cyan-400"></i> MITRE ATT&CK Mapping
-            </h3>
+        <!-- =====================================================
+             VIEW: DASHBOARD
+        ===================================================== -->
+        <section id="view-dashboard" class="view space-y-6">
+
+          <!-- Stat cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="stat-card" data-accent="cyan">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-[11px] font-semibold uppercase tracking-wider" style="color: var(--text-3)">Engine Status</p>
+                  <h3 class="text-2xl font-extrabold text-white mt-2 num">Operational</h3>
+                  <p class="text-[11px] mt-1 font-mono" style="color: var(--cyan)">Dual-Engine Ready</p>
+                </div>
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.25);">
+                  <i data-lucide="cpu" class="w-4.5 h-4.5" style="color: var(--cyan)"></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="stat-card" data-accent="emerald">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-[11px] font-semibold uppercase tracking-wider" style="color: var(--text-3)">Triage Latency</p>
+                  <h3 class="text-2xl font-extrabold text-white mt-2 num">&lt;380<span class="text-base font-bold ml-1" style="color: var(--text-3)">ms</span></h3>
+                  <p class="text-[11px] mt-1 font-mono" style="color: var(--emerald)">Edge Container</p>
+                </div>
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.25);">
+                  <i data-lucide="zap" class="w-4.5 h-4.5" style="color: var(--emerald)"></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="stat-card" data-accent="amber">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-[11px] font-semibold uppercase tracking-wider" style="color: var(--text-3)">MITRE Coverage</p>
+                  <h3 class="text-2xl font-extrabold text-white mt-2 num">v14</h3>
+                  <p class="text-[11px] mt-1 font-mono" style="color: var(--amber)">Enterprise Matrix</p>
+                </div>
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.25);">
+                  <i data-lucide="target" class="w-4.5 h-4.5" style="color: var(--amber)"></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="stat-card" data-accent="violet">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-[11px] font-semibold uppercase tracking-wider" style="color: var(--text-3)">Active Session</p>
+                  <h3 class="text-2xl font-extrabold text-white mt-2 num" id="sessionCount">0</h3>
+                  <p class="text-[11px] mt-1 font-mono" style="color: var(--violet)">Analyses Run</p>
+                </div>
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: rgba(139,92,246,0.1); border: 1px solid rgba(139,92,246,0.25);">
+                  <i data-lucide="bar-chart-3" class="w-4.5 h-4.5" style="color: var(--violet)"></i>
+                </div>
+              </div>
+            </div>
           </div>
-          <div id="mitreMatrix" class="space-y-2.5"></div>
 
-          <div class="pt-2 border-t border-slate-800/80">
-            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-2">
-              <i data-lucide="server" class="w-3.5 h-3.5 text-indigo-400"></i> Affected Subsystems
-            </h4>
-            <div id="subsystemsContainer" class="flex flex-wrap gap-2"></div>
+          <!-- Row 2: radar + activity -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Radar -->
+            <div class="panel p-6 lg:col-span-1">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i data-lucide="radar" class="w-4 h-4" style="color: var(--cyan)"></i>
+                    Live Threat Radar
+                  </h3>
+                  <p class="text-[11px] mt-0.5" style="color: var(--text-3)">Perimeter scan — 360° sweep</p>
+                </div>
+                <span class="badge badge-critical">
+                  <span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span>
+                  LIVE
+                </span>
+              </div>
+              <div class="radar mx-auto max-w-[280px]">
+                <div class="radar-dot" style="top: 32%; left: 62%; animation-delay: 0s;"></div>
+                <div class="radar-dot" style="top: 68%; left: 28%; animation-delay: 0.6s;"></div>
+                <div class="radar-dot" style="top: 45%; left: 78%; animation-delay: 1.2s;"></div>
+                <div class="radar-dot" style="top: 78%; left: 55%; animation-delay: 0.3s; background:#F59E0B; box-shadow: 0 0 12px 2px rgba(245,158,11,0.6);"></div>
+              </div>
+              <div class="grid grid-cols-3 gap-2 mt-5 pt-4 border-t" style="border-color: var(--border);">
+                <div class="text-center">
+                  <p class="text-lg font-extrabold text-rose-400 num">4</p>
+                  <p class="text-[10px] uppercase tracking-wider" style="color: var(--text-3)">Critical</p>
+                </div>
+                <div class="text-center border-x" style="border-color: var(--border);">
+                  <p class="text-lg font-extrabold text-amber-400 num">7</p>
+                  <p class="text-[10px] uppercase tracking-wider" style="color: var(--text-3)">Elevated</p>
+                </div>
+                <div class="text-center">
+                  <p class="text-lg font-extrabold text-emerald-400 num">24</p>
+                  <p class="text-[10px] uppercase tracking-wider" style="color: var(--text-3)">Contained</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Activity feed -->
+            <div class="panel p-6 lg:col-span-2">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i data-lucide="activity" class="w-4 h-4" style="color: var(--emerald)"></i>
+                    Security Operations Feed
+                  </h3>
+                  <p class="text-[11px] mt-0.5" style="color: var(--text-3)">Latest event stream from ingestion pipeline</p>
+                </div>
+                <button class="btn btn-ghost text-[11px]" onclick="toast('info','Feed','Full log stream opened')">
+                  <i data-lucide="external-link" class="w-3.5 h-3.5"></i> View All
+                </button>
+              </div>
+
+              <div id="activityFeed" class="space-y-1">
+                <!-- populated by JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 3: Quick actions -->
+          <div class="panel p-6">
+            <div class="flex items-center justify-between mb-5">
+              <div>
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                  <i data-lucide="rocket" class="w-4 h-4" style="color: var(--violet)"></i>
+                  Quick Response Actions
+                </h3>
+                <p class="text-[11px] mt-0.5" style="color: var(--text-3)">One-click telemetry injection for rapid validation</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div onclick="quickAnalyze('ssh')" class="p-5 rounded-xl cursor-pointer panel-hover transition"
+                   style="background: rgba(4,6,11,0.6); border: 1px solid var(--border);">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3);">
+                    <i data-lucide="terminal" class="w-4 h-4" style="color: var(--amber)"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm font-bold text-white">SSH Brute-Force</p>
+                    <p class="text-[10.5px] font-mono" style="color: var(--text-3)">auth.log • T1110.001</p>
+                  </div>
+                </div>
+                <p class="text-xs leading-relaxed" style="color: var(--text-2)">Simulate distributed credential stuffing against privileged administrative accounts.</p>
+              </div>
+
+              <div onclick="quickAnalyze('sqli')" class="p-5 rounded-xl cursor-pointer panel-hover transition"
+                   style="background: rgba(4,6,11,0.6); border: 1px solid var(--border);">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background: rgba(244,63,94,0.1); border: 1px solid rgba(244,63,94,0.3);">
+                    <i data-lucide="code-2" class="w-4 h-4" style="color: var(--rose)"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm font-bold text-white">Web SQL Injection</p>
+                    <p class="text-[10.5px] font-mono" style="color: var(--text-3)">access.log • T1190</p>
+                  </div>
+                </div>
+                <p class="text-xs leading-relaxed" style="color: var(--text-2)">Simulate union-based database extraction via sqlmap against public web services.</p>
+              </div>
+
+              <div onclick="switchView('console')" class="p-5 rounded-xl cursor-pointer panel-hover transition"
+                   style="background: linear-gradient(135deg, rgba(6,182,212,0.08), rgba(99,102,241,0.08)); border: 1px solid rgba(6,182,212,0.3);">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background: rgba(6,182,212,0.15); border: 1px solid rgba(6,182,212,0.4);">
+                    <i data-lucide="upload-cloud" class="w-4 h-4" style="color: var(--cyan)"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm font-bold text-white">Custom Telemetry</p>
+                    <p class="text-[10.5px] font-mono" style="color: var(--cyan)">Paste / Upload</p>
+                  </div>
+                </div>
+                <p class="text-xs leading-relaxed" style="color: var(--text-2)">Ingest custom logs, upload raw event files, or configure your own Gemini key.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =====================================================
+             VIEW: CONSOLE
+        ===================================================== -->
+        <section id="view-console" class="view hidden space-y-6">
+
+          <div class="panel p-6">
+            <!-- Console header -->
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b" style="border-color: var(--border);">
+              <div>
+                <h2 class="text-base font-bold text-white flex items-center gap-2.5">
+                  <i data-lucide="terminal-square" class="w-5 h-5" style="color: var(--cyan)"></i>
+                  Telemetry Ingestion Console
+                </h2>
+                <p class="text-xs mt-1" style="color: var(--text-3)">Stream raw security logs into the AI triage pipeline</p>
+              </div>
+
+              <!-- Input tabs -->
+              <div class="flex items-center gap-1 p-1 rounded-xl" style="background: rgba(4,6,11,0.7); border: 1px solid var(--border);">
+                <button class="tab-input active px-4 py-1.5 text-xs font-semibold rounded-lg transition" data-input="paste" onclick="switchInputTab('paste')" style="color: var(--cyan); background: rgba(6,182,212,0.12);">Paste</button>
+                <button class="tab-input px-4 py-1.5 text-xs font-semibold rounded-lg transition" data-input="upload" onclick="switchInputTab('upload')" style="color: var(--text-2);">Upload</button>
+                <button class="tab-input px-4 py-1.5 text-xs font-semibold rounded-lg transition" data-input="samples" onclick="switchInputTab('samples')" style="color: var(--text-2);">Scenarios</button>
+              </div>
+            </div>
+
+            <!-- PASTE TAB -->
+            <div id="input-paste" class="input-tab pt-5">
+              <div class="flex items-center justify-between mb-2.5">
+                <label class="text-[11px] font-bold uppercase tracking-wider" style="color: var(--text-2)">Raw Telemetry Stream</label>
+                <div class="flex items-center gap-2">
+                  <button class="btn btn-ghost text-[11px] py-1 px-2.5" onclick="clearConsole()">
+                    <i data-lucide="eraser" class="w-3 h-3"></i> Clear
+                  </button>
+                  <button class="btn btn-ghost text-[11px] py-1 px-2.5" onclick="pasteFromClipboard()">
+                    <i data-lucide="clipboard-paste" class="w-3 h-3"></i> Paste
+                  </button>
+                </div>
+              </div>
+              <textarea id="logStream" class="input-field code-area" rows="12"
+                        placeholder="# Paste raw security logs here...
+# Supported: Linux auth.log, Nginx/Apache access.log, syslog, iptables traces
+
+Sep 17 04:12:01 edge-srv01 sshd[2841]: Failed password for invalid user admin from 185.220.101.5 port 41202 ssh2
+..."></textarea>
+              <div class="flex items-center justify-between mt-2 text-[10.5px] font-mono" style="color: var(--text-3)">
+                <span id="byteCount">0 bytes</span>
+                <span>Ctrl+Enter to run triage</span>
+              </div>
+            </div>
+
+            <!-- UPLOAD TAB -->
+            <div id="input-upload" class="input-tab hidden pt-5">
+              <div id="dropzone" class="dropzone rounded-2xl p-12 text-center transition-all duration-200"
+                   style="border: 2px dashed var(--border-2); background: rgba(4,6,11,0.4);">
+                <div class="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center mb-4"
+                     style="background: rgba(6,182,212,0.08); border: 1px solid rgba(6,182,212,0.25);">
+                  <i data-lucide="upload-cloud" class="w-7 h-7" style="color: var(--cyan)"></i>
+                </div>
+                <p class="text-sm font-semibold text-white mb-1">Drop log file here</p>
+                <p class="text-xs mb-4" style="color: var(--text-3)">or click to browse — supports .log, .txt, .json, .csv</p>
+                <input type="file" id="fileInput" class="hidden" accept=".log,.txt,.json,.csv,text/*" />
+                <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                  <i data-lucide="folder-open" class="w-4 h-4"></i> Select File
+                </button>
+                <p id="uploadFileName" class="text-[11px] mt-3 font-mono" style="color: var(--text-3)"></p>
+              </div>
+            </div>
+
+            <!-- SAMPLES TAB -->
+            <div id="input-samples" class="input-tab hidden pt-5">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div onclick="loadSample('ssh')" class="p-5 rounded-xl cursor-pointer panel-hover"
+                     style="background: rgba(4,6,11,0.6); border: 1px solid var(--border);">
+                  <div class="flex items-start justify-between mb-3">
+                    <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3);">
+                      <i data-lucide="terminal" class="w-5 h-5" style="color: var(--amber)"></i>
+                    </div>
+                    <span class="badge badge-high">HIGH</span>
+                  </div>
+                  <p class="text-sm font-bold text-white mb-1">Distributed SSH Brute-Force</p>
+                  <p class="text-[11px] font-mono mb-2" style="color: var(--text-3)">auth.log • T1110.001</p>
+                  <p class="text-xs leading-relaxed" style="color: var(--text-2)">Multi-vector credential stuffing against root & service accounts from an external source node.</p>
+                </div>
+
+                <div onclick="loadSample('sqli')" class="p-5 rounded-xl cursor-pointer panel-hover"
+                     style="background: rgba(4,6,11,0.6); border: 1px solid var(--border);">
+                  <div class="flex items-start justify-between mb-3">
+                    <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background: rgba(244,63,94,0.1); border: 1px solid rgba(244,63,94,0.3);">
+                      <i data-lucide="code-2" class="w-5 h-5" style="color: var(--rose)"></i>
+                    </div>
+                    <span class="badge badge-critical">CRITICAL</span>
+                  </div>
+                  <p class="text-sm font-bold text-white mb-1">Web SQL Injection Campaign</p>
+                  <p class="text-[11px] font-mono mb-2" style="color: var(--text-3)">access.log • T1190</p>
+                  <p class="text-xs leading-relaxed" style="color: var(--text-2)">Union-based DB extraction with path traversal probes targeting public web infrastructure.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Config row -->
+            <div class="divider my-5"></div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-end">
+              <div class="lg:col-span-2">
+                <label class="text-[11px] font-bold uppercase tracking-wider block mb-2" style="color: var(--text-2)">
+                  <i data-lucide="key-round" class="w-3 h-3 inline mr-1"></i>
+                  Gemini API Key <span class="font-normal normal-case" style="color: var(--text-3)">— Optional</span>
+                </label>
+                <input type="password" id="userKey" class="input-field font-mono text-xs"
+                       placeholder="AIzaSy••••••••••••••••••••  (leave empty to use deterministic heuristic engine)" />
+              </div>
+
+              <button id="inspectBtn" onclick="dispatchAnalysis()" class="btn btn-primary w-full py-3">
+                <i data-lucide="scan-line" class="w-4 h-4"></i>
+                <span>Execute AI Triage</span>
+              </button>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- =====================================================
+             VIEW: ANALYSIS
+        ===================================================== -->
+        <section id="view-analysis" class="view hidden space-y-6">
+
+          <!-- Empty state -->
+          <div id="emptyAnalysis" class="panel p-16 text-center">
+            <div class="w-20 h-20 mx-auto rounded-2xl flex items-center justify-center mb-5"
+                 style="background: rgba(6,182,212,0.05); border: 1px solid rgba(6,182,212,0.2);">
+              <i data-lucide="scan-search" class="w-9 h-9" style="color: var(--cyan); opacity: 0.7"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">No active analysis</h3>
+            <p class="text-sm max-w-md mx-auto mb-6" style="color: var(--text-3)">
+              Ingest telemetry and run AI triage to generate a full incident report with MITRE mapping, IoCs, and containment rules.
+            </p>
+            <button class="btn btn-primary" onclick="switchView('console')">
+              <i data-lucide="terminal-square" class="w-4 h-4"></i>
+              Open Ingestion Console
+            </button>
+          </div>
+
+          <!-- Report -->
+          <div id="reportContainer" class="hidden space-y-6">
+
+            <!-- Status banner -->
+            <div id="statusBanner" class="panel p-6 relative overflow-hidden">
+              <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
+                <div class="flex items-start gap-5">
+                  <div id="statusIndicator" class="w-16 h-16 rounded-2xl flex items-center justify-center font-black text-2xl flex-shrink-0"></div>
+                  <div class="space-y-2">
+                    <div class="flex flex-wrap items-center gap-2.5">
+                      <span id="severityTag" class="badge"></span>
+                      <span id="threatScoreTag" class="badge badge-neutral"></span>
+                      <span id="engineTag" class="text-[11px] font-mono" style="color: var(--text-3)"></span>
+                    </div>
+                    <h2 id="incidentTitle" class="text-xl lg:text-2xl font-extrabold text-white tracking-tight leading-tight"></h2>
+                    <p id="incidentSummary" class="text-sm max-w-3xl leading-relaxed" style="color: var(--text-1)"></p>
+                  </div>
+                </div>
+
+                <div class="flex flex-col lg:flex-row gap-2 flex-shrink-0">
+                  <button class="btn btn-ghost" onclick="exportReport()">
+                    <i data-lucide="download" class="w-4 h-4"></i> Export
+                  </button>
+                  <button class="btn btn-ghost" onclick="addNote()">
+                    <i data-lucide="file-text" class="w-4 h-4"></i> Add Note
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="panel">
+              <div class="flex items-center gap-1 border-b px-2" style="border-color: var(--border);">
+                <div class="tab active" data-rtab="overview" onclick="switchReportTab('overview')">Overview</div>
+                <div class="tab" data-rtab="mitre" onclick="switchReportTab('mitre')">MITRE ATT&CK</div>
+                <div class="tab" data-rtab="iocs" onclick="switchReportTab('iocs')">Indicators</div>
+                <div class="tab" data-rtab="containment" onclick="switchReportTab('containment')">Containment</div>
+                <div class="tab" data-rtab="raw" onclick="switchReportTab('raw')">Raw JSON</div>
+              </div>
+
+              <!-- Overview tab -->
+              <div id="rtab-overview" class="rtab p-6 space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  <!-- Kill chain chart -->
+                  <div class="lg:col-span-2 panel p-5">
+                    <div class="flex items-center justify-between mb-4">
+                      <div>
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                          <i data-lucide="trending-up" class="w-4 h-4" style="color: var(--amber)"></i>
+                          Kill Chain Progression
+                        </h3>
+                        <p class="text-[11px] mt-0.5" style="color: var(--text-3)">Threat intensity across incident stages</p>
+                      </div>
+                    </div>
+                    <div class="h-56 w-full">
+                      <canvas id="killChainChart"></canvas>
+                    </div>
+                  </div>
+
+                  <!-- Key metrics -->
+                  <div class="panel p-5 space-y-4">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2 mb-2">
+                      <i data-lucide="gauge" class="w-4 h-4" style="color: var(--cyan)"></i>
+                      Key Metrics
+                    </h3>
+                    <div id="metricList" class="space-y-3.5"></div>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <!-- Affected systems -->
+                  <div class="panel p-5">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2 mb-4">
+                      <i data-lucide="server" class="w-4 h-4" style="color: var(--indigo)"></i>
+                      Affected Subsystems
+                    </h3>
+                    <div id="subsystemsContainer" class="flex flex-wrap gap-2"></div>
+                  </div>
+
+                  <!-- Recommendations -->
+                  <div class="panel p-5">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2 mb-4">
+                      <i data-lucide="shield-check" class="w-4 h-4" style="color: var(--emerald)"></i>
+                      Defensive Advisories
+                    </h3>
+                    <ul id="recommendationsList" class="space-y-2.5 text-sm" style="color: var(--text-1)"></ul>
+                  </div>
+                </div>
+              </div>
+
+              <!-- MITRE tab -->
+              <div id="rtab-mitre" class="rtab hidden p-6 space-y-4">
+                <div class="flex items-center justify-between mb-2">
+                  <div>
+                    <h3 class="text-sm font-bold text-white">MITRE ATT&CK® v14 Techniques</h3>
+                    <p class="text-[11px] mt-0.5" style="color: var(--text-3)">Adversary behavior mapped to enterprise matrix</p>
+                  </div>
+                </div>
+                <div id="mitreMatrix" class="space-y-2.5"></div>
+              </div>
+
+              <!-- IoCs tab -->
+              <div id="rtab-iocs" class="rtab hidden p-6 space-y-4">
+                <div class="flex items-center justify-between mb-2">
+                  <div>
+                    <h3 class="text-sm font-bold text-white">Detected Indicators of Compromise</h3>
+                    <p class="text-[11px] mt-0.5" style="color: var(--text-3)">Extracted from raw telemetry stream</p>
+                  </div>
+                  <span id="iocCountBadge" class="badge badge-neutral">0 detected</span>
+                </div>
+                <div id="iocContainer" class="space-y-2.5"></div>
+              </div>
+
+              <!-- Containment tab -->
+              <div id="rtab-containment" class="rtab hidden p-6 space-y-5">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                      <i data-lucide="shield-alert" class="w-4 h-4" style="color: var(--emerald)"></i>
+                      Automated Host Firewall Containment
+                    </h3>
+                    <p class="text-[11px] mt-0.5" style="color: var(--text-3)">Drop malicious traffic at network ingress immediately</p>
+                  </div>
+                  <button class="btn btn-ghost" onclick="copyRemediations()">
+                    <i data-lucide="copy" class="w-4 h-4"></i> Copy All
+                  </button>
+                </div>
+
+                <div class="terminal">
+                  <div class="terminal-header">
+                    <span class="terminal-dot" style="background:#F43F5E"></span>
+                    <span class="terminal-dot" style="background:#F59E0B"></span>
+                    <span class="terminal-dot" style="background:#10B981"></span>
+                    <span class="ml-3 font-mono">root@edge-srv01: ~/containment</span>
+                    <span class="ml-auto font-mono">iptables / ufw</span>
+                  </div>
+                  <div class="terminal-body" id="commandsArea"></div>
+                </div>
+
+                <div class="p-4 rounded-xl" style="background: rgba(244,63,94,0.05); border: 1px solid rgba(244,63,94,0.2);">
+                  <div class="flex items-start gap-3">
+                    <i data-lucide="alert-triangle" class="w-4 h-4 mt-0.5 flex-shrink-0" style="color: var(--rose)"></i>
+                    <div>
+                      <p class="text-xs font-bold text-rose-300 mb-1">Operational Notice</p>
+                      <p class="text-[11.5px] leading-relaxed" style="color: var(--text-2)">
+                        These rules must be applied on the affected edge hosts. Review the source IPs against your allow-lists before enforcement to prevent blocking legitimate business traffic.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Raw JSON tab -->
+              <div id="rtab-raw" class="rtab hidden p-6">
+                <div class="flex items-center justify-between mb-3">
+                  <h3 class="text-sm font-bold text-white">Raw Analysis Payload</h3>
+                  <button class="btn btn-ghost text-[11px]" onclick="copyRawJSON()">
+                    <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy JSON
+                  </button>
+                </div>
+                <pre id="rawJsonView" class="terminal-body p-4 rounded-xl text-xs" style="background: #02040A; border: 1px solid var(--border); max-height: 520px; overflow: auto; color: #7DD3FC;"></pre>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- =====================================================
+             VIEW: SCENARIOS
+        ===================================================== -->
+        <section id="view-scenarios" class="view hidden space-y-6">
+          <div class="panel p-6">
+            <h2 class="text-base font-bold text-white flex items-center gap-2.5 mb-1">
+              <i data-lucide="book-marked" class="w-5 h-5" style="color: var(--amber)"></i>
+              Attack Scenario Library
+            </h2>
+            <p class="text-xs mb-6" style="color: var(--text-3)">Pre-loaded real-world telemetry traces for validation & training</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="panel p-5 panel-hover" style="background: rgba(4,6,11,0.5);">
+                <div class="flex items-start justify-between mb-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3);">
+                      <i data-lucide="terminal" class="w-5 h-5" style="color: var(--amber)"></i>
+                    </div>
+                    <div>
+                      <p class="text-sm font-bold text-white">Distributed SSH Brute-Force</p>
+                      <p class="text-[10.5px] font-mono mt-0.5" style="color: var(--text-3)">T1110.001 • Credential Access</p>
+                    </div>
+                  </div>
+                  <span class="badge badge-high">HIGH</span>
+                </div>
+                <p class="text-xs leading-relaxed mb-4" style="color: var(--text-2)">
+                  High-frequency PAM authentication failures across multiple privileged accounts, indicating credential stuffing from an external source node.
+                </p>
+                <button class="btn btn-ghost w-full" onclick="loadSample('ssh')">
+                  <i data-lucide="play" class="w-3.5 h-3.5"></i> Load & Analyze
+                </button>
+              </div>
+
+              <div class="panel p-5 panel-hover" style="background: rgba(4,6,11,0.5);">
+                <div class="flex items-start justify-between mb-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background: rgba(244,63,94,0.1); border: 1px solid rgba(244,63,94,0.3);">
+                      <i data-lucide="code-2" class="w-5 h-5" style="color: var(--rose)"></i>
+                    </div>
+                    <div>
+                      <p class="text-sm font-bold text-white">Web SQL Injection Campaign</p>
+                      <p class="text-[10.5px] font-mono mt-0.5" style="color: var(--text-3)">T1190 • Initial Access</p>
+                    </div>
+                  </div>
+                  <span class="badge badge-critical">CRITICAL</span>
+                </div>
+                <p class="text-xs leading-relaxed mb-4" style="color: var(--text-2)">
+                  Automated sqlmap-driven union-based extraction, path traversal probes, and XSS injection attempts against public web apps.
+                </p>
+                <button class="btn btn-ghost w-full" onclick="loadSample('sqli')">
+                  <i data-lucide="play" class="w-3.5 h-3.5"></i> Load & Analyze
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =====================================================
+             VIEW: MITRE
+        ===================================================== -->
+        <section id="view-mitre" class="view hidden space-y-6">
+          <div class="panel p-6">
+            <h2 class="text-base font-bold text-white flex items-center gap-2.5 mb-1">
+              <i data-lucide="crosshair" class="w-5 h-5" style="color: var(--rose)"></i>
+              MITRE ATT&CK® Enterprise Matrix
+            </h2>
+            <p class="text-xs mb-6" style="color: var(--text-3)">Coverage map for the heuristic detection engine</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div class="panel p-5" style="background: rgba(4,6,11,0.5);">
+                <div class="flex items-center justify-between mb-3">
+                  <p class="text-xs font-bold uppercase tracking-wider" style="color: var(--cyan)">Initial Access</p>
+                  <span class="badge badge-neutral">TA0001</span>
+                </div>
+                <div class="space-y-2">
+                  <div class="p-2.5 rounded-lg text-xs" style="background: rgba(30,41,59,0.4); border: 1px solid var(--border);">
+                    <span class="font-mono font-bold" style="color: var(--cyan)">T1190</span>
+                    <span class="ml-2" style="color: var(--text-1)">Exploit Public-Facing Application</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel p-5" style="background: rgba(4,6,11,0.5);">
+                <div class="flex items-center justify-between mb-3">
+                  <p class="text-xs font-bold uppercase tracking-wider" style="color: var(--amber)">Credential Access</p>
+                  <span class="badge badge-neutral">TA0006</span>
+                </div>
+                <div class="space-y-2">
+                  <div class="p-2.5 rounded-lg text-xs" style="background: rgba(30,41,59,0.4); border: 1px solid var(--border);">
+                    <span class="font-mono font-bold" style="color: var(--amber)">T1110.001</span>
+                    <span class="ml-2" style="color: var(--text-1)">Password Guessing</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel p-5" style="background: rgba(4,6,11,0.5);">
+                <div class="flex items-center justify-between mb-3">
+                  <p class="text-xs font-bold uppercase tracking-wider" style="color: var(--violet)">Discovery</p>
+                  <span class="badge badge-neutral">TA0007</span>
+                </div>
+                <div class="space-y-2">
+                  <div class="p-2.5 rounded-lg text-xs" style="background: rgba(30,41,59,0.4); border: 1px solid var(--border);">
+                    <span class="font-mono font-bold" style="color: var(--violet)">T1083</span>
+                    <span class="ml-2" style="color: var(--text-1)">File & Directory Discovery</span>
+                  </div>
+                  <div class="p-2.5 rounded-lg text-xs" style="background: rgba(30,41,59,0.4); border: 1px solid var(--border);">
+                    <span class="font-mono font-bold" style="color: var(--violet)">T1046</span>
+                    <span class="ml-2" style="color: var(--text-1)">Network Service Discovery</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel p-5" style="background: rgba(4,6,11,0.5);">
+                <div class="flex items-center justify-between mb-3">
+                  <p class="text-xs font-bold uppercase tracking-wider" style="color: var(--emerald)">Execution</p>
+                  <span class="badge badge-neutral">TA0002</span>
+                </div>
+                <div class="space-y-2">
+                  <div class="p-2.5 rounded-lg text-xs" style="background: rgba(30,41,59,0.4); border: 1px solid var(--border);">
+                    <span class="font-mono font-bold" style="color: var(--emerald)">T1059</span>
+                    <span class="ml-2" style="color: var(--text-1)">Command & Scripting Interpreter</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel p-5" style="background: rgba(4,6,11,0.5);">
+                <div class="flex items-center justify-between mb-3">
+                  <p class="text-xs font-bold uppercase tracking-wider" style="color: var(--indigo)">Defense Evasion</p>
+                  <span class="badge badge-neutral">TA0005</span>
+                </div>
+                <div class="space-y-2">
+                  <div class="p-2.5 rounded-lg text-xs" style="background: rgba(30,41,59,0.4); border: 1px solid var(--border);">
+                    <span class="font-mono font-bold" style="color: var(--indigo)">T1078</span>
+                    <span class="ml-2" style="color: var(--text-1)">Valid Accounts Abuse</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel p-5" style="background: rgba(4,6,11,0.5);">
+                <div class="flex items-center justify-between mb-3">
+                  <p class="text-xs font-bold uppercase tracking-wider" style="color: var(--rose)">Collection</p>
+                  <span class="badge badge-neutral">TA0009</span>
+                </div>
+                <div class="space-y-2">
+                  <div class="p-2.5 rounded-lg text-xs" style="background: rgba(30,41,59,0.4); border: 1px solid var(--border);">
+                    <span class="font-mono font-bold" style="color: var(--rose)">T1005</span>
+                    <span class="ml-2" style="color: var(--text-1)">Data from Local System</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =====================================================
+             VIEW: SETTINGS
+        ===================================================== -->
+        <section id="view-settings" class="view hidden space-y-6">
+          <div class="panel p-6">
+            <h2 class="text-base font-bold text-white flex items-center gap-2.5 mb-1">
+              <i data-lucide="settings" class="w-5 h-5" style="color: var(--text-2)"></i>
+              Engine Configuration
+            </h2>
+            <p class="text-xs mb-6" style="color: var(--text-3)">Runtime settings for the SecOps-AI analysis pipeline</p>
+
+            <div class="space-y-4 max-w-2xl">
+              <div class="p-4 rounded-xl" style="background: rgba(4,6,11,0.5); border: 1px solid var(--border);">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm font-semibold text-white">Deterministic Heuristic Engine</p>
+                    <p class="text-[11px] mt-0.5" style="color: var(--text-3)">Always-on fallback — guarantees 100% uptime</p>
+                  </div>
+                  <span class="badge badge-low">ACTIVE</span>
+                </div>
+              </div>
+
+              <div class="p-4 rounded-xl" style="background: rgba(4,6,11,0.5); border: 1px solid var(--border);">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm font-semibold text-white">Google Gemini 1.5 Flash</p>
+                    <p class="text-[11px] mt-0.5" style="color: var(--text-3)">Cloud-native deep forensic analysis — requires API key</p>
+                  </div>
+                  <span id="geminiStatus" class="badge badge-neutral">STANDBY</span>
+                </div>
+              </div>
+
+              <div class="p-4 rounded-xl" style="background: rgba(4,6,11,0.5); border: 1px solid var(--border);">
+                <p class="text-sm font-semibold text-white mb-2">Default Gemini API Key</p>
+                <input type="password" class="input-field font-mono text-xs" id="settingsKey"
+                       placeholder="Set a persistent API key for this browser session" />
+                <p class="text-[10.5px] mt-2 font-mono" style="color: var(--text-3)">Stored locally in this browser only. Never sent anywhere except Google's API.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+
+      <!-- ================= FOOTER ================= -->
+      <footer class="mt-8 px-6 py-5 border-t" style="border-color: var(--border);">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] font-mono" style="color: var(--text-3)">
+          <p>SecOps-AI Sentinel • v1.0.0 • Enterprise Threat Triage Copilot</p>
+          <div class="flex items-center gap-4">
+            <span class="flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Render Cloud
+            </span>
+            <span>MIT Licensed</span>
           </div>
         </div>
-
-        <div class="glass-panel rounded-2xl p-5 space-y-4 border-slate-800/80">
-          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-              <i data-lucide="fingerprint" class="w-4 h-4 text-rose-400"></i> Discovered IoCs
-            </h3>
-            <span id="iocCountBadge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-800">0 found</span>
-          </div>
-          <div id="iocContainer" class="space-y-2.5 max-h-72 overflow-y-auto pr-1"></div>
-        </div>
-
-        <div class="glass-panel rounded-2xl p-5 space-y-4 border-slate-800/80 flex flex-col justify-between">
-          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-              <i data-lucide="bar-chart-2" class="w-4 h-4 text-amber-400"></i> Kill Chain Progression
-            </h3>
-          </div>
-          <div class="h-48 w-full flex items-center justify-center">
-            <canvas id="killChainChart"></canvas>
-          </div>
-          <p class="text-[11px] text-slate-500 font-mono text-center">Threat Severity Curve Across Incident Stages</p>
-        </div>
-
-      </div>
-
-      <!-- Firewall Block Rules -->
-      <div class="glass-panel rounded-2xl p-6 border-slate-800/80 space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
-          <div>
-            <h3 class="text-sm font-bold text-white flex items-center gap-2">
-              <i data-lucide="shield-alert" class="w-4 h-4 text-emerald-400"></i> Automated Containment & Block Rules
-            </h3>
-            <p class="text-xs text-slate-400 mt-0.5">Drop malicious traffic immediately via host-based firewalls.</p>
-          </div>
-          <button onclick="copyRemediations()" class="text-xs px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 transition font-medium flex items-center gap-1.5 self-start">
-            <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Rules
-          </button>
-        </div>
-
-        <div id="commandsArea" class="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs text-emerald-400 space-y-1.5 overflow-x-auto"></div>
-
-        <div class="pt-2">
-          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Hardening & Defensive Advisory</h4>
-          <ul id="recommendationsList" class="space-y-1.5 text-xs text-slate-300 list-disc list-inside"></ul>
-        </div>
-      </div>
+      </footer>
 
     </div>
+  </div>
 
-  </main>
-
-  <footer class="border-t border-slate-900 bg-slate-950/60 py-6 text-center text-xs text-slate-500">
-    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-      <p>SecOps-AI Sentinel • Open-Source Autonomous Threat Intelligence Platform</p>
-      <p class="font-mono text-[11px] text-slate-600">Containerized &bull; Google Cloud Run Free Tier Native</p>
-    </div>
-  </footer>
-
+  <!-- ============================================================
+       SCRIPT
+  ============================================================ -->
   <script>
-    lucide.createIcons();
-    let chartInstance = null;
+    /* ============================================================
+       GLOBAL STATE
+    ============================================================ */
+    const STATE = {
+      view: 'dashboard',
+      sessionCount: 0,
+      lastReport: null,
+      uploadFile: null,
+      chart: null,
+    };
 
-    async function injectSample(type) {
+    const VIEW_META = {
+      dashboard: { title: 'Mission Control', sub: 'Real-time security operations overview' },
+      console:   { title: 'Ingestion Console', sub: 'Stream raw telemetry into the AI pipeline' },
+      analysis:  { title: 'Analysis Report',   sub: 'Detailed incident triage and response plan' },
+      scenarios: { title: 'Attack Scenarios',  sub: 'Preloaded real-world telemetry traces' },
+      mitre:     { title: 'MITRE ATT&CK',      sub: 'Coverage across the enterprise matrix' },
+      settings:  { title: 'Configuration',     sub: 'Engine runtime settings' },
+    };
+
+    /* ============================================================
+       TOAST SYSTEM
+    ============================================================ */
+    function toast(type, title, message, timeout = 4200) {
+      const container = document.getElementById('toastContainer');
+      const el = document.createElement('div');
+      el.className = `toast toast-${type}`;
+      const icons = { success: 'check-circle-2', error: 'x-circle', info: 'info', warn: 'alert-triangle' };
+      const colors = { success: '#34D399', error: '#FB7185', info: '#22D3EE', warn: '#FBBF24' };
+      el.innerHTML = `
+        <i data-lucide="${icons[type] || 'info'}" class="w-5 h-5 flex-shrink-0 mt-0.5" style="color: ${colors[type] || '#22D3EE'}"></i>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-bold text-white">${title}</p>
+          <p class="text-xs mt-0.5 leading-relaxed" style="color: var(--text-2)">${message}</p>
+        </div>
+        <button onclick="this.parentElement.remove()" class="opacity-40 hover:opacity-100 transition flex-shrink-0">
+          <i data-lucide="x" class="w-3.5 h-3.5"></i>
+        </button>
+      `;
+      container.appendChild(el);
+      lucide.createIcons();
+      setTimeout(() => {
+        el.classList.add('removing');
+        setTimeout(() => el.remove(), 300);
+      }, timeout);
+    }
+
+    /* ============================================================
+       SIDEBAR
+    ============================================================ */
+    function toggleSidebar() {
+      const sb = document.getElementById('sidebar');
+      const mw = document.getElementById('mainWrap');
+      sb.classList.toggle('collapsed');
+      mw.style.marginLeft = sb.classList.contains('collapsed') ? '68px' : '240px';
+    }
+
+    /* ============================================================
+       VIEW SWITCHING
+    ============================================================ */
+    function switchView(view) {
+      STATE.view = view;
+      document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+      document.getElementById(`view-${view}`).classList.remove('hidden');
+      document.getElementById(`view-${view}`).classList.add('fade-in');
+
+      document.querySelectorAll('.nav-item').forEach(n => {
+        n.classList.toggle('active', n.dataset.view === view);
+      });
+
+      const meta = VIEW_META[view] || VIEW_META.dashboard;
+      document.getElementById('pageTitle').textContent = meta.title;
+      document.getElementById('pageSubtitle').textContent = meta.sub;
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ============================================================
+       CONSOLE INPUT TABS
+    ============================================================ */
+    function switchInputTab(tab) {
+      document.querySelectorAll('.input-tab').forEach(t => t.classList.add('hidden'));
+      document.getElementById(`input-${tab}`).classList.remove('hidden');
+      document.querySelectorAll('.tab-input').forEach(t => {
+        const active = t.dataset.input === tab;
+        t.style.color = active ? 'var(--cyan)' : 'var(--text-2)';
+        t.style.background = active ? 'rgba(6,182,212,0.12)' : 'transparent';
+      });
+    }
+
+    /* ============================================================
+       SAMPLE LOADING
+    ============================================================ */
+    async function loadSample(type) {
       try {
         const res = await fetch(`/api/sample/${type}`);
         const data = await res.json();
         document.getElementById('logStream').value = data.log_content;
+        updateByteCount();
+        switchInputTab('paste');
+        switchView('console');
+        toast('info', 'Scenario Loaded', `${type === 'ssh' ? 'SSH Brute-Force' : 'Web SQL Injection'} telemetry injected into console.`);
       } catch (e) {
-        console.error("Could not load sample", e);
+        toast('error', 'Load Failed', 'Could not fetch scenario from server.');
       }
     }
 
+    async function quickAnalyze(type) {
+      switchView('console');
+      await loadSample(type);
+      setTimeout(() => dispatchAnalysis(), 400);
+    }
+
+    /* ============================================================
+       CONSOLE UTILITIES
+    ============================================================ */
+    function updateByteCount() {
+      const v = document.getElementById('logStream').value;
+      const bytes = new Blob([v]).size;
+      const kb = (bytes / 1024).toFixed(1);
+      document.getElementById('byteCount').textContent = bytes > 1024 ? `${kb} KB` : `${bytes} bytes`;
+    }
+
+    function clearConsole() {
+      document.getElementById('logStream').value = '';
+      updateByteCount();
+      toast('info', 'Console Cleared', 'Telemetry buffer has been reset.');
+    }
+
+    async function pasteFromClipboard() {
+      try {
+        const text = await navigator.clipboard.readText();
+        document.getElementById('logStream').value = text;
+        updateByteCount();
+        toast('success', 'Pasted', 'Clipboard content loaded into console.');
+      } catch (e) {
+        toast('warn', 'Clipboard', 'Browser blocked clipboard access. Paste manually with Ctrl+V.');
+      }
+    }
+
+    /* ============================================================
+       FILE UPLOAD
+    ============================================================ */
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+
+    ['dragenter', 'dragover'].forEach(evt => {
+      dropzone.addEventListener(evt, e => {
+        e.preventDefault();
+        dropzone.classList.add('dragover');
+      });
+    });
+    ['dragleave', 'drop'].forEach(evt => {
+      dropzone.addEventListener(evt, e => {
+        e.preventDefault();
+        dropzone.classList.remove('dragover');
+      });
+    });
+    dropzone.addEventListener('drop', e => {
+      const file = e.dataTransfer.files[0];
+      if (file) handleFile(file);
+    });
+    fileInput.addEventListener('change', e => {
+      if (e.target.files[0]) handleFile(e.target.files[0]);
+    });
+
+    function handleFile(file) {
+      STATE.uploadFile = file;
+      document.getElementById('uploadFileName').textContent = `✓ ${file.name} (${(file.size/1024).toFixed(1)} KB)`;
+      toast('success', 'File Ready', `${file.name} staged for analysis.`);
+    }
+
+    /* ============================================================
+       ANALYSIS DISPATCH
+    ============================================================ */
     async function dispatchAnalysis() {
-      const logs = document.getElementById('logStream').value;
+      const logs = document.getElementById('logStream').value.trim();
       const key = document.getElementById('userKey').value;
       const btn = document.getElementById('inspectBtn');
 
-      if (!logs.trim()) {
-        alert("Please paste logs or select a 1-click test scenario first.");
+      if (!logs && !STATE.uploadFile) {
+        toast('warn', 'No Telemetry', 'Paste logs, upload a file, or select a 1-click scenario first.');
+        switchInputTab('paste');
         return;
       }
 
       btn.disabled = true;
-      btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Analyzing Telemetry...`;
+      const originalHTML = btn.innerHTML;
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Analyzing Telemetry...</span>`;
       lucide.createIcons();
 
       const formData = new FormData();
-      formData.append('raw_logs', logs);
+      if (STATE.uploadFile && !logs) {
+        formData.append('file', STATE.uploadFile);
+      } else {
+        try {
+          const b64 = btoa(unescape(encodeURIComponent(logs)));
+          formData.append('raw_logs_b64', b64);
+        } catch (e) {
+          formData.append('raw_logs', logs);
+        }
+      }
       formData.append('api_key', key);
 
       try {
         const response = await fetch('/api/analyze', { method: 'POST', body: formData });
+        if (!response.ok) throw new Error(`Server responded ${response.status}`);
         const result = await response.json();
+        STATE.lastReport = result;
+        STATE.sessionCount++;
+        document.getElementById('sessionCount').textContent = STATE.sessionCount;
+
         displayIncidentReport(result);
+        switchView('analysis');
+        toast('success', 'Triage Complete', `Analysis finished — severity: ${result.severity}`);
+        document.getElementById('analysisDot').classList.remove('hidden');
+        addFeedItem(result);
       } catch (err) {
-        alert("Execution error: " + err);
+        toast('error', 'Execution Failed', err.message || 'Unable to reach the analysis endpoint.');
       } finally {
         btn.disabled = false;
-        btn.innerHTML = `<i data-lucide="scan-line" class="w-4 h-4"></i> Execute AI Triage`;
+        btn.innerHTML = originalHTML;
         lucide.createIcons();
       }
     }
 
+    /* ============================================================
+       REPORT DISPLAY
+    ============================================================ */
     function displayIncidentReport(data) {
-      const dashboard = document.getElementById('resultsDashboard');
-      dashboard.classList.remove('hidden');
-
-      const isCrit = data.severity === 'CRITICAL';
-      const isHigh = data.severity === 'HIGH';
+      document.getElementById('emptyAnalysis').classList.add('hidden');
+      document.getElementById('reportContainer').classList.remove('hidden');
 
       const banner = document.getElementById('statusBanner');
       const indicator = document.getElementById('statusIndicator');
-      const severityTag = document.getElementById('severityTag');
+      const sevTag = document.getElementById('severityTag');
 
-      if (isCrit) {
-        banner.className = "p-6 rounded-2xl border bg-rose-950/25 border-rose-800/80 shadow-lg shadow-rose-950/40";
-        indicator.className = "w-14 h-14 rounded-2xl bg-rose-600/20 border border-rose-500/80 text-rose-400 flex items-center justify-center font-bold text-2xl";
-        indicator.innerHTML = "!";
-        severityTag.className = "text-xs font-extrabold px-3 py-0.5 rounded-full tracking-wider uppercase bg-rose-600 text-white";
-      } else if (isHigh) {
-        banner.className = "p-6 rounded-2xl border bg-amber-950/25 border-amber-800/80 shadow-lg shadow-amber-950/40";
-        indicator.className = "w-14 h-14 rounded-2xl bg-amber-600/20 border border-amber-500/80 text-amber-400 flex items-center justify-center font-bold text-2xl";
-        indicator.innerHTML = "▲";
-        severityTag.className = "text-xs font-extrabold px-3 py-0.5 rounded-full tracking-wider uppercase bg-amber-500 text-black";
-      } else {
-        banner.className = "p-6 rounded-2xl border bg-cyan-950/25 border-cyan-800/80 shadow-lg shadow-cyan-950/40";
-        indicator.className = "w-14 h-14 rounded-2xl bg-cyan-600/20 border border-cyan-500/80 text-cyan-400 flex items-center justify-center font-bold text-2xl";
-        indicator.innerHTML = "i";
-        severityTag.className = "text-xs font-extrabold px-3 py-0.5 rounded-full tracking-wider uppercase bg-cyan-500 text-black";
-      }
+      const config = {
+        CRITICAL: { cls: 'badge-critical', indBg: 'rgba(244,63,94,0.12)', indBd: 'rgba(244,63,94,0.5)', indColor: '#FB7185', glyph: '!' },
+        HIGH:     { cls: 'badge-high',     indBg: 'rgba(245,158,11,0.12)', indBd: 'rgba(245,158,11,0.5)', indColor: '#FBBF24', glyph: '▲' },
+        MEDIUM:   { cls: 'badge-medium',   indBg: 'rgba(6,182,212,0.12)',  indBd: 'rgba(6,182,212,0.5)',  indColor: '#22D3EE', glyph: 'i' },
+        LOW:      { cls: 'badge-low',      indBg: 'rgba(16,185,129,0.12)', indBd: 'rgba(16,185,129,0.5)', indColor: '#34D399', glyph: '✓' },
+      };
+      const c = config[data.severity] || config.MEDIUM;
 
-      severityTag.innerText = data.severity + " SEVERITY";
-      document.getElementById('threatScoreTag').innerText = `Risk Index: ${data.threat_score || 85}/100`;
-      document.getElementById('engineTag').innerText = `[${data.engine || 'Engine Verified'}]`;
-      document.getElementById('incidentTitle').innerText = data.threat_title;
-      document.getElementById('incidentSummary').innerText = data.executive_summary;
+      banner.style.background = `linear-gradient(135deg, ${c.indBg.replace('0.12','0.08')}, rgba(12,18,32,0.9))`;
+      banner.style.borderColor = c.indBd;
 
+      indicator.style.background = c.indBg;
+      indicator.style.border = `1px solid ${c.indBd}`;
+      indicator.style.color = c.indColor;
+      indicator.textContent = c.glyph;
+
+      sevTag.className = `badge ${c.cls}`;
+      sevTag.textContent = `${data.severity} SEVERITY`;
+
+      document.getElementById('threatScoreTag').textContent = `Risk Index: ${data.threat_score || 85}/100`;
+      document.getElementById('engineTag').textContent = `[${data.engine || 'Engine Verified'}]`;
+      document.getElementById('incidentTitle').textContent = data.threat_title || 'Unclassified Threat';
+      document.getElementById('incidentSummary').textContent = data.executive_summary || '';
+
+      // MITRE
       document.getElementById('mitreMatrix').innerHTML = (data.mitre_techniques || []).map(m => `
-        <div class="p-3 rounded-xl bg-slate-950/80 border border-slate-800 flex justify-between items-center text-xs">
-          <div class="flex items-center gap-2">
-            <span class="font-mono text-cyan-400 font-bold px-2 py-0.5 rounded bg-cyan-950/80 border border-cyan-900">${m.id}</span>
-            <span class="text-slate-200 font-medium">${m.name}</span>
+        <div class="mitre-chip">
+          <div class="flex items-center gap-3">
+            <span class="font-mono text-[11px] font-bold px-2 py-0.5 rounded"
+                  style="color: var(--cyan); background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.3);">${m.id}</span>
+            <span class="text-[13px] font-medium text-white">${m.name}</span>
           </div>
-          <span class="text-[10px] text-slate-500 uppercase tracking-widest font-mono">${m.tactic}</span>
+          <span class="text-[10px] uppercase tracking-widest font-mono font-semibold" style="color: var(--text-3)">${m.tactic}</span>
         </div>
-      `).join('');
+      `).join('') || '<p class="text-xs" style="color: var(--text-3)">No techniques mapped.</p>';
 
+      // Subsystems
       document.getElementById('subsystemsContainer').innerHTML = (data.target_services || ['Generic Gateway']).map(s => `
-        <span class="text-xs px-2.5 py-1 rounded-lg bg-indigo-950/60 border border-indigo-800/80 text-indigo-300 font-mono">${s}</span>
+        <span class="text-xs px-3 py-1.5 rounded-lg font-mono font-medium"
+              style="background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.3); color: #A5B4FC;">${s}</span>
       `).join('');
 
+      // IoCs
       const iocs = data.detected_iocs || [];
-      document.getElementById('iocCountBadge').innerText = `${iocs.length} detected`;
-      iocBox = document.getElementById('iocContainer');
-      iocBox.innerHTML = iocs.map(ioc => `
-        <div class="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-xs">
-          <div class="flex items-center justify-between font-mono text-rose-300 font-semibold">
-            <span>${ioc.value}</span>
-            <span class="text-[10px] uppercase px-1.5 py-0.5 rounded bg-rose-950/80 text-rose-400 border border-rose-900">${ioc.type}</span>
+      document.getElementById('iocCountBadge').textContent = `${iocs.length} detected`;
+      document.getElementById('iocContainer').innerHTML = iocs.map(ioc => `
+        <div class="ioc-row">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <span class="font-mono text-[12.5px] font-semibold truncate" style="color: #FB7185;">${ioc.value}</span>
+              <span class="text-[9.5px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded"
+                    style="background: rgba(244,63,94,0.1); color: #FB7185; border: 1px solid rgba(244,63,94,0.3);">${ioc.type}</span>
+            </div>
+            <p class="text-[11.5px] mt-1" style="color: var(--text-3)">${ioc.context}</p>
           </div>
-          <p class="text-[11px] text-slate-400 mt-1">${ioc.context}</p>
+        </div>
+      `).join('') || '<p class="text-xs" style="color: var(--text-3)">No indicators extracted.</p>';
+
+      // Commands
+      document.getElementById('commandsArea').innerHTML =
+        (data.remediation_commands || []).map(c => `<div class="cmd-line">${c.command}</div>`).join('') ||
+        '<div style="color: var(--text-3)">No containment rules generated.</div>';
+
+      // Recommendations
+      document.getElementById('recommendationsList').innerHTML =
+        (data.recommendations || []).map(r => `
+          <li class="flex items-start gap-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4 mt-0.5 flex-shrink-0" style="color: var(--emerald)"></i>
+            <span class="leading-relaxed">${r}</span>
+          </li>
+        `).join('') || '<li style="color: var(--text-3)">No advisories.</li>';
+
+      // Metrics sidebar
+      const metricsHTML = [
+        { label: 'Threat Score',     value: `${data.threat_score || 85}/100`, accent: c.indColor, pct: data.threat_score || 85 },
+        { label: 'IoCs Extracted',   value: iocs.length,                       accent: 'var(--cyan)', pct: Math.min(100, iocs.length * 20) },
+        { label: 'Techniques Mapped',value: (data.mitre_techniques || []).length, accent: 'var(--amber)', pct: Math.min(100, (data.mitre_techniques || []).length * 25) },
+        { label: 'Containment Rules',value: (data.remediation_commands || []).length, accent: 'var(--emerald)', pct: Math.min(100, (data.remediation_commands || []).length * 15) },
+      ].map(m => `
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[11px] font-semibold uppercase tracking-wider" style="color: var(--text-3)">${m.label}</span>
+            <span class="text-sm font-bold num" style="color: ${m.accent}">${m.value}</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" style="width: ${m.pct}%; background: ${m.accent};"></div>
+          </div>
         </div>
       `).join('');
+      document.getElementById('metricList').innerHTML = metricsHTML;
 
-      document.getElementById('commandsArea').innerHTML = (data.remediation_commands || []).map(c => `<div>${c.command}</div>`).join('');
-      document.getElementById('recommendationsList').innerHTML = (data.recommendations || []).map(r => `<li>${r}</li>`).join('');
+      // Raw JSON
+      document.getElementById('rawJsonView').textContent = JSON.stringify(data, null, 2);
 
+      // Chart
       renderKillChainChart(data.chart_metrics);
-      dashboard.scrollIntoView({ behavior: 'smooth' });
+      lucide.createIcons();
     }
 
+    /* ============================================================
+       REPORT TABS
+    ============================================================ */
+    function switchReportTab(tab) {
+      document.querySelectorAll('.rtab').forEach(t => t.classList.add('hidden'));
+      document.getElementById(`rtab-${tab}`).classList.remove('hidden');
+      document.querySelectorAll('.tab[data-rtab]').forEach(t => {
+        t.classList.toggle('active', t.dataset.rtab === tab);
+      });
+    }
+
+    /* ============================================================
+       CHART
+    ============================================================ */
     function renderKillChainChart(metrics) {
       const ctx = document.getElementById('killChainChart').getContext('2d');
-      if (chartInstance) chartInstance.destroy();
+      if (STATE.chart) STATE.chart.destroy();
 
-      const labels = metrics?.labels || ["Recon", "Access", "Lateral", "Extraction", "Impact"];
+      const labels = metrics?.labels || ['Recon', 'Access', 'Lateral', 'Extraction', 'Impact'];
       const curve  = metrics?.severity_curve || [20, 60, 90, 85, 40];
 
-      chartInstance = new Chart(ctx, {
+      const gradient = ctx.createLinearGradient(0, 0, 0, 220);
+      gradient.addColorStop(0, 'rgba(6,182,212,0.35)');
+      gradient.addColorStop(1, 'rgba(6,182,212,0.0)');
+
+      STATE.chart = new Chart(ctx, {
         type: 'line',
         data: {
           labels,
@@ -384,37 +1758,198 @@
             label: 'Threat Intensity',
             data: curve,
             borderColor: '#06B6D4',
-            backgroundColor: 'rgba(6, 182, 212, 0.1)',
-            borderWidth: 2,
-            tension: 0.4,
+            borderWidth: 2.5,
+            backgroundColor: gradient,
             fill: true,
-            pointBackgroundColor: '#06B6D4'
+            tension: 0.42,
+            pointBackgroundColor: '#06B6D4',
+            pointBorderColor: '#04060B',
+            pointBorderWidth: 2,
+            pointRadius: 5,
+            pointHoverRadius: 7,
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(4,6,11,0.95)',
+              borderColor: '#1A2332',
+              borderWidth: 1,
+              titleColor: '#F1F5F9',
+              bodyColor: '#CBD5E1',
+              padding: 10,
+              cornerRadius: 8,
+              titleFont: { size: 11, weight: '700' },
+              bodyFont: { size: 12 }
+            }
+          },
           scales: {
             x: {
-              grid: { color: 'rgba(30, 41, 59, 0.4)' },
-              ticks: { color: '#64748B', font: { size: 10 } }
+              grid: { color: 'rgba(30,41,59,0.35)', drawBorder: false },
+              ticks: { color: '#64748B', font: { size: 10.5, weight: '500' } }
             },
             y: {
               min: 0, max: 100,
-              grid: { color: 'rgba(30, 41, 59, 0.4)' },
-              ticks: { color: '#64748B', font: { size: 10 } }
+              grid: { color: 'rgba(30,41,59,0.35)', drawBorder: false },
+              ticks: { color: '#64748B', font: { size: 10.5, weight: '500' }, stepSize: 25 }
             }
           }
         }
       });
     }
 
+    /* ============================================================
+       ACTIONS
+    ============================================================ */
     function copyRemediations() {
-      const text = document.getElementById('commandsArea').innerText;
-      navigator.clipboard.writeText(text);
-      alert("Host firewall mitigation rules copied to clipboard.");
+      const txt = document.getElementById('commandsArea').innerText;
+      if (!txt.trim()) { toast('warn', 'Nothing to Copy', 'No commands available.'); return; }
+      navigator.clipboard.writeText(txt);
+      toast('success', 'Copied', 'Containment rules copied to clipboard.');
     }
+
+    function copyRawJSON() {
+      const txt = document.getElementById('rawJsonView').textContent;
+      navigator.clipboard.writeText(txt);
+      toast('success', 'Copied', 'Raw JSON payload copied to clipboard.');
+    }
+
+    function exportReport() {
+      if (!STATE.lastReport) { toast('warn', 'No Report', 'Run an analysis first.'); return; }
+      const blob = new Blob([JSON.stringify(STATE.lastReport, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `secops-report-${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast('success', 'Report Exported', 'Incident report downloaded as JSON.');
+    }
+
+    function addNote() {
+      if (!STATE.lastReport) { toast('warn', 'No Report', 'Run an analysis first.'); return; }
+      const note = prompt('Analyst note for this incident:');
+      if (note && note.trim()) {
+        STATE.lastReport.analyst_note = note.trim();
+        toast('success', 'Note Attached', 'Analyst note saved to the report.');
+      }
+    }
+
+    /* ============================================================
+       ACTIVITY FEED (dashboard)
+    ============================================================ */
+    const SEED_FEED = [
+      { icon: 'shield-check', color: 'var(--emerald)', title: 'Containment rule enforced', detail: '185.220.101.5 dropped at edge', time: '2m ago', severity: 'HIGH' },
+      { icon: 'fingerprint',  color: 'var(--rose)',    title: 'IoCs harvested',            detail: '4 malicious IPs extracted', time: '8m ago', severity: 'CRITICAL' },
+      { icon: 'crosshair',    color: 'var(--amber)',   title: 'MITRE technique mapped',    detail: 'T1190 • Exploit Public-Facing App', time: '15m ago', severity: 'MEDIUM' },
+      { icon: 'activity',     color: 'var(--cyan)',    title: 'Telemetry ingested',        detail: 'auth.log • 8 events parsed', time: '22m ago', severity: 'LOW' },
+      { icon: 'server',       color: 'var(--violet)',  title: 'Subsystem flagged',         detail: 'SSH (Port 22) under pressure', time: '31m ago', severity: 'HIGH' },
+    ];
+
+    function renderFeed() {
+      const el = document.getElementById('activityFeed');
+      el.innerHTML = SEED_FEED.map((f, i) => `
+        <div class="feed-item" style="animation-delay: ${i * 0.06}s">
+          <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+               style="background: rgba(30,41,59,0.5); border: 1px solid var(--border);">
+            <i data-lucide="${f.icon}" class="w-4 h-4" style="color: ${f.color}"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-2">
+              <p class="text-[12.5px] font-semibold text-white truncate">${f.title}</p>
+              <span class="text-[10px] font-mono flex-shrink-0" style="color: var(--text-3)">${f.time}</span>
+            </div>
+            <p class="text-[11px] mt-0.5 truncate" style="color: var(--text-3)">${f.detail}</p>
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function addFeedItem(report) {
+      const el = document.getElementById('activityFeed');
+      const item = document.createElement('div');
+      item.className = 'feed-item';
+      const color = report.severity === 'CRITICAL' ? 'var(--rose)' :
+                    report.severity === 'HIGH' ? 'var(--amber)' : 'var(--cyan)';
+      item.innerHTML = `
+        <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+             style="background: rgba(30,41,59,0.5); border: 1px solid var(--border);">
+          <i data-lucide="check-circle-2" class="w-4 h-4" style="color: var(--emerald)"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center justify-between gap-2">
+            <p class="text-[12.5px] font-semibold text-white truncate">${report.threat_title}</p>
+            <span class="text-[10px] font-mono flex-shrink-0" style="color: var(--text-3)">just now</span>
+          </div>
+          <p class="text-[11px] mt-0.5 truncate" style="color: ${color}">
+            ${report.severity} • Risk ${report.threat_score}/100 • ${(report.attacker_ips || []).length} IPs
+          </p>
+        </div>
+      `;
+      el.insertBefore(item, el.firstChild);
+      if (el.children.length > 8) el.removeChild(el.lastChild);
+      lucide.createIcons();
+    }
+
+    /* ============================================================
+       INIT
+    ============================================================ */
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      renderFeed();
+
+      // Byte count listener
+      const ta = document.getElementById('logStream');
+      ta.addEventListener('input', updateByteCount);
+
+      // Keyboard shortcut: Ctrl/Cmd + Enter to analyze
+      ta.addEventListener('keydown', e => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+          e.preventDefault();
+          dispatchAnalysis();
+        }
+      });
+
+      // Sidebar nav keyboard nav (optional)
+      document.addEventListener('keydown', e => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+          e.preventDefault();
+          document.querySelector('input[type="text"]').focus();
+        }
+      });
+
+      // Save settings key to local storage
+      const settingsKey = document.getElementById('settingsKey');
+      settingsKey.addEventListener('change', () => {
+        if (settingsKey.value.trim()) {
+          localStorage.setItem('secops_gemini_key', settingsKey.value.trim());
+          toast('success', 'API Key Saved', 'Your Gemini key is stored locally in this browser.');
+        } else {
+          localStorage.removeItem('secops_gemini_key');
+          toast('info', 'API Key Cleared', 'Persistent key has been removed.');
+        }
+      });
+
+      // Load saved key if present
+      const savedKey = localStorage.getItem('secops_gemini_key');
+      if (savedKey) {
+        document.getElementById('userKey').value = savedKey;
+        document.getElementById('geminiStatus').className = 'badge badge-low';
+        document.getElementById('geminiStatus').textContent = 'READY';
+      }
+
+      // Show session count
+      document.getElementById('sessionCount').textContent = STATE.sessionCount;
+
+      // Welcome toast
+      setTimeout(() => {
+        toast('info', 'SecOps-AI Sentinel', 'Mission Control is online. Ready for threat triage.');
+      }, 600);
+    });
   </script>
 </body>
 </html>
