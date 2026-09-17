@@ -136,47 +136,24 @@ Click any card on Mission Control to load & auto-analyze real-world traces:
 
     Air-gap mode: Leave all keys blank → heuristic engine runs entirely offline.
 
-secops-ai-sentinel/
+## 📂 Project Structure
+secops-ai-cloudrun/
 │
-├── 📄 index.html                       # The entire single-file SPA (core app)
-├── 🖼️  interface.png                    # Mission Control dashboard screenshot
+├── index.html              # 🧠 The entire application (single-file, zero-backend)
+├── interface.png           # 🖼️ Mission Control UI preview (README banner)
+├── LICENSE                 # 📜 MIT License
+├── README.md               # 📖 Project documentation
 │
-├── 📁 assets/                          # Branding & static media
-│   ├── logo.svg                        # Sentinel shield logo (used in README/favicon)
-│   ├── banner.png                      # GitHub social preview banner (1280×640)
-│   └── favicon.ico                     # Browser tab icon
+├── samples/                # 📁 Sample telemetry for demo
+│   ├── auth_sample.log     #    SSH brute-force attack trace
+│   └── web_sample.log      #    Web SQL injection trace
 │
-├── 📁 samples/                         # Ready-to-use telemetry traces for testing
-│   ├── ssh-bruteforce.log              # T1110.001 — SSH password guessing
-│   ├── sqli-attack.log                 # T1190 — SQL injection payloads
-│   ├── ransomware-vss.log              # T1490 — Shadow copy deletion
-│   └── webshell-exec.log               # T1059.004 — Unix shell via web
+├── docs/                   # 📁 Extended documentation
+│   ├── SETUP.md            #    Provider key setup guide
+│   └── ARCHITECTURE.md     #    Deep-dive on heuristic engine
 │
-├── 📁 docs/                            # Extended documentation
-│   ├── ARCHITECTURE.md                 # Dual-engine design & data flow
-│   ├── PROVIDERS.md                    # How to get free API keys (8 providers)
-│   ├── CONTAINMENT.md                  # Firewall rule reference (5 formats)
-│   ├── MITRE_MAPPING.md                # Full TTP coverage table
-│   └── SCREENSHOTS/                    # Feature screenshots per view
-│       ├── dashboard.png
-│       ├── terminal.png
-│       ├── report.png
-│       └── stix-export.png
-│
-├── 📁 .github/                         # GitHub automation & templates
-│   ├── workflows/
-│   │   └── pages.yml                   # Auto-deploy to GitHub Pages on push
-│   ├── ISSUE_TEMPLATE/
-│   │   ├── bug_report.md
-│   │   └── feature_request.md
-│   └── PULL_REQUEST_TEMPLATE.md
-│
-├── 📄 .gitignore                       # Ignore OS/editor clutter
-├── 📄 .editorconfig                    # Consistent formatting across editors
-├── 📄 LICENSE                          # MIT License
-├── 📄 CHANGELOG.md                     # Version history (v1.0 → v2.0)
-├── 📄 CONTRIBUTING.md                  # How to contribute
-└── 📄 README.md                        # You are here
+├── .gitignore              # 🚫 Ignore OS/editor junk
+└── .nojekyll               # ⚙️ (Only if deploying to GitHub Pages)
 
 That's it. No requirements.txt, no Dockerfile, no app/ folder, no venv. If you want to add a backend later (e.g., to proxy Anthropic calls), the code is modular enough to extract AI_CALLERS into a small FastAPI service.
 
