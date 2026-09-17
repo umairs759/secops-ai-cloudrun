@@ -1,17 +1,18 @@
-# 🛡️ SecOps-AI Sentinel — Autonomous Cyber Threat Copilot
+# 🛡️ SecOps-AI Sentinel v2.0 — Autonomous Cyber Threat Copilot
 
 <div align="center">
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-Render_Cloud-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://secops-ai-cloudrun.onrender.com)
-[![GitHub License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
-[![Google Gemini](https://img.shields.io/badge/AI_Engine-Gemini_1.5_Flash-8E75B2?style=for-the-badge&logo=googlebard&logoColor=white)](https://aistudio.google.com/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
+[![Single File](https://img.shields.io/badge/Single--File-HTML-46E3B7?style=for-the-badge&logo=html5&logoColor=white)]()
+[![Zero Backend](https://img.shields.io/badge/Backend-None_(100%25_Client--Side)-purple?style=for-the-badge)]()
+[![Multi AI](https://img.shields.io/badge/AI_Providers-8_Supported-8E75B2?style=for-the-badge)]()
 [![MITRE ATT&CK](https://img.shields.io/badge/Taxonomy-MITRE_v14-red?style=for-the-badge)](https://attack.mitre.org/)
 
-**An enterprise-grade, cloud-native SOC Copilot engineered to eliminate log triage fatigue.**  
-Ingests raw security telemetry, maps attacks to the **MITRE ATT&CK Framework**, extracts actionable IoCs, and generates immediate host firewall containment scripts (`iptables` / `ufw`).
+**A single-file, zero-dependency, enterprise-grade SOC Copilot that runs entirely in your browser.**
+Ingests raw telemetry, maps to **MITRE ATT&CK**, extracts IoCs, generates containment rules
+(`iptables` / `ufw` / `Snort` / `Suricata` / Windows Firewall), and exports **STIX 2.1** bundles.
 
-[🌐 Explore Live Production App](https://secops-ai-cloudrun.onrender.com) • [Report Bug](https://github.com/umairs759/secops-ai-cloudrun/issues) • [Request Feature](https://github.com/umairs759/secops-ai-cloudrun/issues)
+**No backend. No install. No build step. Just open `index.html`.**
 
 </div>
 
@@ -25,125 +26,181 @@ Ingests raw security telemetry, maps attacks to the **MITRE ATT&CK Framework**, 
 
 ---
 
-## ⚡ Core Architecture & Engineering Highlights
+## ⚡ Why This Exists
 
-- **Dual-Engine Threat Analysis (100% Uptime Guaranteed):**
-  - **Primary Core:** Powers deep forensic analysis using **Google Gemini 1.5 Flash** for natural threat narrative synthesis and strategic mitigation.
-  - **Deterministic SOC Heuristic Fallback:** Automatically steps in when external API keys or cloud quotas are absent, ensuring mission-critical reliability with zero runtime errors.
-- **Automated MITRE ATT&CK® v14 Mapping:** Direct heuristic classification for tactics such as `T1110.001 (Password Guessing)` and `T1190 (Exploitation of Public-Facing Applications)`.
-- **Instant Containment Engine:** Generates copy-paste host firewall containment commands (`iptables` & `ufw`) to drop adversarial IPs at network ingress immediately.
-- **Enterprise Dark SOC UI:** Built with a Glassmorphism theme, Chart.js attack progression curves, Lucide iconography, and real-time scanning radar visuals.
-- **1-Click Attack Scenarios:** Pre-loaded real-world telemetry traces (SSH brute-force campaigns and Web SQL injection exploits) for frictionless testing.
-- **Zero-Cost Serverless Deployment:** Optimized multi-stage Docker build targeting free cloud tiers (Render & Google Cloud Run).
+Traditional SOC tooling requires: a Python backend, a cloud VM, an LLM API proxy, an IaC pipeline, and 4 different dashboards glued together.  
+**SecOps-AI Sentinel collapses all of that into a single HTML file** you can drop on any static host (or even open from your filesystem) and start triaging.
+
+- ✅ **Zero Backend** — 100% client-side, no server, no data leaves your browser (unless you opt in to a cloud AI provider).
+- ✅ **BYOK Model** — Bring Your Own Key. Keys are stored **only** in your browser's `localStorage`.
+- ✅ **Deterministic Fallback** — If no API key is set, a built-in heuristic engine still performs full triage. **Never fails, never returns empty.**
+- ✅ **Air-Gap Friendly** — Works offline for heuristic analysis. Only the CDN assets need internet on first load.
 
 ---
 
-## 📊 Telemetry Triage Matrix
+## 🧠 Dual-Engine Threat Analysis
 
-| Metric / Layer | Specification |
+| Engine | Purpose | Requires Key? |
+|---|---|---|
+| **Local Heuristic Engine v2.0** | Regex + rule-based TTP detection, IoC extraction, MITRE mapping. Always available. | ❌ No |
+| **Google Gemini 1.5 Flash** | Deep narrative threat synthesis. | ✅ Yes (Free tier) |
+| **Groq (Llama 3.1)** | Ultra-fast inference. | ✅ Yes (Free tier) |
+| **OpenRouter** | Access to free Llama models. | ✅ Yes (Free tier) |
+| **Mistral Small** | EU-hosted inference. | ✅ Yes (Free tier) |
+| **Cohere Command-R** | Enterprise RAG-friendly. | ✅ Yes (Free tier) |
+| **OpenAI GPT-4o-mini** | Paid high-accuracy. | ✅ Yes (Paid) |
+| **Anthropic Claude 3.5 Haiku** | Paid high-accuracy. | ✅ Yes (Paid) |
+
+> If a cloud provider fails (rate limit, invalid key, network error), the platform **automatically falls back** to the local heuristic engine and continues triage — no crash, no data loss.
+
+---
+
+## 🧰 Feature Matrix
+
+| Module | Capability |
 |---|---|
-| **Analysis Latency** | `< 380 ms` (Local & Edge Container) |
-| **Supported Telemetry** | Linux `auth.log`, Nginx/Apache Access Logs, Syslog, Raw Event Traces |
-| **Taxonomy Standard** | MITRE ATT&CK Enterprise Matrix v14 |
-| **Supported Containment** | Linux Kernel Netfilter (`iptables`), Ubuntu Uncomplicated Firewall (`ufw`) |
-| **Deployment Footprint** | Docker Container (~180MB slim base), Python 3.11+ |
+| **Mission Control** | Real-time animated radar, live telemetry feed, 1-click scenario tests |
+| **Terminal Shell** | 20+ commands (`scan`, `hash`, `encode`, `ioc add`, `setkey`, `goto`, etc.) with history |
+| **Log Analyzer** | Paste logs OR drag-and-drop files (`.log`, `.txt`, `.json`, `.csv`), CTRL+ENTER to run |
+| **Recon Scanner** | Simulated port sweep (labeled clearly — no real network calls) |
+| **Payload Builder** | Red-team vectors: Bash, Python, PowerShell, PHP, Netcat, SQLi |
+| **Encoder Lab** | Base64, Hex, URL, ROT13 — encode & decode |
+| **Hash Generator** | SHA-256 via Web Crypto API |
+| **MITRE ATT&CK Matrix** | Auto-highlights detected techniques across tactics |
+| **IoC Vault** | Manual + auto-extracted indicators, CSV export, localStorage persistence |
+| **Containment Synthesis** | Auto-generates rules for **iptables, UFW, Snort, Suricata, Windows Firewall** |
+| **Incident Report** | Severity badge, kill-chain chart (Chart.js), targets, mitigations |
+| **STIX 2.1 Export** | Standardized JSON bundle download for SIEM/TIP ingestion |
+| **Settings** | Manage all provider keys, toggle Matrix rain, reset to factory |
 
 ---
 
-## 🕹️ Interactive 1-Click Scenarios
+## 📊 Technical Specifications
 
-Visit the [Live Instance](https://secops-ai-cloudrun.onrender.com) and test the engine instantly:
-
-1. **SSH Distributed Brute-Force:** Ingests high-frequency failed PAM authentication attempts against administrative users, extracts malicious origin IPs, and generates immediate drop rules.
-2. **Web SQL Injection (SQLi):** Spots Union-based database extraction attempts and command execution probes targeting public web servers, classifying them as Critical Severity.
+| Metric | Value |
+|---|---|
+| **Footprint** | Single `index.html` (~90 KB uncompressed) |
+| **Runtime Dependencies** | Tailwind CSS CDN, Chart.js CDN (only external assets) |
+| **Analysis Latency** | `< 380 ms` (local heuristic) · `< 3 s` (cloud AI) |
+| **Storage** | `localStorage` for API keys, IoC vault, provider preference |
+| **Supported Telemetry** | Linux `auth.log`, Nginx/Apache access logs, Syslog, Windows Event Log exports, raw text |
+| **Taxonomy** | MITRE ATT&CK Enterprise v14 |
+| **Containment Targets** | iptables · UFW · Snort · Suricata · Windows Advanced Firewall |
+| **Export Format** | STIX 2.1 JSON bundle |
+| **Browser Support** | Chrome / Edge / Firefox / Safari (modern, ES2020+) |
 
 ---
 
-## 🛠️ Local Development & Quickstart
+## 🚀 Quickstart
 
-### Prerequisites
-* Python 3.11+ installed
-* Git
-
-### 1. Clone & Setup
+### Option 1: Just Open It
 ```bash
-# Clone the repository
-git clone [https://github.com/umairs759/secops-ai-cloudrun.git](https://github.com/umairs759/secops-ai-cloudrun.git)
+git clone https://github.com/umairs759/secops-ai-cloudrun.git
 cd secops-ai-cloudrun
+# Open index.html in your browser. Done.
 ```
-
-# Create a virtual environment (optional but recommended)
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-## 2. Environment Configuration (Optional)
-```cp .env.example .env
-# Add your Gemini API Key in .env to enable Gemini LLM mode:
-# GEMINI_API_KEY=your_key_here
+## Option 2: Serve Locally (recommended)
 ```
-(If left empty, the deterministic heuristic engine handles all analysis automatically).
-
-### 3. Launch Local Server
-
+python3 -m http.server 8080
+# Visit http://localhost:8080
 ```
-uvicorn app.main:app --reload --port 8080
-```
-Open http://localhost:8080 in your browser.
+### Option 3: Deploy to Static Host (Free)
 
-## ☁️ Deployment Guides
+    GitHub Pages: Push to main, enable Pages in repo settings.
 
-### Option A: Render (Currently Active)
+    Netlify: Drag-and-drop index.html at https://app.netlify.com/drop
 
-Link your GitHub repository to a new Render Web Service.
+    Vercel: vercel --prod
 
-Set Environment to Python.
+    Cloudflare Pages: Connect repo, zero config.
 
-Build Command: pip install -r requirements.txt
+## 🕹️ 1-Click Attack Scenarios
 
-Start Command: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+Click any card on Mission Control to load & auto-analyze real-world traces:
 
-### Option B: Google Cloud Run (Serverless Free Tier)
+    SSH Brute Force → T1110.001 (Password Guessing) · HIGH
 
-Deploy using the Google Cloud CLI:
-```gcloud run deploy secops-ai-sentinel \
-  --source . \
-  --platform managed \
-  --region us-central1 \
-  --allow-unauthenticated \
-  --min-instances 0 \
-  --max-instances 2 \
-  --memory 512Mi \
-  --cpu 1
-```
+    SQL Injection → T1190 (Exploit Public-Facing App) · CRITICAL
 
-## 📂 Project Structure
+    Webshell Execution → T1059.004 (Unix Shell) · HIGH
 
-```text
-secops-ai-cloudrun/
-├── app/
-│   ├── __init__.py          # Application package initialization
-│   ├── main.py              # FastAPI endpoints, static routing & health checks
-│   ├── analyzer.py          # Gemini AI core + Deterministic Heuristic Fallback Engine
-│   ├── static/
-│   │   └── logo.svg         # SOC Sentinel branding icon
-│   └── templates/
-│       └── index.html       # Enterprise Cyber SOC single-page interface
-├── samples/
-│   ├── auth_sample.log      # Real-world SSH brute-force attack trace
-│   └── web_sample.log       # Real-world Web SQL injection & traversal trace
-├── Dockerfile               # Multi-stage production container configuration
-├── requirements.txt         # Production Python dependencies
-├── interface.png            # Mission control UI preview screenshot
-├── .dockerignore            # Docker build exclusion rules
-├── .gitignore               # Local environment ignore rules
-├── .env.example             # Environment template for API keys
-└── README.md                # Project documentation & deployment guides
-```
+    Ransomware (VSSAdmin) → T1490 (Inhibit System Recovery) · CRITICAL
+  
+## 🔐 Security & Privacy
 
+    API keys never leave your device. They're stored in localStorage and sent directly from your browser to the provider you chose.
+
+    No telemetry, no analytics, no tracking.
+
+    CORS note: Some providers (like Anthropic) require the anthropic-dangerous-direct-browser-access header, which is already wired up. For production use, consider routing through your own proxy.
+
+    Air-gap mode: Leave all keys blank → heuristic engine runs entirely offline.
+
+secops-ai-sentinel/
+│
+├── 📄 index.html                       # The entire single-file SPA (core app)
+├── 🖼️  interface.png                    # Mission Control dashboard screenshot
+│
+├── 📁 assets/                          # Branding & static media
+│   ├── logo.svg                        # Sentinel shield logo (used in README/favicon)
+│   ├── banner.png                      # GitHub social preview banner (1280×640)
+│   └── favicon.ico                     # Browser tab icon
+│
+├── 📁 samples/                         # Ready-to-use telemetry traces for testing
+│   ├── ssh-bruteforce.log              # T1110.001 — SSH password guessing
+│   ├── sqli-attack.log                 # T1190 — SQL injection payloads
+│   ├── ransomware-vss.log              # T1490 — Shadow copy deletion
+│   └── webshell-exec.log               # T1059.004 — Unix shell via web
+│
+├── 📁 docs/                            # Extended documentation
+│   ├── ARCHITECTURE.md                 # Dual-engine design & data flow
+│   ├── PROVIDERS.md                    # How to get free API keys (8 providers)
+│   ├── CONTAINMENT.md                  # Firewall rule reference (5 formats)
+│   ├── MITRE_MAPPING.md                # Full TTP coverage table
+│   └── SCREENSHOTS/                    # Feature screenshots per view
+│       ├── dashboard.png
+│       ├── terminal.png
+│       ├── report.png
+│       └── stix-export.png
+│
+├── 📁 .github/                         # GitHub automation & templates
+│   ├── workflows/
+│   │   └── pages.yml                   # Auto-deploy to GitHub Pages on push
+│   ├── ISSUE_TEMPLATE/
+│   │   ├── bug_report.md
+│   │   └── feature_request.md
+│   └── PULL_REQUEST_TEMPLATE.md
+│
+├── 📄 .gitignore                       # Ignore OS/editor clutter
+├── 📄 .editorconfig                    # Consistent formatting across editors
+├── 📄 LICENSE                          # MIT License
+├── 📄 CHANGELOG.md                     # Version history (v1.0 → v2.0)
+├── 📄 CONTRIBUTING.md                  # How to contribute
+└── 📄 README.md                        # You are here
+
+That's it. No requirements.txt, no Dockerfile, no app/ folder, no venv. If you want to add a backend later (e.g., to proxy Anthropic calls), the code is modular enough to extract AI_CALLERS into a small FastAPI service.
+
+## 🛠️ Extending
+
+Add a new AI provider:
+
+    Add an entry to AI_PROVIDERS in the <script> block.
+
+    Add a caller function to AI_CALLERS.
+
+    Done — it will auto-appear in the dropdown and Settings.
+
+Add a new containment format:
+
+    Add a <button class="tab-btn" data-ctab="myfw"> in the Containment view.
+
+    Add a rule-template branch in updateContainmentOutput().
 
 ## 📜 License & Acknowledgments
 
-This project is open-source under the MIT License — see the LICENSE file for details. Built for cybersecurity teams, incident responders, and cloud engineers.
+MIT License — see LICENSE.
+Built for blue teams, red teams, incident responders, and anyone tired of 12-tab triage workflows.
+
+Iconography hand-rolled as inline SVG (no Lucide CDN dependency).
+UI inspired by Black Hat / DEF CON terminal aesthetics.
+</div> ```
