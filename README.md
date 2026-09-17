@@ -119,25 +119,28 @@ Deploy using the Google Cloud CLI:
 ```
 
 ## 📂 Project Structure
+
+```text
 secops-ai-cloudrun/
 ├── app/
-│   ├── __init__.py          # App initialization
-│   ├── main.py              # FastAPI endpoints, static mounting & health checks
-│   ├── analyzer.py          # Gemini AI + Deterministic Heuristic Engine
+│   ├── __init__.py          # Application package initialization
+│   ├── main.py              # FastAPI endpoints, static routing & health checks
+│   ├── analyzer.py          # Gemini AI core + Deterministic Heuristic Fallback Engine
 │   ├── static/
-│   │   └── logo.svg         # SOC Sentinel vector branding
+│   │   └── logo.svg         # SOC Sentinel branding icon
 │   └── templates/
-│       └── index.html       # Cyber SOC Glassmorphism single-page UI
+│       └── index.html       # Enterprise Cyber SOC single-page interface
 ├── samples/
-│   ├── auth_sample.log      # Raw Linux SSH brute force sample
-│   └── web_sample.log       # Raw Web SQLi exploit sample
+│   ├── auth_sample.log      # Real-world SSH brute-force attack trace
+│   └── web_sample.log       # Real-world Web SQL injection & traversal trace
 ├── Dockerfile               # Multi-stage production container configuration
-├── requirements.txt         # Production dependencies
-├── interface.png            # Dashboard preview screenshot
-├── .dockerignore
-├── .gitignore
-├── .env.example
-└── README.md
+├── requirements.txt         # Production Python dependencies
+├── interface.png            # Mission control UI preview screenshot
+├── .dockerignore            # Docker build exclusion rules
+├── .gitignore               # Local environment ignore rules
+├── .env.example             # Environment template for API keys
+└── README.md                # Project documentation & deployment guides
+```
 
 
 ## 📜 License & Acknowledgments
