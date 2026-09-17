@@ -2648,4 +2648,853 @@ function renderReport(data) {
           '<div style="display:flex;flex-wrap:wrap;gap:8px;">' +
             (services.length ? services.map(function (s) {
               return '<span style="font-family:JetBrains Mono;font-size:11px;padding:5px 10px;background:rgba(183,148,246,0.08);border:1px solid rgba(183,148,246,0.3);border-radius:6px;color:var(--purple);">' + esc(s) + '</span>';
-            }).join('') : '<span style="color:var(--text-2);font-size:
+            }).join('') : '<span style="color:var(--text-2);font-size:12px;">No subsystems identified.</span>') +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="panel" style="margin-bottom:20px;">' +
+      '<div class="panel-header"><div class="panel-title"><i data-lucide="shield-check" style="width:15px;height:15px;"></i>Defensive Advisories</div></div>' +
+      '<div class="panel-body">' +
+        '<ul style="list-style:none;display:flex;flex-direction:column;gap:10px;">' +
+          (recs.length ? recs.map(function (r) {
+            return '<li style="display:flex;align-items:flex-start;gap:10px;font-size:12.5px;color:var(--text-1);line-height:1.6;">' +
+              '<i data-lucide="check-circle-2" style="width:14px;height:14px;color:var(--green);flex-shrink:0;margin-top:2px;"></i>' +
+              '<span>' + esc(r) + '</span>' +
+            '</li>';
+          }).join('') : '<li style="color:var(--text-2);font-size:12px;">No advisories provided.</li>') +
+        '</ul>' +
+      '</div>' +
+    '</div>';
+
+  wrap.innerHTML = html;
+  if (window.lucide) lucide.createIcons();
+  setTimeout(function () { renderKillChart(data.chart_metrics); }, 60);
+}
+
+/* ============================================================
+   METRIC BAR HELPER
+============================================================ */
+function metricBar(label, value, max, color) {
+  const pct = Math.max(2, Math.min(100, (value / max) * 100));
+  return '<div style="margin-bottom:14px;">' +
+    '<div style="display:flex;justify-content:space-between;margin-bottom:5px;">' +
+      '<span style="font-size:10.5px;color:var(--text-1);letter-spacing:1px;text-transform:uppercase;">' + esc(label) + '</span>' +
+      '<span style="font-size:11px;font-weight:700;color:' + color + ';">' + value + ' / ' + max + '</span>' +
+    '</div>' +
+    '<div class="progress"><div class="progress-bar" style="width:' + pct + '%;background:' + color + ';"></div></div>' +
+  '</div>';
+}
+
+/* ============================================================
+   KILL CHAIN CHART (Chart.js)
+============================================================ */
+function renderKillChart(metrics) {
+  const canvas = document.getElementById('killChart');
+  if (!canvas || !window.Chart) return;
+
+  if (STATE.killChart) {
+    try { STATE.killChart.destroy(); } catch (e) {}
+    STATE.killChart = null;
+  }
+
+  const ctx = canvas.getContext('2d');
+  const labels = (metrics && metrics.labels) || ['Recon', 'Weaponize', 'Deliver', 'Exploit', 'C2'];
+  const data = (metrics && metrics.severity_curve) || [20, 45, 70, 90, 40];
+
+  const gradient = ctx.createLinearGradient(0, 0, 0, 220);
+  gradient.addColorStop(0, 'rgba(0, 255, 156, 0.4)');
+  gradient.addColorStop(0.6, 'rgba(0, 229, 255, 0.1)');
+  gradient.addColorStop(1, 'rgba(0, 255, 156, 0)');
+
+  STATE.killChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Threat Intensity',
+        data: data,
+        borderColor: '#00FF9C',
+        backgroundColor: gradient,
+        borderWidth: 2,
+        tension: 0.42,
+        fill: true,
+        pointBackgroundColor: '#00FF9C',
+        pointBorderColor: '#000',
+        pointBorderWidth: 2,
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        pointHoverBackgroundColor: '#00E5FF'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 800, easing: 'easeOutQuart' },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(5, 8, 10, 0.98)',
+          borderColor: 'rgba(0, 255, 156, 0.4)',
+          borderWidth: 1,
+          titleColor: '#E6EDF3',
+          bodyColor: '#8B949E',
+          titleFont: { family: 'JetBrains Mono', size: 11, weight: '700' },
+          bodyFont: { family: 'JetBrains Mono', size: 11 },
+          padding: 10,
+          cornerRadius: 6,
+          displayColors: false
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(0, 255, 156, 0.08)', drawBorder: false },
+          ticks: { color: '#8B949E', font: { family: 'JetBrains Mono', size: 10 } }
+        },
+        y: {
+          min: 0, max: 100,
+          grid: { color: 'rgba(0, 255, 156, 0.08)', drawBorder: false },
+          ticks: { color: '#8B949E', font: { family: 'JetBrains Mono', size: 10 }, stepSize: 25 }
+        }
+      }
+    }
+  });
+}
+
+/* ============================================================
+   MITRE ATT&CK MATRIX
+============================================================ */
+const MITRE_MATRIX = [
+  { tactic: 'Initial Access', color: '#00E5FF', techs: [
+    { id: 'T1190', name: 'Exploit Public-Facing App' },
+    { id: 'T1566', name: 'Phishing' },
+    { id: 'T1078', name: 'Valid Accounts' }
+  ]},
+  { tactic: 'Execution', color: '#00FF9C', techs: [
+    { id: 'T1059', name: 'Command & Scripting' },
+    { id: 'T1059.004', name: 'Unix Shell' },
+    { id: 'T1053', name: 'Scheduled Task/Job' }
+  ]},
+  { tactic: 'Persistence', color: '#B794F6', techs: [
+    { id: 'T1136', name: 'Create Account' },
+    { id: 'T1543', name: 'Create/Modify Service' },
+    { id: 'T1547', name: 'Boot Autostart' }
+  ]},
+  { tactic: 'Privilege Escalation', color: '#FFB627', techs: [
+    { id: 'T1548', name: 'Abuse Elevation Control' },
+    { id: 'T1068', name: 'Exploit for Priv Esc' }
+  ]},
+  { tactic: 'Defense Evasion', color: '#818CF8', techs: [
+    { id: 'T1070', name: 'Indicator Removal' },
+    { id: 'T1027', name: 'Obfuscated Files' },
+    { id: 'T1562', name: 'Impair Defenses' }
+  ]},
+  { tactic: 'Credential Access', color: '#FFB627', techs: [
+    { id: 'T1110', name: 'Brute Force' },
+    { id: 'T1110.001', name: 'Password Guessing' },
+    { id: 'T1003', name: 'OS Credential Dumping' }
+  ]},
+  { tactic: 'Discovery', color: '#B794F6', techs: [
+    { id: 'T1046', name: 'Network Service Discovery' },
+    { id: 'T1083', name: 'File & Directory Discovery' },
+    { id: 'T1082', name: 'System Info Discovery' }
+  ]},
+  { tactic: 'Lateral Movement', color: '#FF2E63', techs: [
+    { id: 'T1021', name: 'Remote Services' },
+    { id: 'T1021.004', name: 'SSH' },
+    { id: 'T1570', name: 'Lateral Tool Transfer' }
+  ]},
+  { tactic: 'Collection', color: '#FF2E63', techs: [
+    { id: 'T1005', name: 'Data from Local System' },
+    { id: 'T1560', name: 'Archive Collected Data' }
+  ]},
+  { tactic: 'Command & Control', color: '#F472B6', techs: [
+    { id: 'T1071', name: 'App Layer Protocol' },
+    { id: 'T1571', name: 'Non-Standard Port' },
+    { id: 'T1095', name: 'Non-App Layer Protocol' }
+  ]},
+  { tactic: 'Exfiltration', color: '#F87171', techs: [
+    { id: 'T1041', name: 'Exfil Over C2' },
+    { id: 'T1048', name: 'Exfil Over Alt Protocol' }
+  ]},
+  { tactic: 'Impact', color: '#EF4444', techs: [
+    { id: 'T1486', name: 'Data Encrypted for Impact' },
+    { id: 'T1490', name: 'Inhibit System Recovery' }
+  ]}
+];
+
+function updateMitre(report) {
+  const hitIds = {};
+  ((report && report.mitre_techniques) || []).forEach(function (t) {
+    if (t && t.id) hitIds[t.id] = t;
+  });
+
+  const grid = document.getElementById('mitreGrid');
+  if (!grid) return;
+
+  let totalHits = 0;
+  grid.innerHTML = MITRE_MATRIX.map(function (tac) {
+    return '<div class="panel" style="padding:14px;">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">' +
+        '<span style="font-size:10.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:' + tac.color + ';">' + tac.tactic + '</span>' +
+      '</div>' +
+      '<div style="display:flex;flex-direction:column;gap:6px;">' +
+        tac.techs.map(function (t) {
+          const hit = !!hitIds[t.id];
+          if (hit) totalHits++;
+          const url = 'https://attack.mitre.org/techniques/' + t.id.replace('.', '/') + '/';
+          return '<a href="' + url + '" target="_blank" rel="noopener" class="mitre-card" style="text-decoration:none;padding:8px 10px;background:' + (hit ? 'rgba(255,46,99,0.08)' : 'rgba(0,0,0,0.4)') + ';border:1px solid ' + (hit ? 'rgba(255,46,99,0.4)' : 'var(--border)') + ';border-radius:6px;display:block;transition:all 0.15s;" onmouseover="this.style.borderColor=\'' + (hit ? 'var(--red)' : 'var(--green)') + '\'" onmouseout="this.style.borderColor=\'' + (hit ? 'rgba(255,46,99,0.4)' : 'var(--border)') + '\'">' +
+            '<div style="display:flex;align-items:center;gap:8px;">' +
+              '<span style="font-family:JetBrains Mono;font-size:10px;font-weight:700;color:' + (hit ? 'var(--red)' : 'var(--cyan)') + ';padding:1px 5px;background:' + (hit ? 'rgba(255,46,99,0.1)' : 'rgba(0,229,255,0.08)') + ';border-radius:3px;">' + t.id + '</span>' +
+              '<span style="font-size:11px;color:' + (hit ? 'var(--text-0)' : 'var(--text-1)') + ';">' + t.name + '</span>' +
+              (hit ? '<i data-lucide="alert-circle" style="width:12px;height:12px;color:var(--red);margin-left:auto;"></i>' : '') +
+            '</div>' +
+          '</a>';
+        }).join('') +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  const summary = document.getElementById('mitreSummary');
+  if (summary) summary.textContent = totalHits + ' techniques detected';
+
+  const badge = document.getElementById('navMitreBadge');
+  if (badge) {
+    if (totalHits > 0) { badge.textContent = totalHits; badge.classList.remove('hidden'); }
+    else badge.classList.add('hidden');
+  }
+  if (window.lucide) lucide.createIcons();
+}
+
+/* ============================================================
+   IoC VAULT
+============================================================ */
+function lookupRep(ip) {
+  if (!ip) return { verdict: 'UNKNOWN', score: 0, source: 'n/a', color: 'gray' };
+  if (/^127\./.test(ip) || /^10\./.test(ip) || /^192\.168\./.test(ip) || /^172\.(1[6-9]|2\d|3[01])\./.test(ip)) {
+    return { verdict: 'INTERNAL', score: 0, source: 'RFC1918', color: 'gray' };
+  }
+  if (/^185\.220\.101\./.test(ip)) return { verdict: 'MALICIOUS', score: 98, source: 'Tor Exit Node', color: 'red' };
+  if (/^194\.26\.29\./.test(ip)) return { verdict: 'MALICIOUS', score: 92, source: 'AbuseIPDB', color: 'red' };
+  if (/^45\.(1[3-9]\d|2\d{2})\./.test(ip)) return { verdict: 'SUSPICIOUS', score: 62, source: 'Datacenter', color: 'amber' };
+  return { verdict: 'UNVERIFIED', score: 20, source: 'No reputation data', color: 'cyan' };
+}
+
+function classifyCIDR(ip) {
+  const p = (ip || '').split('.');
+  if (p.length !== 4) return 'n/a';
+  const f = parseInt(p[0], 10);
+  if (isNaN(f)) return 'n/a';
+  if (f < 128) return 'Class A /8';
+  if (f < 192) return 'Class B /16';
+  if (f < 224) return 'Class C /24';
+  return 'Reserved';
+}
+
+function updateIocs(report) {
+  const container = document.getElementById('iocContainer');
+  if (!container) return;
+  const iocs = (report && report.detected_iocs) || [];
+
+  const navBadge = document.getElementById('navIocBadge');
+  if (navBadge) {
+    if (iocs.length > 0) { navBadge.textContent = iocs.length; navBadge.classList.remove('hidden'); }
+    else navBadge.classList.add('hidden');
+  }
+
+  if (iocs.length === 0) {
+    container.innerHTML = '<div class="panel" style="padding:60px 24px;text-align:center;">' +
+      '<i data-lucide="fingerprint" style="width:42px;height:42px;color:var(--text-2);margin:0 auto 12px;display:block;"></i>' +
+      '<div style="color:var(--text-2);font-size:13px;">No indicators extracted from the last analysis.</div>' +
+    '</div>';
+    if (window.lucide) lucide.createIcons();
+    return;
+  }
+
+  container.innerHTML = '<div class="panel" style="padding:18px;">' +
+    '<div style="display:flex;flex-direction:column;gap:10px;">' +
+      iocs.map(function (ioc, idx) {
+        const val = ioc && ioc.value ? String(ioc.value) : '';
+        const type = ioc && ioc.type ? String(ioc.type) : 'unknown';
+        const ctx = ioc && ioc.context ? String(ioc.context) : '';
+        const rep = lookupRep(val);
+        const isIP = /\b(?:\d{1,3}\.){3}\d{1,3}\b/.test(val);
+        return '<div style="padding:13px 15px;background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:8px;">' +
+          '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+            '<span style="font-family:JetBrains Mono;font-size:12.5px;font-weight:600;color:#FF2E63;word-break:break-all;">' + esc(val) + '</span>' +
+            '<span class="badge badge-red">' + esc(type) + '</span>' +
+            '<span class="badge badge-' + rep.color + '">' + rep.verdict + ' · ' + rep.score + '</span>' +
+            (isIP ? '<span class="badge badge-purple">' + classifyCIDR(val) + '</span>' : '') +
+          '</div>' +
+          '<div style="font-size:11.5px;color:var(--text-2);margin-top:6px;">' + esc(ctx) + '</div>' +
+          '<div style="font-size:10.5px;color:var(--text-2);margin-top:4px;font-family:JetBrains Mono;">Source: ' + rep.source + '</div>' +
+          '<div style="display:flex;gap:6px;margin-top:8px;">' +
+            (isIP ? '<a class="btn btn-ghost btn-sm" href="https://www.abuseipdb.com/check/' + encodeURIComponent(val) + '" target="_blank" rel="noopener" style="text-decoration:none;"><i data-lucide="external-link" style="width:10px;height:10px;"></i> AbuseIPDB</a>' : '') +
+            '<button class="btn btn-ghost btn-sm" onclick="copyToClipboard(\'' + String(val).replace(/'/g, "\\'") + '\', \'IoC value copied.\')">' +
+              '<i data-lucide="copy" style="width:10px;height:10px;"></i> Copy' +
+            '</button>' +
+          '</div>' +
+        '</div>';
+      }).join('') +
+    '</div>' +
+  '</div>';
+  if (window.lucide) lucide.createIcons();
+}
+
+function copyAllIocs() {
+  const r = STATE.lastReport;
+  if (!r) { toast('warn', 'No Report', 'Run an analysis first.'); return; }
+  const iocs = r.detected_iocs || [];
+  if (!iocs.length) { toast('warn', 'No IoCs', 'Nothing to copy.'); return; }
+  const txt = iocs.map(function (i) { return (i.type || 'unknown') + '\t' + (i.value || '') + '\t' + (i.context || ''); }).join('\n');
+  copyToClipboard(txt, iocs.length + ' indicators copied.');
+}
+
+function exportIocsCSV() {
+  const r = STATE.lastReport;
+  if (!r) { toast('warn', 'No Report', 'Run an analysis first.'); return; }
+  const iocs = r.detected_iocs || [];
+  if (!iocs.length) { toast('warn', 'No IoCs', 'Nothing to export.'); return; }
+  const q = function (v) { return '"' + String(v || '').replace(/"/g, '""') + '"'; };
+  const header = 'Type,Value,Context,Reputation,Verdict\n';
+  const rows = iocs.map(function (i) {
+    const rep = lookupRep(i.value);
+    return [q(i.type), q(i.value), q(i.context), rep.score, rep.verdict].join(',');
+  }).join('\n');
+  const blob = new Blob([header + rows], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'secops-iocs-' + Date.now() + '.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('success', 'CSV Exported', iocs.length + ' indicators downloaded.');
+}
+
+/* ============================================================
+   CONTAINMENT CENTER
+============================================================ */
+function extractAttackerIPs(report) {
+  if (!report) return [];
+  const iocs = report.detected_iocs || [];
+  const out = [];
+  const seen = {};
+  iocs.forEach(function (i) {
+    const t = (i && i.type ? String(i.type) : '').toLowerCase();
+    const v = i && i.value ? String(i.value).trim() : '';
+    if (!v) return;
+    if (t.indexOf('ip') !== -1 || t.indexOf('address') !== -1 || /\b(?:\d{1,3}\.){3}\d{1,3}\b/.test(v)) {
+      const m = v.match(/\b(?:\d{1,3}\.){3}\d{1,3}\b/);
+      if (m && !seen[m[0]]) { seen[m[0]] = true; out.push(m[0]); }
+    }
+  });
+  return out;
+}
+
+function switchContainment(tab) {
+  STATE.containmentTab = tab;
+  document.querySelectorAll('.tab-btn[data-ctab]').forEach(function (b) {
+    b.classList.toggle('active', b.dataset.ctab === tab);
+  });
+  updateContainmentOutput();
+}
+
+function updateContainment(report) {
+  if (report) STATE.lastReport = report;
+  updateContainmentOutput();
+}
+
+function updateContainmentOutput() {
+  const out = document.getElementById('containmentOutput');
+  if (!out) return;
+  const r = STATE.lastReport;
+  if (!r) {
+    out.textContent = '$ run an analysis to generate containment rules...\n';
+    return;
+  }
+  const ips = extractAttackerIPs(r);
+  if (!ips.length) {
+    out.textContent = '$ no attacker IPs identified in the last analysis.\n$ ensure telemetry contains IP-based IoCs.\n';
+    return;
+  }
+  const tab = STATE.containmentTab;
+  let lines = [];
+  if (tab === 'iptables') {
+    lines = ips.map(function (ip) { return 'iptables -A INPUT -s ' + ip + ' -j DROP'; });
+  } else if (tab === 'ufw') {
+    lines = ips.map(function (ip) { return 'ufw insert 1 deny from ' + ip + ' to any'; });
+  } else if (tab === 'snort') {
+    lines = ips.map(function (ip, i) { return 'alert ip ' + ip + ' any -> $HOME_NET any (msg:"SecOps-AI Blocked ' + ip + '"; sid:10000' + i + '; rev:1;)'; });
+  } else if (tab === 'suricata') {
+    lines = ips.map(function (ip, i) { return 'drop ip ' + ip + ' any -> $HOME_NET any (msg:"SecOps-AI Containment ' + ip + '"; sid:20000' + i + '; rev:1;)'; });
+  } else if (tab === 'windows') {
+    lines = ips.map(function (ip) { return 'netsh advfirewall firewall add rule name="Block ' + ip + '" dir=in action=block remoteip=' + ip; });
+  }
+  out.textContent = '# Generated ' + lines.length + ' rule(s) for ' + ips.length + ' hostile IP(s) — engine: ' + tab + '\n\n' + lines.join('\n') + '\n';
+}
+
+function copyContainment() {
+  const out = document.getElementById('containmentOutput');
+  if (!out || !STATE.lastReport) { toast('warn', 'No Rules', 'Run an analysis first.'); return; }
+  const lines = out.textContent.split('\n').filter(function (l) { return l && l.trim() && l.charAt(0) !== '#' && l.charAt(0) !== '$'; }).join('\n');
+  if (!lines.trim()) { toast('warn', 'No Rules', 'No rules generated yet.'); return; }
+  copyToClipboard(lines, 'Containment rules copied to clipboard.');
+}
+
+/* ============================================================
+   STIX EXPORT
+============================================================ */
+function buildStix(report) {
+  if (!report) return null;
+  const now = new Date().toISOString();
+  const identityId = 'identity--' + uuid();
+  const objects = [{
+    type: 'identity', spec_version: '2.1', id: identityId,
+    created: now, modified: now, name: 'SecOps-AI Sentinel',
+    identity_class: 'system', description: 'Autonomous SOC triage platform'
+  }];
+  const reportRefs = [identityId];
+
+  ((report.detected_iocs) || []).forEach(function (ioc, idx) {
+    const id = 'indicator--' + uuid();
+    const val = String(ioc.value || '').replace(/'/g, "\\'");
+    objects.push({
+      type: 'indicator', spec_version: '2.1', id: id,
+      created: now, modified: now, created_by_ref: identityId,
+      name: 'IoC #' + (idx + 1) + ' — ' + (ioc.type || 'artifact'),
+      description: ioc.context || 'Extracted by SecOps-AI Sentinel',
+      indicator_types: ['malicious-activity'],
+      pattern: '[' + (ioc.type || 'artifact') + ':value = \'' + val + '\']',
+      pattern_type: 'stix', valid_from: now, labels: ['secops-ai', 'auto-extracted']
+    });
+    reportRefs.push(id);
+  });
+
+  ((report.mitre_techniques) || []).forEach(function (t) {
+    if (!t || !t.id) return;
+    const id = 'attack-pattern--' + uuid();
+    objects.push({
+      type: 'attack-pattern', spec_version: '2.1', id: id,
+      created: now, modified: now, created_by_ref: identityId,
+      name: t.name || t.id,
+      description: 'MITRE ATT&CK ' + t.id + ' (' + (t.tactic || 'Unmapped') + ')',
+      external_references: [{
+        source_name: 'mitre-attack', external_id: t.id,
+        url: 'https://attack.mitre.org/techniques/' + String(t.id).replace('.', '/') + '/'
+      }],
+      kill_chain_phases: [{
+        kill_chain_name: 'mitre-attack',
+        phase_name: (t.tactic || 'unknown').toLowerCase().replace(/\s+/g, '-')
+      }]
+    });
+    reportRefs.push(id);
+  });
+
+  const reportId = 'report--' + uuid();
+  objects.push({
+    type: 'report', spec_version: '2.1', id: reportId,
+    created: now, modified: now, created_by_ref: identityId,
+    name: report.threat_title || 'SecOps Incident Report',
+    description: report.executive_summary || '',
+    report_types: ['threat-report', 'incident'],
+    published: now, object_refs: reportRefs,
+    labels: ['secops-ai', (report.severity || 'unknown').toLowerCase()]
+  });
+
+  return {
+    type: 'bundle', id: 'bundle--' + uuid(),
+    spec_version: '2.1', objects: objects
+  };
+}
+
+function switchExport(tab) {
+  STATE.exportTab = tab;
+  document.querySelectorAll('.tab-btn[data-etab]').forEach(function (b) {
+    b.classList.toggle('active', b.dataset.etab === tab);
+  });
+  updateExportOutput();
+}
+
+function updateExport(report) {
+  if (report) STATE.lastReport = report;
+  updateExportOutput();
+}
+
+function updateExportOutput() {
+  const out = document.getElementById('exportContent');
+  if (!out) return;
+  const r = STATE.lastReport;
+  if (!r) {
+    out.textContent = '$ run an analysis first...\n';
+    return;
+  }
+  if (STATE.exportTab === 'stix') {
+    out.textContent = JSON.stringify(buildStix(r), null, 2);
+  } else {
+    out.textContent = JSON.stringify(r, null, 2);
+  }
+}
+
+function downloadStix() {
+  const r = STATE.lastReport;
+  if (!r) { toast('warn', 'No Report', 'Run an analysis first.'); return; }
+  const bundle = buildStix(r);
+  const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'secops-stix-' + Date.now() + '.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('success', 'STIX Exported', (bundle.objects || []).length + ' objects bundled.');
+}
+
+function copyStix() {
+  const out = document.getElementById('exportContent');
+  if (!out) { toast('warn', 'No Export', 'Nothing to copy.'); return; }
+  copyToClipboard(out.textContent, 'Export payload copied.');
+}
+
+function printAudit() {
+  const r = STATE.lastReport;
+  if (!r) { toast('warn', 'No Report', 'Run an analysis first.'); return; }
+  const w = window.open('', '_blank', 'width=900,height=760');
+  if (!w) { toast('error', 'Popup Blocked', 'Allow popups to print the audit.'); return; }
+  const techs = ((r.mitre_techniques) || []).map(function (t) {
+    return '<tr><td>' + esc(t.id) + '</td><td>' + esc(t.name) + '</td><td>' + esc(t.tactic) + '</td></tr>';
+  }).join('') || '<tr><td colspan="3">None</td></tr>';
+  const iocs = ((r.detected_iocs) || []).map(function (i) {
+    return '<tr><td>' + esc(i.type) + '</td><td>' + esc(i.value) + '</td><td>' + esc(i.context || '') + '</td></tr>';
+  }).join('') || '<tr><td colspan="3">None</td></tr>';
+  const recs = ((r.recommendations) || []).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') || '<li>None</li>';
+  const html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>SecOps Audit — ' + esc(r.threat_title || '') + '</title>' +
+    '<style>body{font-family:system-ui,-apple-system,sans-serif;padding:40px;color:#111;max-width:900px;margin:auto;line-height:1.55;}h1{font-size:22px;border-bottom:2px solid #00B894;padding-bottom:10px;margin-bottom:6px;}h2{font-size:15px;color:#0891B2;margin-top:30px;border-bottom:1px solid #e2e8f0;padding-bottom:5px;}table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px;}th,td{border:1px solid #cbd5e1;padding:8px 11px;text-align:left;}th{background:#f1f5f9;font-weight:700;}.badge{display:inline-block;padding:4px 12px;border-radius:6px;font-size:11px;font-weight:700;background:#E11D48;color:#fff;letter-spacing:0.5px;}.meta{color:#64748b;font-size:12px;margin-bottom:22px;}.footer{margin-top:50px;padding-top:18px;border-top:1px solid #e2e8f0;font-size:11px;color:#94a3b8;}ul{font-size:13px;line-height:1.8;padding-left:20px;}</style></head><body>' +
+    '<h1>SecOps-AI Sentinel — Incident Audit</h1>' +
+    '<div class="meta">Generated: ' + new Date().toLocaleString() + ' · Engine: ' + esc(r.engine || 'n/a') + ' · Risk Index: ' + (r.threat_score || 0) + '/100</div>' +
+    '<p><span class="badge">' + esc(r.severity || 'UNKNOWN') + '</span> &nbsp; <strong style="font-size:15px;">' + esc(r.threat_title || '') + '</strong></p>' +
+    '<p>' + esc(r.executive_summary || '') + '</p>' +
+    '<h2>MITRE ATT&CK Techniques</h2><table><thead><tr><th>ID</th><th>Name</th><th>Tactic</th></tr></thead><tbody>' + techs + '</tbody></table>' +
+    '<h2>Indicators of Compromise</h2><table><thead><tr><th>Type</th><th>Value</th><th>Context</th></tr></thead><tbody>' + iocs + '</tbody></table>' +
+    '<h2>Defensive Advisories</h2><ul>' + recs + '</ul>' +
+    '<div class="footer">SecOps-AI Sentinel v2.0 — Black Hat Edition · Auto-generated incident audit</div>' +
+    '</body></html>';
+  w.document.write(html);
+  w.document.close();
+  setTimeout(function () { w.focus(); w.print(); }, 380);
+}
+
+/* ============================================================
+   ACTIVITY FEED
+============================================================ */
+function addFeedItem(report) {
+  const feed = document.getElementById('activityFeed');
+  if (!feed) return;
+  const sev = report.severity || 'LOW';
+  const color = sev === 'CRITICAL' ? 'var(--red)' : sev === 'HIGH' ? 'var(--amber)' : 'var(--cyan)';
+  const item = document.createElement('div');
+  item.className = 'feed-item';
+  item.innerHTML =
+    '<div class="icon-wrap" style="background:rgba(255,46,99,0.08);border-color:rgba(255,46,99,0.3);">' +
+      '<i data-lucide="alert-triangle" style="width:15px;height:15px;color:' + color + ';"></i>' +
+    '</div>' +
+    '<div style="flex:1;min-width:0;">' +
+      '<div style="font-size:12px;font-weight:600;color:var(--text-0);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(report.threat_title || 'Analysis Complete') + '</div>' +
+      '<div style="font-size:10.5px;color:var(--text-2);margin-top:2px;">' + esc(sev) + ' · Risk ' + (report.threat_score || 0) + '/100 · ' + ((report.detected_iocs) || []).length + ' IoCs</div>' +
+    '</div>' +
+    '<div class="num" style="font-size:10px;color:var(--text-2);flex-shrink:0;">' + nowTime() + '</div>';
+  feed.insertBefore(item, feed.firstChild);
+  while (feed.children.length > 15) feed.removeChild(feed.lastChild);
+  if (window.lucide) lucide.createIcons();
+}
+
+function clearFeed() {
+  const feed = document.getElementById('activityFeed');
+  if (feed) {
+    feed.innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--text-2);font-size:12px;">' +
+      '<i data-lucide="inbox" style="width:28px;height:28px;margin:0 auto 10px;display:block;opacity:0.5;"></i>' +
+      'Feed cleared. New events will appear here.' +
+    '</div>';
+    if (window.lucide) lucide.createIcons();
+  }
+  toast('info', 'Feed Cleared', 'Activity stream reset.');
+}
+
+function showNotifications() {
+  const count = STATE.analyses;
+  if (count === 0) toast('info', 'Notifications', 'No new alerts in the queue.');
+  else toast('info', 'Notifications', count + ' incident(s) analyzed this session. Open Incident Report for details.');
+}
+
+/* ============================================================
+   SETTINGS
+============================================================ */
+function toggleMatrix(v) {
+  const c = document.getElementById('matrixCanvas');
+  if (!c || !window.matrixControl) return;
+  if (v === 'off') {
+    c.style.opacity = '0';
+    window.matrixControl.stop();
+    toast('info', 'Matrix Disabled', 'Background effect turned off.');
+  } else {
+    c.style.opacity = '0.15';
+    window.matrixControl.start();
+    toast('info', 'Matrix Enabled', 'Background effect turned on.');
+  }
+}
+
+function saveSettings() {
+  const k = document.getElementById('persistKey').value.trim();
+  const m = document.getElementById('matrixToggle').value;
+  try {
+    if (k) localStorage.setItem('secops_key', k);
+    else localStorage.removeItem('secops_key');
+    localStorage.setItem('secops_matrix', m);
+    const apiIn = document.getElementById('apiKeyInput');
+    if (apiIn) apiIn.value = k;
+    toast('success', 'Settings Saved', 'Configuration persisted locally.');
+  } catch (e) {
+    toast('warn', 'Storage Blocked', 'Browser denied localStorage access.');
+  }
+}
+
+function resetSettings() {
+  try {
+    localStorage.removeItem('secops_key');
+    localStorage.removeItem('secops_matrix');
+  } catch (e) {}
+  document.getElementById('persistKey').value = '';
+  document.getElementById('apiKeyInput').value = '';
+  document.getElementById('matrixToggle').value = 'on';
+  toggleMatrix('on');
+  toast('success', 'Reset Complete', 'All settings restored to factory defaults.');
+}
+
+/* ============================================================
+   HEX MODAL
+============================================================ */
+function openHex() {
+  const logs = document.getElementById('logStream').value || '';
+  const body = document.getElementById('hexBody');
+  if (!logs.trim()) { toast('warn', 'No Data', 'Paste logs into the analyzer first.'); return; }
+  const bytes = new TextEncoder().encode(logs);
+  const max = Math.min(1024, bytes.length);
+  let html = '';
+  for (let off = 0; off < max; off += 16) {
+    const slice = bytes.slice(off, off + 16);
+    let hex = '', ascii = '';
+    for (let i = 0; i < 16; i++) {
+      if (i < slice.length) {
+        hex += slice[i].toString(16).padStart(2, '0') + ' ';
+        ascii += (slice[i] >= 32 && slice[i] <= 126) ? String.fromCharCode(slice[i]) : '.';
+      } else { hex += '   '; ascii += ' '; }
+      if (i === 7) hex += ' ';
+    }
+    html += '<div class="hex-row">' +
+      '<span class="hex-off">0x' + off.toString(16).padStart(8, '0') + '</span>' +
+      '<span class="hex-bytes">' + hex + '</span>' +
+      '<span class="hex-ascii">|' + esc(ascii) + '|</span>' +
+    '</div>';
+  }
+  if (bytes.length > max) {
+    html += '<div style="text-align:center;padding:14px;color:var(--text-2);font-size:11px;font-family:JetBrains Mono;">— first ' + max + ' of ' + bytes.length + ' bytes —</div>';
+  }
+  body.innerHTML = html;
+  document.getElementById('hexModal').classList.remove('hidden');
+}
+
+function closeHex() {
+  document.getElementById('hexModal').classList.add('hidden');
+}
+
+/* ============================================================
+   GLOBAL SEARCH
+============================================================ */
+function runGlobalSearch(q) {
+  q = (q || '').trim();
+  if (!q) return;
+  const r = STATE.lastReport;
+  if (!r) { toast('info', 'Search', 'Run an analysis to enable search.'); return; }
+  const hay = JSON.stringify(r).toLowerCase();
+  if (hay.indexOf(q.toLowerCase()) === -1) {
+    toast('warn', 'No Matches', 'No occurrence of "' + q + '" in the current report.');
+    return;
+  }
+  const lo = q.toLowerCase();
+  if (/^\d{1,3}(\.\d{1,3}){3}$/.test(q)) {
+    switchView('ioc');
+    toast('success', 'Match Found', 'IP address detected — opened IoC Vault.');
+  } else if (lo.startsWith('t1') || lo.startsWith('ta0')) {
+    switchView('mitre');
+    toast('success', 'Match Found', 'MITRE technique reference — opened matrix.');
+  } else {
+    switchView('report');
+    toast('success', 'Match Found', 'Reference located in the incident report.');
+  }
+}
+
+/* ============================================================
+   INITIALIZATION
+============================================================ */
+function initApp() {
+  if (window.lucide) lucide.createIcons();
+
+  // Radar animation
+  try { Radar.init(); } catch (e) { console.warn('Radar init failed:', e); }
+
+  // Terminal emulator
+  initTerminal();
+
+  // Byte counter + Ctrl+Enter on textarea
+  const ta = document.getElementById('logStream');
+  if (ta) {
+    ta.addEventListener('input', updateByteCount);
+    ta.addEventListener('keydown', function (e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        runAnalysis();
+      }
+    });
+  }
+
+  // File input
+  const fi = document.getElementById('fileInput');
+  if (fi) {
+    fi.addEventListener('change', function (e) {
+      const f = e.target.files && e.target.files[0];
+      if (!f) return;
+      const reader = new FileReader();
+      reader.onload = function (ev) {
+        document.getElementById('logStream').value = ev.target.result || '';
+        updateByteCount();
+        document.getElementById('uploadFileName').textContent = '✓ ' + f.name + ' (' + Math.round(f.size / 1024) + ' KB)';
+        toast('success', 'File Loaded', f.name + ' is ready for analysis.');
+      };
+      reader.readAsText(f);
+    });
+  }
+
+  // Dropzone drag/drop
+  const dz = document.getElementById('dropzone');
+  if (dz) {
+    ['dragenter', 'dragover'].forEach(function (evt) {
+      dz.addEventListener(evt, function (e) {
+        e.preventDefault(); e.stopPropagation();
+        dz.classList.add('drag');
+      });
+    });
+    ['dragleave', 'drop'].forEach(function (evt) {
+      dz.addEventListener(evt, function (e) {
+        e.preventDefault(); e.stopPropagation();
+        if (evt === 'drop' || e.target === dz) dz.classList.remove('drag');
+      });
+    });
+    dz.addEventListener('drop', function (e) {
+      const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+      if (!f) return;
+      const reader = new FileReader();
+      reader.onload = function (ev) {
+        document.getElementById('logStream').value = ev.target.result || '';
+        updateByteCount();
+        document.getElementById('uploadFileName').textContent = '✓ ' + f.name;
+        toast('success', 'File Dropped', f.name + ' loaded into console.');
+      };
+      reader.readAsText(f);
+    });
+  }
+
+  // Modal backdrop close on click
+  const hm = document.getElementById('hexModal');
+  if (hm) {
+    hm.addEventListener('click', function (e) { if (e.target === hm) closeHex(); });
+  }
+
+  // Load persisted settings
+  try {
+    const k = localStorage.getItem('secops_key');
+    if (k) {
+      const apiIn = document.getElementById('apiKeyInput');
+      const pk = document.getElementById('persistKey');
+      if (apiIn) apiIn.value = k;
+      if (pk) pk.value = k;
+    }
+    const m = localStorage.getItem('secops_matrix');
+    if (m === 'off') {
+      document.getElementById('matrixToggle').value = 'off';
+      toggleMatrix('off');
+    }
+  } catch (e) {}
+
+  // Global keyboard shortcuts
+  document.addEventListener('keydown', function (e) {
+    // Ctrl/Cmd + Enter = Execute triage
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      if (STATE.view === 'analyzer') {
+        runAnalysis();
+      } else {
+        switchView('analyzer');
+        setTimeout(runAnalysis, 180);
+      }
+    }
+    // Ctrl/Cmd + K = Search focus
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+      e.preventDefault();
+      const s = document.getElementById('globalSearch');
+      if (s) { s.focus(); s.select(); }
+    }
+    // Escape = close modals / blur search
+    if (e.key === 'Escape') {
+      const hx = document.getElementById('hexModal');
+      if (hx && !hx.classList.contains('hidden')) {
+        closeHex();
+      } else {
+        const s = document.getElementById('globalSearch');
+        if (document.activeElement === s) s.blur();
+      }
+    }
+  });
+
+  // Search box Enter
+  const gs = document.getElementById('globalSearch');
+  if (gs) {
+    gs.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        runGlobalSearch(gs.value);
+      }
+    });
+  }
+
+  // Feed timestamp
+  const t1 = document.getElementById('feedTime1');
+  if (t1) t1.textContent = nowTime();
+
+  // Initial stats
+  document.getElementById('statAnalyses').textContent = STATE.analyses;
+  document.getElementById('statScore').textContent = '00';
+  document.getElementById('statCmds').textContent = STATE.commands;
+
+  // Welcome toast
+  setTimeout(function () {
+    toast('info', 'SecOps-AI Sentinel', 'Black Hat Edition online. Type "help" in the Terminal for available commands.');
+  }, 600);
+
+  // Auto-load radar with default state
+  updateRadarDots(0);
+  updateMitre(null);
+  updateIocs(null);
+  updateContainmentOutput();
+  updateExportOutput();
+}
+
+/* ============================================================
+   BOOTSTRAP
+============================================================ */
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
+</script>
+</body>
+</html>
