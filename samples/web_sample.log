@@ -1,0 +1,6 @@
+194.26.29.112 - - [17/Sep/2026:08:15:20 +0000] "GET /api/v1/products?cat=1 HTTP/1.1" 200 4520 "-" "Mozilla/5.0"
+194.26.29.112 - - [17/Sep/2026:08:15:22 +0000] "GET /api/v1/products?cat=1%27%20UNION%20SELECT%20null,username,password%20FROM%20users-- HTTP/1.1" 200 4520 "-" "sqlmap/1.6#stable"
+194.26.29.112 - - [17/Sep/2026:08:15:25 +0000] "GET /admin/login.php?user=admin%27%20OR%201=1-- HTTP/1.1" 302 512 "-" "sqlmap/1.6#stable"
+194.26.29.112 - - [17/Sep/2026:08:15:30 +0000] "GET /../../../../etc/passwd HTTP/1.1" 403 162 "-" "curl/7.88.1"
+194.26.29.112 - - [17/Sep/2026:08:15:32 +0000] "GET /wp-config.php.bak HTTP/1.1" 404 198 "-" "Nikto/2.1.6"
+194.26.29.112 - - [17/Sep/2026:08:15:35 +0000] "POST /api/v1/checkout HTTP/1.1" 500 891 "<script>alert('XSS')</script>" "Mozilla/5.0"

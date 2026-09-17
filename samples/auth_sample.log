@@ -1,0 +1,8 @@
+Sep 17 04:12:01 edge-srv01 sshd[2841]: Failed password for invalid user admin from 185.220.101.5 port 41202 ssh2
+Sep 17 04:12:03 edge-srv01 sshd[2843]: Failed password for root from 185.220.101.5 port 41208 ssh2
+Sep 17 04:12:06 edge-srv01 sshd[2847]: Failed password for root from 185.220.101.5 port 41214 ssh2
+Sep 17 04:12:09 edge-srv01 sshd[2850]: Failed password for invalid user test from 185.220.101.5 port 41220 ssh2
+Sep 17 04:12:12 edge-srv01 sshd[2855]: Failed password for invalid user oracle from 185.220.101.5 port 41228 ssh2
+Sep 17 04:12:15 edge-srv01 sshd[2860]: Failed password for root from 185.220.101.5 port 41235 ssh2
+Sep 17 04:12:18 edge-srv01 sshd[2866]: PAM 2 more authentication failures; logname= uid=0 euid=0 tty=ssh ruser= rhost=185.220.101.5 user=root
+Sep 17 04:12:22 edge-srv01 sshd[2870]: Maximum authentication attempts exceeded for root from 185.220.101.5 port 41240 ssh2 [preauth]
