@@ -1,4 +1,5 @@
 import os
+import base64
 from pathlib import Path
 from fastapi import FastAPI, Request, Form, UploadFile, File
 from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
@@ -35,7 +36,7 @@ SAMPLES = {
         '194.26.29.112 - - [17/Sep/2026:08:15:22 +0000] "GET /api/v1/products?cat=1%27%20UNION%20SELECT%20null,username,password%20FROM%20users-- HTTP/1.1" 200 4520 "-" "sqlmap/1.6#stable"\n'
         '194.26.29.112 - - [17/Sep/2026:08:15:25 +0000] "GET /admin/login.php?user=admin%27%20OR%201=1-- HTTP/1.1" 302 512 "-" "sqlmap/1.6#stable"\n'
         '194.26.29.112 - - [17/Sep/2026:08:15:30 +0000] "GET /../../../../etc/passwd HTTP/1.1" 403 162 "-" "curl/7.88.1"\n'
-        '194.26.29.112 - - [17/Sep/2026:08:15:35 +0000] "POST /api/v1/checkout HTTP/1.1" 500 891 "<script>alert(1)</script>" "Mozilla/5.0"'
+        '194.26.29.112 - - [17/Sep/2026:08:15:35 +0000] "POST /api/v1/checkout HTTP/1.1" 500 891 "XSS_SECURITY_PROBE" "Mozilla/5.0"'
     )
 }
 
@@ -56,10 +57,17 @@ async def fetch_sample_log(sample_type: str):
 @app.post("/api/analyze")
 async def execute_analysis(
     raw_logs: str = Form(""),
+    raw_logs_b64: str = Form(""),
     api_key: str = Form(""),
     file: UploadFile = File(None)
 ):
     content = raw_logs
+    if raw_logs_b64:
+        try:
+            content = base64.b64decode(raw_logs_b64).decode("utf-8", errors="ignore")
+        except Exception:
+            content = raw_logs
+
     if file and file.filename:
         file_bytes = await file.read()
         content = file_bytes.decode("utf-8", errors="ignore")
