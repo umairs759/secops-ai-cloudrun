@@ -88,7 +88,8 @@ pip install -r requirements.txt
 
 ### 3. Launch Local Server
 
-```uvicorn app.main:app --reload --port 8080
+```
+uvicorn app.main:app --reload --port 8080
 ```
 Open http://localhost:8080 in your browser.
 
