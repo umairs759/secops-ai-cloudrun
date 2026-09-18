@@ -2,11 +2,14 @@
 
 <div align="center">
 
+[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-SecOps--AI_CloudRun-success?style=for-the-badge&logo=render&logoColor=white)](https://secops-ai-cloudrun.onrender.com/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
 [![Single File](https://img.shields.io/badge/Single--File-HTML-46E3B7?style=for-the-badge&logo=html5&logoColor=white)]()
 [![Zero Backend](https://img.shields.io/badge/Backend-None_(100%25_Client--Side)-purple?style=for-the-badge)]()
 [![Multi AI](https://img.shields.io/badge/AI_Providers-8_Supported-8E75B2?style=for-the-badge)]()
 [![MITRE ATT&CK](https://img.shields.io/badge/Taxonomy-MITRE_v14-red?style=for-the-badge)](https://attack.mitre.org/)
+
+</div>
 
 **A single-file, zero-dependency, enterprise-grade SOC Copilot that runs entirely in your browser.**
 Ingests raw telemetry, maps to **MITRE ATT&CK**, extracts IoCs, generates containment rules
