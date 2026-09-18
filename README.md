@@ -140,23 +140,22 @@ Click any card on Mission Control to load & auto-analyze real-world traces:
     Air-gap mode: Leave all keys blank → heuristic engine runs entirely offline.
 
 ## 📂 Project Structure
+
 secops-ai-cloudrun/
-│
-├── index.html              # 🧠 The entire application (single-file, zero-backend)
-├── interface.png           # 🖼️ Mission Control UI preview (README banner)
-├── LICENSE                 # 📜 MIT License
-├── README.md               # 📖 Project documentation
-│
-├── samples/                # 📁 Sample telemetry for demo
-│   ├── auth_sample.log     #    SSH brute-force attack trace
-│   └── web_sample.log      #    Web SQL injection trace
-│
-├── docs/                   # 📁 Extended documentation
-│   ├── SETUP.md            #    Provider key setup guide
-│   └── ARCHITECTURE.md     #    Deep-dive on heuristic engine
-│
-├── .gitignore              # 🚫 Ignore OS/editor junk
-└── .nojekyll               # ⚙️ (Only if deploying to GitHub Pages)
+├── 📄 index.html          # 🧠 The entire application (single-file, zero-backend)
+├── 🖼️ interface.png       # 🖼️ Mission Control UI preview (README banner)
+├── 📜 LICENSE             # 📜 MIT License
+├── 📖 README.md           # 📖 Project documentation
+├── 🐳 Dockerfile          # 🐳 Container configuration for Cloud Run
+├── ⚙️ requirements.txt    # ⚙️ Python dependencies (if needed)
+├── 🌐 .env.example        # 🌐 Environment variables template
+├── 🚫 .dockerignore       # 🚫 Docker build ignore rules
+├── 📁 samples/            # 📁 Sample telemetry for demo
+│   ├── 📄 auth_sample.log #    SSH brute-force attack trace
+│   └── 📄 web_sample.log  #    Web SQL injection trace
+└── 📁 docs/               # 📁 Extended documentation
+    ├── 📄 SETUP.md        #    Provider key setup guide
+    └── 📄 ARCHITECTURE.md #    Deep-dive on heuristic engine
 
 That's it. No requirements.txt, no Dockerfile, no app/ folder, no venv. If you want to add a backend later (e.g., to proxy Anthropic calls), the code is modular enough to extract AI_CALLERS into a small FastAPI service.
 
